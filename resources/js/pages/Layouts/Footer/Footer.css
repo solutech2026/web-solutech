@@ -1,0 +1,501 @@
+.footer-modern-minimal {
+  background: #ffffff;
+  color: #1a1a1a;
+  border-top: 1px solid #f0f0f0;
+  position: relative;
+  padding: 64px 0 24px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Main Grid */
+.footer-main-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 48px;
+  margin-bottom: 64px;
+}
+
+@media (max-width: 992px) {
+  .footer-main-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+}
+
+@media (max-width: 576px) {
+  .footer-main-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+/* Brand Column - MODIFICADO */
+.footer-brand-column {
+  grid-column: span 1;
+}
+
+/* Logo como imagen */
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease;
+}
+
+.brand-logo:hover {
+  transform: translateY(-1px);
+}
+
+.logo-image {
+  height: 40px; /* Ajusta según tu logo */
+  width: auto;
+  display: block;
+  transition: filter 0.3s ease;
+}
+
+.brand-logo:hover .logo-image {
+  filter: brightness(1.1);
+}
+
+/* Fallback que se oculta cuando la imagen carga */
+.logo-fallback {
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Si la imagen falla, muestra el texto */
+.brand-logo img:not([src]),
+.brand-logo img[src=""],
+.brand-logo img[src*="undefined"] {
+  display: none;
+}
+
+.brand-logo img:not([src]) + .logo-fallback,
+.brand-logo img[src=""] + .logo-fallback,
+.brand-logo img[src*="undefined"] + .logo-fallback {
+  display: flex;
+}
+
+.logo-mark {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.brand-name {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.brand-primary {
+  color: #1a1a1a;
+}
+
+.brand-accent {
+  color: #667eea;
+}
+
+.brand-tagline {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 32px;
+}
+
+/* Responsive para logo */
+@media (max-width: 768px) {
+  .logo-image {
+    height: 32px;
+  }
+  
+  .brand-name {
+    font-size: 20px;
+  }
+  
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-image {
+    height: 28px;
+  }
+  
+  .brand-name {
+    font-size: 18px;
+  }
+}
+
+/* Newsletter - AÑADIDO PARA QUE EL FORM SE VEA BIEN */
+.newsletter-section {
+  margin-top: 32px;
+}
+
+.newsletter-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.newsletter-form {
+  width: 100%;
+}
+
+.newsletter-form .input-group {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+
+.newsletter-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px 0 0 8px;
+  font-size: 14px;
+  background: #fafafa;
+  transition: all 0.2s ease;
+  min-width: 0;
+}
+
+.newsletter-input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: #ffffff;
+}
+
+.newsletter-submit {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.newsletter-submit:hover {
+  opacity: 0.9;
+}
+
+.newsletter-submit:active {
+  transform: scale(0.98);
+}
+
+.arrow-icon {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.5;
+}
+
+/* Columns */
+.footer-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.column-title {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  color: #1a1a1a;
+}
+
+/* Services */
+.services-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.service-item {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #f5f7ff;
+  color: #667eea;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  width: fit-content;
+}
+
+.service-item:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Navigation */
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nav-link {
+  color: #666;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s ease;
+  position: relative;
+  padding: 4px 0;
+  display: inline-block;
+}
+
+.nav-link:hover {
+  color: #667eea;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #667eea;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Contact Info */
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.contact-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: #667eea;
+  margin-top: 2px;
+}
+
+.contact-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke-width: 1.5;
+}
+
+.contact-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #666;
+}
+
+/* Social Media - CORREGIDO */
+.footer-social {
+  grid-column: span 4;
+  margin-top: 0;
+}
+
+@media (max-width: 992px) {
+  .footer-social {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 576px) {
+  .footer-social {
+    grid-column: span 1;
+  }
+}
+
+.social-links {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  padding: 8px 0;
+}
+
+.social-link:hover {
+  color: #667eea;
+}
+
+.external-icon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+
+/* Footer Bottom */
+.footer-bottom {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 24px;
+}
+
+.footer-bottom-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .footer-bottom-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+.copyright {
+  display: flex;
+  flex-direction: column;
+}
+
+.copyright-text {
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 4px;
+}
+
+.copyright-subtext {
+  font-size: 12px;
+  color: #ccc;
+}
+
+.legal-links {
+  display: flex;
+}
+
+.legal-links-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.legal-link {
+  color: #999;
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.2s ease;
+}
+
+.legal-link:hover {
+  color: #667eea;
+}
+
+.legal-separator {
+  color: #e0e0e0;
+  font-size: 12px;
+}
+
+/* Back to Top Button */
+.back-to-top {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  z-index: 1000;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.arrow-up-icon {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+}
+
+/* Focus States */
+.newsletter-input:focus,
+.newsletter-submit:focus,
+.nav-link:focus,
+.legal-link:focus,
+.back-to-top:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .service-item,
+  .nav-link::after,
+  .back-to-top,
+  .newsletter-submit,
+  .brand-logo {
+    transition: none;
+  }
+  
+  .service-item:hover,
+  .back-to-top:hover {
+    transform: none;
+  }
+}
