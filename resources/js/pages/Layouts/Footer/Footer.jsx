@@ -6,7 +6,8 @@ const Footer = () => {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [subscriptionMessage, setSubscriptionMessage] = useState('');
-  const [subscriptionStatus, setSubscriptionStatus] = useState(''); // 'success', 'error', ''
+  const [subscriptionStatus, setSubscriptionStatus] = useState('');
+  const [logoError, setLogoError] = useState(false); // Estado para manejar error de imagen
 
   const services = [
     { name: 'Admin. de Sistemas', short: 'Sistemas' },
@@ -72,7 +73,6 @@ const Footer = () => {
         setSubscriptionMessage(data.message || '¡Te has suscrito exitosamente!');
         setEmail('');
 
-        // Limpiar mensaje después de 5 segundos
         setTimeout(() => {
           setSubscriptionMessage('');
           setSubscriptionStatus('');
@@ -109,30 +109,27 @@ const Footer = () => {
           {/* Brand Column */}
           <div className="footer-brand-column">
             <div className="brand-logo">
-              {/* Logo como imagen */}
-              <img
-                src="/img/logo_solutech.png"
-                alt="SoluTech Logo"
-                className="logo-image"
-                onError={(e) => {
-                  // Fallback si la imagen no carga
-                  e.target.style.display = 'none';
-                  const fallback = document.querySelector('.logo-fallback');
-                  if (fallback) {
-                    fallback.style.display = 'flex';
-                  }
-                }}
-              />
-
-              {/* Fallback de texto que se muestra solo si la imagen falla */}
-              <div className="logo-fallback">
-                <div className="logo-mark">ST</div>
-                <div className="brand-name">
-                  <span className="brand-primary">Solu</span>
-                  <span className="brand-accent">Tech</span>
+              {/* Logo como imagen con fallback */}
+              {!logoError ? (
+                <img
+                  src="./img/logo_solutech.jpeg"
+                  alt="SoluTech Logo"
+                  className="logo-image"
+                  onError={() => setLogoError(true)}
+                  onLoad={() => setLogoError(false)}
+                />
+              ) : (
+                // Fallback que se muestra si la imagen no carga
+                <div className="logo-fallback">
+                  <div className="logo-mark">ST</div>
+                  <div className="brand-name">
+                    <span className="brand-primary">Solu</span>
+                    <span className="brand-accent">Tech</span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
+            
             <p className="brand-tagline">
               Soluciones Tecnológicas Integrales
             </p>

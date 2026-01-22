@@ -44,7 +44,7 @@ const Home = () => {
   const stats = [
     { number: '99.9%', label: 'Tiempo de Actividad' },
     { number: '24/7', label: 'Soporte Disponible' },
-    { number: '500+', label: 'Clientes Satisfechos' },
+    { number: '15+', label: 'Clientes Satisfechos' },
     { number: '15+', label: 'Años de Experiencia' }
   ];
 

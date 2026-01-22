@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePage, Link } from '@inertiajs/react';
 import './Navbar.css';
-const brandIcon = '/img/logo_solutech.png';
+const brandIcon = '/img/logo_solutech1.png';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
