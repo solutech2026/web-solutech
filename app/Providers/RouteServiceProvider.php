@@ -43,11 +43,21 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
 
-            // API routes - IMPORTANTE
-            Route::prefix('api')
-                ->middleware('api')
-                ->namespace($this->namespace)
-                ->group(base_path('routes/api.php'));
+            // API routes - Agrega estos logs
+            \Illuminate\Support\Facades\Log::info('Intentando cargar API routes desde: ' . base_path('routes/api.php'));
+
+            if (file_exists(base_path('routes/api.php'))) {
+                \Illuminate\Support\Facades\Log::info('El archivo api.php existe');
+
+                Route::prefix('api')
+                    ->middleware('api')
+                    ->namespace($this->namespace)
+                    ->group(base_path('routes/api.php'));
+
+                \Illuminate\Support\Facades\Log::info('API routes cargadas exitosamente');
+            } else {
+                \Illuminate\Support\Facades\Log::error('El archivo api.php NO existe');
+            }
         });
     }
 

@@ -32,5 +32,9 @@ Route::get('/health', function () {
 
 // Ruta para el Newletter
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
-    ->middleware('web') // ← Esto es clave para CSRF token
     ->name('api.newsletter.subscribe');
+
+    // Ruta de prueba sin controlador
+Route::post('/api/test-simple', function() {
+    return response()->json(['message' => 'Funciona sin CSRF']);
+})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);

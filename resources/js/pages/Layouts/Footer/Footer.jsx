@@ -31,8 +31,8 @@ const Footer = () => {
   };
 
   const socialMedia = [
-    { name: 'LinkedIn', icon: '↗', url: 'https://linkedin.com' },
-    { name: 'Instagram', icon: '↗', url: 'https://instagram.com' },
+    { name: 'Facebook', icon: '↗', url: 'https://www.facebook.com/Solutech.ve' },
+    { name: 'Instagram', icon: '↗', url: 'https://www.instagram.com/solutechoficial.ve/' },
   ];
 
   const newsletterSubscribe = async (e) => {
@@ -55,7 +55,7 @@ const Footer = () => {
     setSubscriptionStatus('');
 
     try {
-      const response = await fetch('/newsletter/subscribe', {
+      const response = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -129,7 +129,7 @@ const Footer = () => {
                 </div>
               )}
             </div>
-            
+
             <p className="brand-tagline">
               Soluciones Tecnológicas Integrales
             </p>
