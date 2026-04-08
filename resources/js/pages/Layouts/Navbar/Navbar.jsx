@@ -6,7 +6,11 @@ const brandIcon = '/img/logo_solutech1.png';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { url } = usePage();
+  const { url, props } = usePage();
+  const { auth } = props; // Asumiendo que tienes auth en los props de Inertia
+
+  // Verificar si el usuario es administrador
+  const isAdmin = auth?.user?.role === 'admin' || auth?.user?.is_admin === true;
 
   // Maneja el scroll para cambiar el estilo
   useEffect(() => {
@@ -76,16 +80,50 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <Link
-            href="/contacto"
-            className="nav-cta"
-          >
-            <span>Contactar</span>
-            <svg viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </Link>
+          {/* Botón de Acceso - Solo para Administrador */}
+          {!auth?.user ? (
+            // Si no está autenticado, mostrar botón ACCEDER
+            <Link href="/login" className="nav-access-btn">
+              <svg viewBox="0 0 20 20" fill="currentColor" className="access-icon">
+                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+              </svg>
+              <span>Acceder</span>
+            </Link>
+          ) : isAdmin ? (
+            // Si es administrador autenticado, mostrar panel de admin
+            <div className="admin-menu">
+              <button className="admin-menu-button">
+                <div className="admin-avatar">
+                  <span>AD</span>
+                </div>
+                <span className="admin-name">Admin</span>
+                <svg className="dropdown-icon" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+              <div className="admin-dropdown">
+                <Link href="/admin/dashboard" className="dropdown-item">
+                  <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                  </svg>
+                  <span>Dashboard Admin</span>
+                </Link>
+                <Link href="/admin/access-control" className="dropdown-item">
+                  <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                  </svg>
+                  <span>Control de Acceso</span>
+                </Link>
+                <div className="dropdown-divider"></div>
+                <Link href="/logout" method="post" as="button" className="dropdown-item logout">
+                  <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 11H7a1 1 0 000 2h7.586l-1.293 1.293z" clipRule="evenodd" />
+                  </svg>
+                  <span>Cerrar Sesión</span>
+                </Link>
+              </div>
+            </div>
+          ) : null}
 
           {/* Mobile Menu Toggle */}
           <button
@@ -141,6 +179,38 @@ const Navbar = () => {
                 )}
               </Link>
             ))}
+            
+            {/* Botón de Acceder para móvil - Solo administrador no autenticado */}
+            {!auth?.user && (
+              <Link href="/login" className="mobile-access-btn" onClick={() => setIsOpen(false)}>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                </svg>
+                <span>Acceder</span>
+              </Link>
+            )}
+            
+            {/* Menú admin para móvil */}
+            {auth?.user && isAdmin && (
+              <>
+                <div className="mobile-admin-header">
+                  <div className="mobile-admin-avatar">AD</div>
+                  <div className="mobile-admin-info">
+                    <span className="mobile-admin-name">{auth.user.name || 'Administrador'}</span>
+                    <span className="mobile-admin-role">Administrador</span>
+                  </div>
+                </div>
+                <Link href="/admin/dashboard" className="mobile-nav-link" onClick={() => setIsOpen(false)}>
+                  <span>Dashboard Admin</span>
+                </Link>
+                <Link href="/admin/access-control" className="mobile-nav-link" onClick={() => setIsOpen(false)}>
+                  <span>Control de Acceso</span>
+                </Link>
+                <Link href="/logout" method="post" as="button" className="mobile-logout-btn" onClick={() => setIsOpen(false)}>
+                  <span>Cerrar Sesión</span>
+                </Link>
+              </>
+            )}
           </div>
 
           <div className="mobile-menu-footer">

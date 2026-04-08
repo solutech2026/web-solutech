@@ -1,0 +1,245 @@
+/* Settings Container */
+.settings-container {
+    padding: 0;
+}
+
+/* Settings Cards */
+.settings-card {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.settings-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.settings-card h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.settings-card h4 i {
+    color: #667eea;
+    font-size: 20px;
+}
+
+.settings-card .form-label {
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 8px;
+}
+
+.settings-card .form-control,
+.settings-card .form-select {
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+}
+
+.settings-card .form-control:focus,
+.settings-card .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Switch Styles */
+.form-switch .form-check-input {
+    width: 44px;
+    height: 22px;
+    border-radius: 22px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-switch .form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+.form-switch .form-check-label {
+    margin-left: 10px;
+    cursor: pointer;
+    color: #4b5563;
+    font-weight: 500;
+}
+
+/* Integration Items */
+.integration-item {
+    background: #f9fafb;
+    border-radius: 16px;
+    padding: 15px 20px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.integration-item:last-child {
+    margin-bottom: 0;
+}
+
+.integration-item:hover {
+    background: white;
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.integration-item i {
+    font-size: 24px;
+    color: #667eea;
+    margin-right: 12px;
+}
+
+.integration-item strong {
+    color: #1f2937;
+    font-size: 15px;
+}
+
+.integration-item .text-muted {
+    margin-top: 5px;
+    margin-left: 36px;
+}
+
+.integration-item .btn-outline-secondary {
+    border-radius: 10px;
+    padding: 6px 16px;
+    transition: all 0.3s ease;
+}
+
+.integration-item .btn-outline-secondary:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+}
+
+/* Action Buttons */
+.settings-actions {
+    background: white;
+    border-radius: 20px;
+    padding: 20px 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    text-align: right;
+}
+
+.settings-actions .btn-secondary {
+    background: #6c757d;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.settings-actions .btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+.settings-actions .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 10px 24px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.settings-actions .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Backup Button */
+.btn-outline-primary {
+    border-radius: 12px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: transparent;
+    transform: translateY(-2px);
+}
+
+/* Help Text */
+.form-text {
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .settings-card {
+        padding: 20px;
+    }
+    
+    .settings-card h4 {
+        font-size: 16px;
+    }
+    
+    .integration-item {
+        padding: 12px 15px;
+    }
+    
+    .integration-item i {
+        font-size: 20px;
+    }
+    
+    .integration-item strong {
+        font-size: 14px;
+    }
+    
+    .integration-item .text-muted {
+        margin-left: 32px;
+        font-size: 11px;
+    }
+    
+    .settings-actions {
+        text-align: center;
+    }
+    
+    .settings-actions .btn-secondary,
+    .settings-actions .btn-primary {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .settings-actions .btn-secondary {
+        margin-right: 0;
+    }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.settings-card {
+    animation: fadeInUp 0.4s ease forwards;
+    opacity: 0;
+}
+
+.settings-card:nth-child(1) { animation-delay: 0.05s; }
+.settings-card:nth-child(2) { animation-delay: 0.1s; }
+.settings-card:nth-child(3) { animation-delay: 0.15s; }
+.settings-card:nth-child(4) { animation-delay: 0.2s; }

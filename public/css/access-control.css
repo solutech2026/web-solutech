@@ -1,0 +1,396 @@
+/* Access Control Container */
+.access-control-container {
+    padding: 0;
+}
+
+/* Filter Card */
+.filter-card {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
+}
+
+.filter-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.filter-card h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-card h4 i {
+    color: #667eea;
+    font-size: 20px;
+}
+
+.filter-card .form-label {
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 8px;
+}
+
+.filter-card .form-select,
+.filter-card .form-control {
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+}
+
+.filter-card .form-select:focus,
+.filter-card .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Tabs Modernos */
+.access-tabs {
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 25px;
+    gap: 10px;
+}
+
+.access-tabs .nav-link {
+    color: #6b7280;
+    border: none;
+    padding: 12px 24px;
+    font-weight: 500;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.access-tabs .nav-link:hover {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.access-tabs .nav-link.active {
+    color: #667eea;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-bottom: 2px solid #667eea;
+}
+
+.access-tabs .nav-link i {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+/* Person Cards Grid */
+.persons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.person-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.person-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.person-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.person-card:hover::before {
+    transform: scaleX(1);
+}
+
+.person-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.person-avatar {
+    width: 65px;
+    height: 65px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.person-info {
+    flex: 1;
+}
+
+.person-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.person-type {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.person-type.employee {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.person-type.visitor {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.person-details {
+    margin-bottom: 15px;
+}
+
+.person-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.person-detail-item i {
+    width: 20px;
+    color: #667eea;
+}
+
+.person-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: #f3f4f6;
+    border-radius: 20px;
+    font-size: 11px;
+    color: #4b5563;
+}
+
+.person-badge.nfc {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.person-footer {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* Access Card */
+.access-card {
+    background: white;
+    border-radius: 20px;
+    padding: 35px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.access-card h4 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 25px;
+}
+
+.access-card h4 i {
+    color: #667eea;
+    margin-right: 10px;
+}
+
+.access-input-group {
+    margin-bottom: 25px;
+}
+
+.access-input-group .input-group-text {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-right: none;
+    border-radius: 16px 0 0 16px;
+}
+
+.access-input-group .form-control {
+    border: 1px solid #e5e7eb;
+    border-left: none;
+    border-radius: 0 16px 16px 0;
+    padding: 12px 15px;
+    font-size: 16px;
+}
+
+.access-input-group .form-control:focus {
+    border-color: #667eea;
+    box-shadow: none;
+}
+
+.access-input-group .btn {
+    border-radius: 16px;
+    margin-left: 10px;
+    padding: 12px 25px;
+}
+
+/* Logs Table */
+.logs-table {
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.logs-table thead th {
+    background: #f9fafb;
+    padding: 15px;
+    font-weight: 600;
+    color: #4b5563;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.logs-table tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.status-badge.granted {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.status-badge.denied {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 20px;
+    border: none;
+    overflow: hidden;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 20px 25px;
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.modal-title i {
+    margin-right: 8px;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.modal-footer {
+    border-top: 1px solid #f0f0f0;
+    padding: 20px 25px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filter-card {
+        padding: 20px;
+    }
+    
+    .access-tabs .nav-link {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    
+    .persons-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .access-card {
+        padding: 25px;
+    }
+    
+    .access-card h4 {
+        font-size: 18px;
+    }
+    
+    .logs-table {
+        font-size: 12px;
+    }
+    
+    .logs-table thead th,
+    .logs-table tbody td {
+        padding: 10px;
+    }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.person-card {
+    animation: fadeInUp 0.4s ease forwards;
+    opacity: 0;
+}
+
+.person-card:nth-child(1) { animation-delay: 0.05s; }
+.person-card:nth-child(2) { animation-delay: 0.1s; }
+.person-card:nth-child(3) { animation-delay: 0.15s; }
+.person-card:nth-child(4) { animation-delay: 0.2s; }
+.person-card:nth-child(5) { animation-delay: 0.25s; }
+.person-card:nth-child(6) { animation-delay: 0.3s; }

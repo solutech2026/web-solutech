@@ -1,0 +1,318 @@
+/* Top Navbar */
+.top-navbar {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 15px 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 998;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+/* Sección izquierda */
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Botón de menú */
+.menu-toggle-btn {
+    background: rgba(102, 126, 234, 0.1);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #667eea;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-toggle-btn:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Botón de colapsar sidebar (versión desktop) */
+.collapse-btn {
+    background: rgba(102, 126, 234, 0.1);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    color: #667eea;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.collapse-btn:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Título de página */
+.page-title {
+    transition: all 0.3s ease;
+}
+
+.page-title h4 {
+    margin: 0;
+    font-weight: 700;
+    color: #1f2937;
+    font-size: 20px;
+    background: linear-gradient(135deg, #1f2937 0%, #4b5563 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.page-title p {
+    margin: 0;
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 4px;
+}
+
+/* Menú de usuario */
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+/* Información del usuario */
+.user-info {
+    text-align: right;
+    padding-right: 10px;
+    border-right: 1px solid #e5e7eb;
+}
+
+.user-info .name {
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+}
+
+.user-info .role {
+    font-size: 11px;
+    color: #9ca3af;
+    margin: 0;
+    margin-top: 2px;
+}
+
+/* Avatar de usuario */
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+}
+
+.user-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Dropdown menu personalizado */
+.dropdown-menu {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 8px 0;
+    margin-top: 10px;
+    min-width: 200px;
+    animation: fadeInDown 0.2s ease;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-item {
+    padding: 10px 20px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item i {
+    width: 20px;
+    margin-right: 10px;
+    color: #9ca3af;
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    padding-left: 25px;
+}
+
+.dropdown-item:hover i {
+    color: #667eea;
+}
+
+.dropdown-item.text-danger:hover {
+    background: rgba(220, 38, 38, 0.1);
+}
+
+.dropdown-divider {
+    margin: 8px 0;
+    border-color: #e5e7eb;
+}
+
+/* Badge de notificaciones */
+.notification-badge {
+    position: relative;
+    cursor: pointer;
+    background: rgba(102, 126, 234, 0.1);
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.notification-badge:hover {
+    background: rgba(102, 126, 234, 0.2);
+}
+
+.notification-badge i {
+    color: #667eea;
+    font-size: 18px;
+}
+
+.notification-badge .badge-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #dc2626;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Buscador */
+.search-bar {
+    background: #f3f4f6;
+    border-radius: 12px;
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.search-bar:hover,
+.search-bar:focus-within {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.search-bar input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 14px;
+    width: 200px;
+}
+
+.search-bar input::placeholder {
+    color: #9ca3af;
+}
+
+.search-bar i {
+    color: #9ca3af;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .top-navbar {
+        padding: 12px 20px;
+    }
+    
+    .page-title h4 {
+        font-size: 18px;
+    }
+    
+    .page-title p {
+        display: none;
+    }
+    
+    .user-info {
+        display: none;
+    }
+    
+    .search-bar {
+        display: none;
+    }
+    
+    .collapse-btn {
+        display: none;
+    }
+    
+    .menu-toggle-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .notification-badge {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* Tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .search-bar input {
+        width: 150px;
+    }
+    
+    .user-info .name {
+        font-size: 13px;
+    }
+}
