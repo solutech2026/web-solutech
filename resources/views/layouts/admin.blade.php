@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <base target="_self">
     <title>Admin SoluTech - @yield('title', 'Control de Acceso')</title>
     
     <!-- Bootstrap 5 CSS -->
@@ -43,5 +44,16 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     @stack('scripts')
+    
+    <script>
+        // Forzar que todos los enlaces se abran en la misma ventana
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('a').forEach(function(link) {
+                if (link.target === '_blank') {
+                    link.target = '_self';
+                }
+            });
+        });
+    </script>
 </body>
 </html>

@@ -51,7 +51,7 @@
                         <button type="submit" class="btn btn-primary flex-grow-1">
                             <i class="fas fa-save"></i> Registrar Tarjeta
                         </button>
-                        <a href="{{ route('admin.nfc-cards') }}" class="btn btn-secondary flex-grow-1">
+                        <a href="{{ route('admin.nfc-cards.index') }}" class="btn btn-secondary flex-grow-1">
                             <i class="fas fa-arrow-left"></i> Cancelar
                         </a>
                     </div>
