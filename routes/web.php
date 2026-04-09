@@ -27,7 +27,7 @@ Route::get('/contacto', function () {
 })->name('contacto');
 
 // ============ RUTAS PÚBLICAS (Bio URLs) ============
-Route::get('/bio/{url}', [App\Http\Controllers\Public\BioController::class, 'show'])->name('public.bio');
+Route::get('/bio', [App\Http\Controllers\Public\BioController::class, 'show'])->name('public.bio');
 
 // ============ RUTAS API PARA ACCESO NFC ============
 Route::prefix('api')->group(function () {
