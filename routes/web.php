@@ -26,8 +26,12 @@ Route::get('/contacto', function () {
     return Inertia\Inertia::render('Contact/Contact');
 })->name('contacto');
 
+// ============ RUTAS PÚBLICAS (Bio) ============
+Route::get('/bio', [App\Http\Controllers\BioController::class, 'show'])->name('bio.show');
+Route::get('/bio/download-vcard', [App\Http\Controllers\BioController::class, 'downloadVCard'])->name('bio.download-vcard');
+
 // ============ RUTAS PÚBLICAS (Bio URLs) ============
-Route::get('/bio', [App\Http\Controllers\Public\BioController::class, 'show'])->name('public.bio');
+Route::get('/bio/{url}', [App\Http\Controllers\Public\BioController::class, 'show'])->name('public.bio');
 
 // ============ RUTAS API PARA ACCESO NFC ============
 Route::prefix('api')->group(function () {
