@@ -102,8 +102,8 @@
                 </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-4 register-links">
-                <a class="text-decoration-none small" href="{{ route('login') }}">
+            <div class="register-links">
+                <a href="{{ route('login') }}">
                     <i class="fas fa-arrow-left"></i> ¿Ya tienes cuenta? Inicia sesión
                 </a>
             </div>
@@ -112,8 +112,8 @@
                 <i class="fas fa-user-plus"></i> Registrarse
             </button>
 
-            <div class="text-center mt-3 register-links">
-                <a href="/" class="text-decoration-none small">
+            <div class="register-links mt-3">
+                <a href="/">
                     <i class="fas fa-home"></i> Volver al inicio
                 </a>
             </div>
