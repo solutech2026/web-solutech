@@ -1,0 +1,752 @@
+/* ============================================
+   NFC READER - ESTILOS MODERNOS SIN ROOT
+   ============================================ */
+
+/* Contenedor principal */
+.nfc-reader-container {
+    padding: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
+.reader-hero {
+    background: linear-gradient(135deg, #1a1a3e 0%, #0f0c29 100%);
+    border-radius: 1.5rem;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+}
+
+.reader-hero .hero-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.reader-hero .hero-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reader-hero .hero-icon i {
+    font-size: 1.75rem;
+    color: #818cf8;
+}
+
+.reader-hero .hero-text h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+}
+
+.reader-hero .hero-text p {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+}
+
+/* ============================================
+   CONNECTION TYPE SELECTOR
+   ============================================ */
+.connection-type-selector {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.connection-option {
+    flex: 1;
+    padding: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 1rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: white;
+    min-width: 120px;
+}
+
+.connection-option:hover {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.connection-option.selected {
+    border-color: #6366f1;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05));
+}
+
+.connection-option i {
+    font-size: 2rem;
+    color: #6366f1;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.connection-option h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0.5rem 0 0.25rem;
+    color: #1f2937;
+}
+
+.connection-option p {
+    font-size: 0.7rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* ============================================
+   CONFIGURATION CARDS
+   ============================================ */
+.config-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+.connection-config {
+    animation: fadeIn 0.3s ease;
+}
+
+/* ============================================
+   READER STATUS
+   ============================================ */
+.reader-status-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.status-label {
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-badge.connected {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.status-badge.disconnected {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.status-badge.testing {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+/* ============================================
+   FORM GROUPS
+   ============================================ */
+.form-group-reader {
+    margin-bottom: 1.5rem;
+}
+
+.form-group-reader label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.input-group-reader {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.input-group-reader .input-reader {
+    flex: 1;
+}
+
+.input-reader {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.input-reader:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.input-reader[readonly] {
+    background: #f9fafb;
+    cursor: not-allowed;
+}
+
+.select-reader {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.select-reader:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.com-port-select {
+    font-family: monospace;
+}
+
+/* ============================================
+   WIRELESS METHODS
+   ============================================ */
+.wireless-methods {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.method-btn {
+    flex: 1;
+    padding: 0.625rem;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.method-btn:hover {
+    background: #e5e7eb;
+}
+
+.method-btn.active {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    color: white;
+}
+
+.wireless-method-content {
+    animation: fadeIn 0.3s ease;
+}
+
+/* ============================================
+   QR CODE
+   ============================================ */
+.qr-container {
+    text-align: center;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 1rem;
+}
+
+.qr-code {
+    display: inline-block;
+    padding: 1rem;
+    background: white;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+}
+
+.qr-placeholder {
+    width: 200px;
+    height: 200px;
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    gap: 0.5rem;
+}
+
+.qr-placeholder i {
+    font-size: 3rem;
+    color: #9ca3af;
+}
+
+.qr-placeholder span {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.qr-instructions {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+/* ============================================
+   PIN CODE
+   ============================================ */
+.pin-container {
+    text-align: center;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 1rem;
+}
+
+.pin-code {
+    margin-bottom: 1rem;
+}
+
+.pin-display {
+    font-size: 2rem;
+    font-family: monospace;
+    font-weight: 700;
+    letter-spacing: 0.5rem;
+    background: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+.pin-instructions {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* ============================================
+   DEVICES LIST
+   ============================================ */
+.paired-devices {
+    margin-top: 1rem;
+    text-align: left;
+}
+
+.paired-devices h5 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #1f2937;
+}
+
+.empty-paired {
+    text-align: center;
+    padding: 1rem;
+    color: #9ca3af;
+    font-size: 0.75rem;
+}
+
+.scanning-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.devices-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+
+.device-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.device-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.device-info i {
+    font-size: 1.25rem;
+    color: #6366f1;
+}
+
+.device-info strong {
+    display: block;
+    font-size: 0.8rem;
+}
+
+.device-info small {
+    font-size: 0.65rem;
+    color: #9ca3af;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn-reader-primary {
+    padding: 0.75rem 1.25rem;
+    background: linear-gradient(135deg, #10b981, #34d399);
+    border: none;
+    border-radius: 0.75rem;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.btn-reader-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-reader-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-reader-secondary {
+    padding: 0.75rem 1.25rem;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border: none;
+    border-radius: 0.75rem;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.btn-reader-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.btn-reader-outline {
+    padding: 0.75rem 1.25rem;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 0.75rem;
+    color: #4b5563;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    flex: 1;
+}
+
+.btn-reader-outline:hover {
+    background: #e5e7eb;
+}
+
+.btn-secondary-sm {
+    padding: 0.5rem 1rem;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 0.5rem;
+    color: #4b5563;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-secondary-sm:hover {
+    background: #e5e7eb;
+}
+
+.btn-connect-sm {
+    padding: 0.375rem 0.875rem;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border: none;
+    border-radius: 0.5rem;
+    color: white;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-connect-sm:hover {
+    transform: translateY(-1px);
+}
+
+/* ============================================
+   STATUS MESSAGES
+   ============================================ */
+.status-message {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.status-message.info {
+    background: rgba(99, 102, 241, 0.1);
+    border-left: 3px solid #6366f1;
+    color: #3730a3;
+}
+
+.status-message.success {
+    background: rgba(16, 185, 129, 0.1);
+    border-left: 3px solid #10b981;
+    color: #065f46;
+}
+
+.status-message.error {
+    background: rgba(239, 68, 68, 0.1);
+    border-left: 3px solid #ef4444;
+    color: #991b1b;
+}
+
+/* ============================================
+   CONNECTION DETAILS
+   ============================================ */
+.connection-details {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: #f3f4f6;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-family: monospace;
+    color: #1f2937;
+}
+
+.connection-details strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-family: system-ui;
+}
+
+/* ============================================
+   SPINNER
+   ============================================ */
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   ALERT
+   ============================================ */
+.alert-reader {
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+}
+
+.alert-reader.info {
+    background: rgba(99, 102, 241, 0.08);
+    border-left: 3px solid #6366f1;
+    color: #1f2937;
+}
+
+.alert-reader.info i {
+    color: #6366f1;
+    margin-top: 0.125rem;
+}
+
+.alert-reader strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #1f2937;
+}
+
+/* ============================================
+   ACTION BUTTONS GROUP
+   ============================================ */
+.action-buttons-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.reader-form-card {
+    animation: fadeIn 0.4s ease;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .nfc-reader-container {
+        padding: 1rem;
+    }
+    
+    .reader-form-card {
+        padding: 1rem;
+    }
+    
+    .reader-hero .hero-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .connection-type-selector {
+        flex-direction: column;
+    }
+    
+    .connection-option {
+        width: 100%;
+    }
+    
+    .input-group-reader {
+        flex-direction: column;
+    }
+    
+    .btn-reader-primary {
+        justify-content: center;
+    }
+    
+    .action-buttons-group {
+        flex-direction: column;
+    }
+    
+    .wireless-methods {
+        flex-direction: column;
+    }
+    
+    .reader-status-card {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .pin-display {
+        font-size: 1.25rem;
+        letter-spacing: 0.25rem;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .qr-placeholder {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .config-card {
+        padding: 1rem;
+    }
+    
+    .device-item {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .device-info {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #818cf8, #c084fc);
+}

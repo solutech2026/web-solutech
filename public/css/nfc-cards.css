@@ -1,396 +1,621 @@
-/* NFC Cards Container */
+/* ============================================
+   NFC CARDS - ESTILOS MODERNOS SIN ROOT
+   ============================================ */
+
+/* Contenedor principal */
 .nfc-container {
-    padding: 0;
+    padding: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-/* Action Bar */
-.action-bar {
-    background: white;
-    border-radius: 20px;
-    padding: 20px 25px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    margin-bottom: 25px;
-    transition: all 0.3s ease;
+/* ============================================
+   HERO SECTION
+   ============================================ */
+.page-hero {
+    background: linear-gradient(135deg, #1a1a3e 0%, #0f0c29 100%);
+    border-radius: 1.5rem;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
 }
 
-.action-bar:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+.hero-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
-.action-bar .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    padding: 10px 20px;
-    border-radius: 12px;
-    transition: all 0.3s ease;
+.hero-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
-.action-bar .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-}
-
-.action-bar .btn-outline-secondary {
-    border-radius: 12px;
-    padding: 10px 20px;
-    transition: all 0.3s ease;
-}
-
-.action-bar .btn-outline-secondary:hover {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-color: transparent;
-    transform: translateY(-2px);
-}
-
-/* Search Box */
-.search-box {
-    position: relative;
-}
-
-.search-box .form-control {
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    padding: 10px 15px;
-    padding-right: 40px;
-    transition: all 0.3s ease;
-}
-
-.search-box .form-control:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.search-box .btn-search {
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #9ca3af;
-    cursor: pointer;
-    padding: 8px 12px;
-}
-
-.search-box .btn-search:hover {
-    color: #667eea;
-}
-
-/* Filter Select */
-.filter-select {
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    padding: 10px 15px;
-    min-width: 150px;
-    transition: all 0.3s ease;
-}
-
-.filter-select:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Stats Cards */
-.nfc-stat-card {
-    background: white;
-    border-radius: 20px;
-    padding: 22px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    text-align: center;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.nfc-stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-}
-
-.nfc-stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-}
-
-.nfc-stat-card:hover::before {
-    transform: scaleX(1);
-}
-
-.nfc-stat-icon {
-    width: 55px;
-    height: 55px;
-    border-radius: 16px;
+.hero-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+    border-radius: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
-    margin: 0 auto 15px;
+}
+
+.hero-icon i {
+    font-size: 1.75rem;
+    color: #818cf8;
+}
+
+.hero-text h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+}
+
+.hero-text p {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+}
+
+/* ============================================
+   BOTONES DEL HERO
+   ============================================ */
+.hero-right {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.btn-primary-modern {
+    padding: 0.625rem 1.25rem;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border: none;
+    border-radius: 0.75rem;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    color: white;
+}
+
+.btn-reader-config {
+    padding: 0.625rem 1.25rem;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.75rem;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-reader-config:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    color: white;
+}
+
+/* ============================================
+   STATS GRID
+   ============================================ */
+.stats-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card-glass {
+    background: white;
+    border-radius: 1rem;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 }
 
-.nfc-stat-card:hover .nfc-stat-icon {
-    transform: scale(1.05);
+.stat-card-glass:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-.nfc-stat-icon.primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.stat-icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon-circle i {
+    font-size: 1.5rem;
     color: white;
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
-.nfc-stat-icon.success {
-    background: #10b981;
-    color: white;
-    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+.stat-icon-circle.blue {
+    background: linear-gradient(135deg, #6366f1, #818cf8);
 }
 
-.nfc-stat-icon.warning {
-    background: #f59e0b;
-    color: white;
-    box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
+.stat-icon-circle.green {
+    background: linear-gradient(135deg, #10b981, #34d399);
 }
 
-.nfc-stat-title {
-    font-size: 13px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #9ca3af;
-    margin-bottom: 8px;
+.stat-icon-circle.orange {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
 }
 
-.nfc-stat-value {
-    font-size: 32px;
-    font-weight: 800;
+.stat-info-glass h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
     color: #1f2937;
 }
 
-/* Cards Grid */
-.cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+.stat-info-glass p {
+    margin: 0;
+    font-size: 0.7rem;
+    color: #6b7280;
 }
 
-/* Card Item */
-.nfc-card-item {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border-radius: 20px;
-    padding: 20px;
-    color: white;
+/* ============================================
+   FILTERS BAR
+   ============================================ */
+.filters-bar-modern {
+    background: white;
+    border-radius: 1rem;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.search-wrapper {
+    flex: 1;
+    min-width: 200px;
     position: relative;
+}
+
+.search-wrapper i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+.search-wrapper input {
+    width: 100%;
+    padding: 0.625rem 1rem 0.625rem 2.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.search-wrapper input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.filters-group {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.filter-select-modern {
+    padding: 0.625rem 2rem 0.625rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    font-size: 0.85rem;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-select-modern:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+.btn-export-modern {
+    padding: 0.625rem 1rem;
+    background: linear-gradient(135deg, #10b981, #34d399);
+    border: none;
+    border-radius: 0.75rem;
+    color: white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-export-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* ============================================
+   CARDS GRID
+   ============================================ */
+.cards-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.nfc-card-modern {
+    background: linear-gradient(135deg, #1a1a3e 0%, #0f0c29 100%);
+    border-radius: 1rem;
     overflow: hidden;
     transition: all 0.3s ease;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
 }
 
-.nfc-card-item::before {
-    content: '';
+.nfc-card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.card-chip-modern {
     position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 150px;
-    height: 150px;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-.nfc-card-item:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-}
-
-.card-chip {
-    width: 45px;
-    height: 35px;
-    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-    border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-
-.card-badge {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(5px);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 500;
-}
-
-.card-code {
-    font-family: 'Courier New', monospace;
-    font-size: 18px;
-    letter-spacing: 2px;
-    margin: 15px 0;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 8px 12px;
-    border-radius: 12px;
-    display: inline-block;
-}
-
-.card-assigned {
-    font-size: 12px;
+    top: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 30px;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    border-radius: 0.5rem;
     opacity: 0.8;
-    margin-bottom: 15px;
+}
+
+.card-badge-modern {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.card-badge-modern.assigned {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.card-badge-modern.unassigned {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.card-body-modern {
+    padding: 1.5rem;
+    text-align: center;
+    flex: 1;
+}
+
+.card-code-modern {
+    font-family: monospace;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 1px;
+    margin: 1rem 0;
+}
+
+.card-uid-modern {
+    font-family: monospace;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 1rem;
+}
+
+.card-person-modern {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+    margin: 0.5rem 0;
 }
 
-.card-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
+.card-person-modern i {
+    color: #818cf8;
+    font-size: 0.8rem;
 }
 
-.card-actions .btn-sm {
-    padding: 6px 12px;
-    border-radius: 10px;
-    font-size: 12px;
-    transition: all 0.3s ease;
-}
-
-.card-actions .btn-light {
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-}
-
-.card-actions .btn-light:hover {
-    background: white;
-    transform: scale(1.05);
-}
-
-.card-actions .btn-outline-light {
-    border: 1px solid rgba(255, 255, 255, 0.3);
+.card-person-modern span {
     color: white;
+    font-size: 0.8rem;
 }
 
-.card-actions .btn-outline-light:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.05);
+.card-company-modern {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.25rem;
 }
 
-/* Modal Styles */
-.modal-content {
-    border-radius: 20px;
+.card-notes-modern {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 0.5rem;
+}
+
+/* ============================================
+   CARD FOOTER
+   ============================================ */
+.card-footer-modern {
+    padding: 1rem 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    gap: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.action-btn {
+    flex: 1;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.action-btn.view {
+    background: rgba(99, 102, 241, 0.2);
+    color: #818cf8;
+}
+
+.action-btn.assign {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.action-btn.delete {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+.empty-state-modern {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 1rem;
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    background: #f3f4f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+.empty-icon i {
+    font-size: 2.5rem;
+    color: #9ca3af;
+}
+
+.empty-state-modern h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-modern p {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+}
+
+.empty-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+/* ============================================
+   MODAL
+   ============================================ */
+.modern-modal .modal-content {
+    border-radius: 1rem;
     border: none;
     overflow: hidden;
 }
 
-.modal-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.modern-modal .modal-header {
+    background: linear-gradient(135deg, #1a1a3e, #0f0c29);
     color: white;
     border: none;
-    padding: 20px 25px;
+    padding: 1.25rem 1.5rem;
 }
 
-.modal-header .btn-close {
+.modern-modal .modal-header .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modern-modal .modal-header .btn-close {
     filter: brightness(0) invert(1);
 }
 
-.modal-title i {
-    margin-right: 8px;
+.modern-modal .modal-body {
+    padding: 1.5rem;
 }
 
-.modal-body {
-    padding: 25px;
-}
-
-.modal-footer {
+.modern-modal .modal-footer {
+    padding: 1rem 1.5rem;
     border-top: 1px solid #f0f0f0;
-    padding: 20px 25px;
 }
 
-.modal-body .form-label {
-    font-weight: 500;
+.btn-secondary-modern {
+    padding: 0.625rem 1.25rem;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 0.75rem;
     color: #4b5563;
-    margin-bottom: 8px;
-}
-
-.modal-body .form-control,
-.modal-body .form-select {
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    padding: 10px 15px;
+    font-weight: 500;
+    cursor: pointer;
     transition: all 0.3s ease;
 }
 
-.modal-body .form-control:focus,
-.modal-body .form-select:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+.btn-secondary-modern:hover {
+    background: #e5e7eb;
 }
 
-/* Empty State */
-.empty-state {
+.loading-spinner {
     text-align: center;
-    padding: 60px 20px;
-    background: white;
-    border-radius: 20px;
-    border: 1px solid #e5e7eb;
-}
-
-.empty-state i {
-    font-size: 60px;
-    color: #d1d5db;
-    margin-bottom: 20px;
-}
-
-.empty-state p {
+    padding: 2rem;
     color: #9ca3af;
-    font-size: 16px;
 }
 
-/* Responsive */
+.loading-spinner::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 2px solid #f3f4f6;
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
 @media (max-width: 768px) {
-    .action-bar {
-        padding: 15px 20px;
+    .nfc-container {
+        padding: 1rem;
     }
     
-    .action-bar .d-flex {
+    .hero-content {
         flex-direction: column;
-        gap: 15px;
+        text-align: center;
     }
     
-    .action-bar .d-flex > div {
+    .hero-left {
+        flex-direction: column;
+    }
+    
+    .hero-right {
+        flex-direction: column;
         width: 100%;
     }
     
-    .search-box {
+    .btn-reader-config,
+    .btn-primary-modern {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .filters-bar-modern {
+        flex-direction: column;
+    }
+    
+    .search-wrapper {
         width: 100%;
     }
     
-    .filter-select {
+    .filters-group {
         width: 100%;
-        min-width: auto;
+        flex-direction: column;
     }
     
-    .cards-grid {
+    .filter-select-modern,
+    .btn-export-modern {
+        width: 100%;
+    }
+    
+    .cards-grid-modern {
         grid-template-columns: 1fr;
     }
     
-    .nfc-stat-value {
-        font-size: 24px;
+    .card-footer-modern {
+        flex-wrap: wrap;
+    }
+    
+    .empty-actions {
+        flex-direction: column;
+    }
+    
+    .empty-actions a {
+        width: 100%;
+        justify-content: center;
     }
 }
 
-/* Animations */
+@media (max-width: 480px) {
+    .stat-card-glass {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .card-body-modern {
+        padding: 1rem;
+    }
+    
+    .card-code-modern {
+        font-size: 1rem;
+    }
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -402,14 +627,40 @@
     }
 }
 
-.nfc-card-item {
+.nfc-card-modern {
     animation: fadeInUp 0.4s ease forwards;
     opacity: 0;
 }
 
-.nfc-card-item:nth-child(1) { animation-delay: 0.05s; }
-.nfc-card-item:nth-child(2) { animation-delay: 0.1s; }
-.nfc-card-item:nth-child(3) { animation-delay: 0.15s; }
-.nfc-card-item:nth-child(4) { animation-delay: 0.2s; }
-.nfc-card-item:nth-child(5) { animation-delay: 0.25s; }
-.nfc-card-item:nth-child(6) { animation-delay: 0.3s; }
+.nfc-card-modern:nth-child(1) { animation-delay: 0.05s; }
+.nfc-card-modern:nth-child(2) { animation-delay: 0.1s; }
+.nfc-card-modern:nth-child(3) { animation-delay: 0.15s; }
+.nfc-card-modern:nth-child(4) { animation-delay: 0.2s; }
+.nfc-card-modern:nth-child(5) { animation-delay: 0.25s; }
+.nfc-card-modern:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #818cf8, #c084fc);
+}

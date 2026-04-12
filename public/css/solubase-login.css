@@ -1,0 +1,660 @@
+/* solubase-login.css - Sin root, moderno y completo */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100;14..32,200;14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap');
+
+/* Reset y base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Wrapper principal */
+.solubase-login-wrapper {
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    overflow-x: hidden;
+}
+
+/* Fondo con efectos */
+.solubase-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background: linear-gradient(145deg, #0a0e27 0%, #1a1a3e 50%, #0a0e27 100%);
+    overflow: hidden;
+}
+
+.gradient-orb-1 {
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: float-orb1 15s ease-in-out infinite;
+}
+
+.gradient-orb-2 {
+    position: absolute;
+    bottom: -20%;
+    left: -5%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: float-orb2 20s ease-in-out infinite reverse;
+}
+
+.gradient-orb-3 {
+    position: absolute;
+    top: 40%;
+    left: 30%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(70px);
+    animation: float-orb3 18s ease-in-out infinite;
+}
+
+.grid-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+}
+
+/* Animaciones de orbes */
+@keyframes float-orb1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(40px, -40px) scale(1.05); }
+}
+
+@keyframes float-orb2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-50px, 30px) scale(0.95); }
+}
+
+@keyframes float-orb3 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(30px, 40px) rotate(5deg); }
+}
+
+/* Contenedor principal */
+.solubase-container {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.solubase-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    max-width: 1300px;
+    width: 100%;
+    background: rgba(15, 20, 45, 0.6);
+    backdrop-filter: blur(20px);
+    border-radius: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease;
+}
+
+/* Side izquierdo - Branding */
+.solubase-brand {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.08));
+    padding: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.solubase-brand::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+    animation: rotate-brand 20s linear infinite;
+}
+
+@keyframes rotate-brand {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.brand-content {
+    text-align: center;
+    max-width: 320px;
+    position: relative;
+    z-index: 1;
+}
+
+.logo-container {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.logo-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.5);
+    animation: pulse-logo 2s ease-in-out infinite;
+}
+
+@keyframes pulse-logo {
+    0%, 100% { transform: scale(1); box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.5); }
+    50% { transform: scale(1.05); box-shadow: 0 15px 40px -5px rgba(99, 102, 241, 0.7); }
+}
+
+.brand-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.solubase-blue {
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.solubase-purple {
+    background: linear-gradient(135deg, #a855f7, #d946ef);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.brand-tagline {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.brand-stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #818cf8;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.25rem;
+}
+
+/* Side derecho - Formulario */
+.solubase-form-container {
+    padding: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-card-modern {
+    width: 100%;
+    max-width: 420px;
+}
+
+.form-header-modern {
+    margin-bottom: 2rem;
+}
+
+.welcome-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(99, 102, 241, 0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #818cf8;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+}
+
+.form-header-modern h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.form-header-modern p {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+}
+
+/* Inputs modernos */
+.input-modern {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.input-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.input-label i {
+    font-size: 0.75rem;
+    color: #6366f1;
+}
+
+.input-field-modern {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.input-field-modern:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.input-field-modern::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.input-focus-border {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.input-field-modern:focus ~ .input-focus-border {
+    width: 100%;
+}
+
+/* Password wrapper */
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper .input-field-modern {
+    padding-right: 2.5rem;
+}
+
+.password-toggle-modern {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.password-toggle-modern:hover {
+    color: #818cf8;
+}
+
+/* Opciones del formulario */
+.form-options-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.checkbox-modern {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    position: relative;
+}
+
+.checkbox-modern input {
+    display: none;
+}
+
+.checkmark-modern {
+    width: 1rem;
+    height: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.25rem;
+    display: inline-block;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.checkbox-modern input:checked + .checkmark-modern {
+    background: #6366f1;
+    border-color: #6366f1;
+}
+
+.checkbox-modern input:checked + .checkmark-modern::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 0.625rem;
+}
+
+.forgot-link-modern {
+    font-size: 0.75rem;
+    color: #818cf8;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.forgot-link-modern:hover {
+    color: #a855f7;
+}
+
+/* Botón de login */
+.btn-login-modern {
+    width: 100%;
+    padding: 0.875rem;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border: none;
+    border-radius: 0.75rem;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-login-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -8px #6366f1;
+}
+
+.btn-login-modern:hover .btn-shine {
+    left: 100%;
+}
+
+.btn-login-modern i {
+    transition: transform 0.3s ease;
+}
+
+.btn-login-modern:hover i {
+    transform: translateX(4px);
+}
+
+/* Enlaces adicionales */
+.register-link-modern {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.register-link-modern a {
+    color: #818cf8;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.register-link-modern a:hover {
+    color: #a855f7;
+}
+
+.back-home-modern {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.back-home-modern a {
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+    font-size: 0.75rem;
+    transition: color 0.3s ease;
+}
+
+.back-home-modern a:hover {
+    color: #818cf8;
+}
+
+/* Social login */
+.social-login {
+    margin-top: 2rem;
+}
+
+.divider {
+    text-align: center;
+    position: relative;
+    margin: 1rem 0;
+}
+
+.divider span {
+    background: rgba(15, 20, 45, 0.6);
+    padding: 0 1rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: -1;
+}
+
+.social-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.social-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.social-btn:hover {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: #6366f1;
+    transform: translateY(-2px);
+}
+
+/* Alertas modernas */
+.alert-modern {
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    backdrop-filter: blur(10px);
+}
+
+.alert-error-modern {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+}
+
+.alert-success-modern {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #34d399;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .solubase-grid {
+        grid-template-columns: 1fr;
+        max-width: 550px;
+    }
+
+    .solubase-brand {
+        padding: 2rem;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .brand-stats {
+        display: none;
+    }
+
+    .solubase-form-container {
+        padding: 2rem;
+    }
+
+    .logo-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .brand-title {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .solubase-container {
+        padding: 1rem;
+    }
+
+    .solubase-form-container {
+        padding: 1.5rem;
+    }
+
+    .form-header-modern h2 {
+        font-size: 1.5rem;
+    }
+
+    .social-buttons {
+        gap: 0.75rem;
+    }
+
+    .social-btn {
+        width: 2rem;
+        height: 2rem;
+    }
+}
+
+/* Animaciones adicionales */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-card-modern {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

@@ -1,0 +1,523 @@
+/* solubase-register.css - Estilos modernos para registro */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100;14..32,200;14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap');
+
+/* Reset y base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Wrapper principal */
+.solubase-register-wrapper {
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+/* Fondo con efectos */
+.solubase-background-register {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background: linear-gradient(145deg, #0a0e27 0%, #1a1a3e 50%, #0a0e27 100%);
+    overflow: hidden;
+}
+
+.gradient-orb-1-register {
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: float-orb1-register 15s ease-in-out infinite;
+}
+
+.gradient-orb-2-register {
+    position: absolute;
+    bottom: -20%;
+    left: -5%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: float-orb2-register 20s ease-in-out infinite reverse;
+}
+
+.gradient-orb-3-register {
+    position: absolute;
+    top: 40%;
+    left: 30%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(70px);
+    animation: float-orb3-register 18s ease-in-out infinite;
+}
+
+.grid-pattern-register {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+}
+
+/* Animaciones */
+@keyframes float-orb1-register {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(40px, -40px) scale(1.05); }
+}
+
+@keyframes float-orb2-register {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-50px, 30px) scale(0.95); }
+}
+
+@keyframes float-orb3-register {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(30px, 40px) rotate(5deg); }
+}
+
+/* Contenedor principal */
+.solubase-register-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Tarjeta de registro */
+.solubase-register-card {
+    background: rgba(15, 20, 45, 0.7);
+    backdrop-filter: blur(20px);
+    border-radius: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 2.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeInUp-register 0.6s ease-out;
+}
+
+.solubase-register-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes fadeInUp-register {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header */
+.register-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.logo-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.logo-icon-register {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+    border-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse-logo-register 2s ease-in-out infinite;
+}
+
+@keyframes pulse-logo-register {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.register-title-solubase {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.solubase-blue {
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.solubase-purple {
+    background: linear-gradient(135deg, #a855f7, #d946ef);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.register-subtitle-solubase {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(99, 102, 241, 0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #818cf8;
+    margin-top: 1rem;
+}
+
+/* Inputs */
+.input-group-register {
+    margin-bottom: 1.5rem;
+}
+
+.input-label-register {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.input-label-register i {
+    font-size: 0.75rem;
+    color: #6366f1;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-field-register {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.input-field-register:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.input-field-register::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.input-focus-border-register {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+.input-field-register:focus ~ .input-focus-border-register {
+    width: 100%;
+}
+
+/* Password toggle */
+.password-toggle-register {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 0;
+    z-index: 2;
+}
+
+.password-toggle-register:hover {
+    color: #818cf8;
+}
+
+.input-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.input-hint i {
+    font-size: 0.7rem;
+}
+
+/* Botón de registro */
+.btn-register-solubase {
+    width: 100%;
+    padding: 0.875rem;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border: none;
+    border-radius: 0.75rem;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+}
+
+.btn-shine-register {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-register-solubase:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -8px #6366f1;
+}
+
+.btn-register-solubase:hover .btn-shine-register {
+    left: 100%;
+}
+
+.btn-register-solubase i {
+    transition: transform 0.3s ease;
+}
+
+.btn-register-solubase:hover i {
+    transform: translateX(4px);
+}
+
+/* Enlaces */
+.register-links-solubase {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.register-links-solubase a {
+    flex: 1;
+    text-align: center;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.75rem;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.login-link {
+    color: #818cf8;
+}
+
+.login-link:hover {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: #6366f1;
+    transform: translateY(-2px);
+}
+
+.home-link {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.home-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Términos y condiciones */
+.register-terms {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.register-terms a {
+    color: #818cf8;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.register-terms a:hover {
+    color: #a855f7;
+}
+
+/* Alertas */
+.alert-modern {
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    backdrop-filter: blur(10px);
+}
+
+.alert-error-register {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+}
+
+.alert-error-register div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .solubase-register-wrapper {
+        padding: 1rem;
+        align-items: flex-start;
+        padding-top: 2rem;
+    }
+
+    .solubase-register-card {
+        padding: 1.5rem;
+    }
+
+    .register-title-solubase {
+        font-size: 2rem;
+    }
+
+    .logo-icon-register {
+        width: 55px;
+        height: 55px;
+    }
+
+    .register-links-solubase {
+        flex-direction: column;
+    }
+
+    .register-links-solubase a {
+        padding: 0.625rem;
+    }
+
+    .input-field-register {
+        padding: 0.75rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .solubase-register-card {
+        padding: 1.25rem;
+    }
+
+    .register-title-solubase {
+        font-size: 1.75rem;
+    }
+
+    .header-badge {
+        font-size: 0.7rem;
+    }
+
+    .input-label-register {
+        font-size: 0.7rem;
+    }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Autocompletado estilos */
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+    -webkit-text-fill-color: white;
+    -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.05) inset;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #818cf8, #c084fc);
+}

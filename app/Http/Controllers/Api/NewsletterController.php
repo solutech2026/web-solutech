@@ -3,181 +3,150 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\NewsletterWelcomeMail;
 use App\Models\NewsletterSubscriber;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class NewsletterController extends Controller
 {
     /**
-     * Suscribir email al newsletter
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * Suscribir un email al newsletter
      */
     public function subscribe(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'source' => 'nullable|string|max:50'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email inválido',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
         try {
-            // Validar el email
-            $validator = Validator::make($request->all(), [
-                'email' => 'required|email|max:255',
-            ]);
+            // Verificar si ya está suscrito activo
+            $existing = NewsletterSubscriber::where('email', $request->email)
+                ->where('status', 'active')
+                ->first();
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Por favor ingresa un email válido.',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            $email = $request->input('email');
-
-            // Verificar si ya está suscrito
-            $existing = NewsletterSubscriber::where('email', $email)->first();
-            
             if ($existing) {
-                if ($existing->unsubscribed_at) {
-                    // Re-suscribir usuario que se había dado de baja
-                    $existing->update([
-                        'subscribed_at' => now(),
-                        'unsubscribed_at' => null,
-                        'status' => 'active'
-                    ]);
-                    
-                    Mail::to($email)->send(new NewsletterWelcomeMail($email));
-                    
-                    return response()->json([
-                        'success' => true,
-                        'message' => '¡Bienvenido de nuevo! Te has re-suscrito exitosamente.',
-                        'data' => ['email' => $email]
-                    ]);
-                }
-                
                 return response()->json([
                     'success' => false,
-                    'message' => 'Este email ya está suscrito a nuestro newsletter.',
-                ], 409);
+                    'message' => 'Este email ya está suscrito al newsletter'
+                ], 400);
             }
 
-            // Crear nuevo suscriptor
-            $subscriber = NewsletterSubscriber::create([
-                'email' => $email,
-                'subscribed_at' => now(),
-                'status' => 'active',
-                'source' => 'website_footer',
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent()
-            ]);
-
-            // Enviar email de bienvenida
-            Mail::to($email)->send(new NewsletterWelcomeMail($email));
-
-            // Opcional: Notificar al administrador
-            // Mail::to('admin@solutech.com')->send(new NewSubscriberNotification($email));
+            // Suscribir o reactivar
+            $subscriber = NewsletterSubscriber::subscribe(
+                $request->email,
+                $request->source ?? 'api',
+                $request->ip(),
+                $request->userAgent()
+            );
 
             return response()->json([
                 'success' => true,
-                'message' => '¡Gracias por suscribirte! Te hemos enviado un email de confirmación.',
+                'message' => 'Suscripción exitosa. Revisa tu correo para confirmar.',
                 'data' => [
-                    'email' => $email,
-                    'subscribed_at' => $subscriber->subscribed_at->format('d/m/Y'),
-                    'id' => $subscriber->id
+                    'email' => $subscriber->email,
+                    'subscribed_at' => $subscriber->subscribed_at
                 ]
-            ], 201);
-
-        } catch (\Exception $e) {
-            Log::error('Error en suscripción newsletter: ' . $e->getMessage(), [
-                'email' => $request->input('email'),
-                'ip' => $request->ip()
             ]);
 
+        } catch (\Exception $e) {
+            Log::error('Newsletter subscription error: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Ocurrió un error al procesar tu suscripción. Por favor, intenta nuevamente más tarde.',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'message' => 'Error al procesar la suscripción'
             ], 500);
         }
     }
 
     /**
-     * Cancelar suscripción (opcional)
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * Desuscribir un email
      */
     public function unsubscribe(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email inválido'
+            ], 422);
+        }
+
         try {
-            $validator = Validator::make($request->all(), [
-                'email' => 'required|email|max:255',
-            ]);
+            $subscriber = NewsletterSubscriber::unsubscribe($request->email);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Email inválido.',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            $email = $request->input('email');
-            
-            $subscriber = NewsletterSubscriber::where('email', $email)->first();
-            
             if (!$subscriber) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No encontramos este email en nuestra lista de suscriptores.',
+                    'message' => 'Email no encontrado en la lista'
                 ], 404);
             }
 
-            if ($subscriber->unsubscribed_at) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Este email ya se había dado de baja anteriormente.',
-                ], 409);
-            }
-
-            $subscriber->update([
-                'unsubscribed_at' => now(),
-                'status' => 'unsubscribed'
-            ]);
-
             return response()->json([
                 'success' => true,
-                'message' => 'Te has dado de baja exitosamente. Lamentamos verte ir.',
+                'message' => 'Te has desuscrito del newsletter exitosamente'
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error en baja newsletter: ' . $e->getMessage());
+            Log::error('Newsletter unsubscribe error: ' . $e->getMessage());
             
             return response()->json([
                 'success' => false,
-                'message' => 'Error al procesar la baja. Por favor, contacta con soporte.',
+                'message' => 'Error al procesar la desuscripción'
             ], 500);
         }
     }
 
     /**
-     * Obtener lista de suscriptores (protegido)
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * Listar suscriptores (solo admin)
      */
     public function index(Request $request)
     {
-        // Solo para administradores
-        // $this->authorize('viewAny', NewsletterSubscriber::class);
-        
-        $subscribers = NewsletterSubscriber::orderBy('created_at', 'desc')->paginate(50);
-        
+        // Aquí deberías agregar middleware de autenticación
+        $subscribers = NewsletterSubscriber::orderBy('created_at', 'desc')
+            ->paginate($request->get('limit', 20));
+
         return response()->json([
             'success' => true,
             'data' => $subscribers
+        ]);
+    }
+
+    /**
+     * Verificar si un email está suscrito
+     */
+    public function check(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email inválido'
+            ], 422);
+        }
+
+        $subscriber = NewsletterSubscriber::where('email', $request->email)
+            ->where('status', 'active')
+            ->first();
+
+        return response()->json([
+            'success' => true,
+            'is_subscribed' => !is_null($subscriber)
         ]);
     }
 }

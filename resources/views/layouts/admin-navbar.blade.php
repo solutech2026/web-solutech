@@ -82,14 +82,14 @@
         
         if (sidebarCollapsed) {
             sidebar.classList.add('collapsed');
-            mainContent.classList.add('expanded');
+            if (mainContent) mainContent.classList.add('expanded');
             if (collapseIcon) {
                 collapseIcon.classList.remove('fa-chevron-left');
                 collapseIcon.classList.add('fa-chevron-right');
             }
         } else {
             sidebar.classList.remove('collapsed');
-            mainContent.classList.remove('expanded');
+            if (mainContent) mainContent.classList.remove('expanded');
             if (collapseIcon) {
                 collapseIcon.classList.remove('fa-chevron-right');
                 collapseIcon.classList.add('fa-chevron-left');
@@ -107,12 +107,14 @@
         }
     });
     
-    // Cambiar sombra al hacer scroll
+    // Cambiar sombra al hacer scroll - Solubase style
     window.addEventListener('scroll', function() {
         const navbar = document.querySelector('.top-navbar');
         if (window.scrollY > 50) {
-            navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+            navbar.classList.add('scrolled');
+            navbar.style.boxShadow = '0 4px 20px rgba(99, 102, 241, 0.15)';
         } else {
+            navbar.classList.remove('scrolled');
             navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.05)';
         }
     });

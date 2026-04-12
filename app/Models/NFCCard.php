@@ -5,21 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class NFCCard extends Model
+class NfcCard extends Model
 {
     use HasFactory;
 
-    // Especificar explícitamente el nombre de la tabla
     protected $table = 'nfc_cards';
 
     protected $fillable = [
         'card_code',
-        'person_id',
+        'card_uid',
+        'assigned_to',
+        'assigned_at',
         'status',
         'notes',
         'metadata',
-        'assigned_at',
         'last_used_at'
+        // ELIMINA 'person_id' del fillable
     ];
 
     protected $casts = [
@@ -28,36 +29,59 @@ class NFCCard extends Model
         'metadata' => 'array'
     ];
 
-    // Relaciones
+    /**
+     * Relación con la persona asignada (usando assigned_to)
+     */
+    public function assignedPerson()
+    {
+        return $this->belongsTo(Person::class, 'assigned_to');
+    }
+
+    /**
+     * Relación con la persona (usando assigned_to)
+     */
     public function person()
     {
-        return $this->belongsTo(Person::class);
+        return $this->belongsTo(Person::class, 'assigned_to');
     }
 
-    public function accessLogs()
+    /**
+     * Verificar si está asignada
+     */
+    public function isAssigned()
     {
-        return $this->hasMany(AccessLog::class);
+        return !is_null($this->assigned_to);
     }
 
-    // Scopes
+    /**
+     * Scope para tarjetas disponibles
+     */
+    public function scopeAvailable($query)
+    {
+        return $query->whereNull('assigned_to')->where('status', 'active');
+    }
+
+    /**
+     * Scope para tarjetas activas
+     */
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
     }
 
+    /**
+     * Scope para tarjetas asignadas
+     */
     public function scopeAssigned($query)
     {
-        return $query->whereNotNull('person_id');
+        return $query->whereNotNull('assigned_to');
     }
 
-    public function scopeUnassigned($query)
+    /**
+     * Get assigned person name
+     */
+    public function getAssignedPersonNameAttribute()
     {
-        return $query->whereNull('person_id');
-    }
-
-    // Accessors
-    public function getIsAssignedAttribute()
-    {
-        return !is_null($this->person_id);
+        return $this->assignedPerson ? $this->assignedPerson->full_name : null;
     }
 }

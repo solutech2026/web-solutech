@@ -9,6 +9,8 @@ class NewsletterSubscriber extends Model
 {
     use HasFactory;
 
+    protected $table = 'newsletter_subscribers';
+
     protected $fillable = [
         'email',
         'subscribed_at',
@@ -26,13 +28,45 @@ class NewsletterSubscriber extends Model
         'metadata' => 'array'
     ];
 
+    /**
+     * Scope para suscriptores activos
+     */
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
     }
 
-    public function scopeSubscribed($query)
+    /**
+     * Suscribir un email
+     */
+    public static function subscribe($email, $source = null, $ip = null, $userAgent = null)
     {
-        return $query->whereNotNull('subscribed_at')->whereNull('unsubscribed_at');
+        return self::updateOrCreate(
+            ['email' => $email],
+            [
+                'status' => 'active',
+                'subscribed_at' => now(),
+                'unsubscribed_at' => null,
+                'source' => $source,
+                'ip_address' => $ip,
+                'user_agent' => $userAgent,
+                'metadata' => json_encode(['subscribed_via' => 'api'])
+            ]
+        );
+    }
+
+    /**
+     * Desuscribir un email
+     */
+    public static function unsubscribe($email)
+    {
+        $subscriber = self::where('email', $email)->first();
+        if ($subscriber) {
+            $subscriber->update([
+                'status' => 'unsubscribed',
+                'unsubscribed_at' => now()
+            ]);
+        }
+        return $subscriber;
     }
 }

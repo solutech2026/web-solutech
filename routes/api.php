@@ -1,40 +1,61 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Api\NewsletterController;
+use App\Http\Controllers\Api\AccessController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
 */
 
-// Ruta para el formulario de contacto (desde tu componente React)
-Route::post('/contact/send', [PageController::class, 'sendContact'])
-    ->middleware('web') // Importante para CSRF token
-    ->name('api.contact.send');
-
-// Ruta de verificación de salud de la API
+// ============================================
+// VERIFICACIÓN DE SALUD
+// ============================================
 Route::get('/health', function () {
     return response()->json([
         'status' => 'online',
-        'service' => 'SoluTech API',
+        'service' => 'Solubase API',
         'timestamp' => now()->toDateTimeString(),
-        'version' => '1.0.0'
+        'version' => '2.0.0'
     ]);
 });
 
-// Ruta para el Newletter
-Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
-    ->name('api.newsletter.subscribe');
+// ============================================
+// FORMULARIO DE CONTACTO
+// ============================================
+Route::post('/contact/send', [PageController::class, 'sendContact'])
+    ->middleware('web')
+    ->name('api.contact.send');
 
-    // Ruta de prueba sin controlador
-Route::post('/api/test-simple', function() {
-    return response()->json(['message' => 'Funciona sin CSRF']);
-})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+// ============================================
+// NEWSLETTER
+// ============================================
+Route::prefix('newsletter')->name('api.newsletter.')->group(function () {
+    Route::post('/subscribe', [NewsletterController::class, 'subscribe'])->name('subscribe');
+    Route::post('/unsubscribe', [NewsletterController::class, 'unsubscribe'])->name('unsubscribe');
+    Route::get('/check', [NewsletterController::class, 'check'])->name('check');
+
+    // Rutas protegidas (solo admin)
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/subscribers', [NewsletterController::class, 'index'])->name('subscribers');
+    });
+});
+
+// ============================================
+// ACCESO NFC
+// ============================================
+Route::prefix('access')->name('api.access.')->group(function () {
+    // Rutas públicas (el lector NFC llama a estas)
+    Route::post('/validate', [AccessController::class, 'validateAccess'])->name('validate');
+    Route::post('/reader/read', [AccessController::class, 'readFromReader'])->name('reader');
+
+    // Rutas protegidas (requieren autenticación)
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/logs', [AccessController::class, 'getLogs'])->name('logs');
+        Route::get('/stats', [AccessController::class, 'getStats'])->name('stats');
+        Route::get('/person/{id}/last', [AccessController::class, 'getLastAccess'])->name('person.last');
+    });
+});

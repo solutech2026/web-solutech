@@ -1,8 +1,11 @@
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="text-center">
-            <img src="/img/logo_solutech1.png" alt="SoluTech" class="logo">
-            <h3>SoluTech</h3>
+            <img src="/img/logo_solutech1.png" alt="Solubase" class="logo">
+            <h3>
+                <span class="solubase-blue">Solu</span>
+                <span class="solubase-purple">Base</span>
+            </h3>
             <p>Sistema de Control de Acceso</p>
         </div>
     </div>
@@ -67,7 +70,7 @@
     
     <div class="sidebar-footer">
         <i class="fas fa-shield-alt"></i>
-        <span>Versión 1.0</span>
+        <span>Versión 2.0</span>
     </div>
 </div>
 
@@ -90,14 +93,14 @@
         
         if (sidebarCollapsed) {
             sidebar.classList.add('collapsed');
-            mainContent.classList.add('expanded');
+            if (mainContent) mainContent.classList.add('expanded');
             if (collapseIcon) {
                 collapseIcon.classList.remove('fa-chevron-left');
                 collapseIcon.classList.add('fa-chevron-right');
             }
         } else {
             sidebar.classList.remove('collapsed');
-            mainContent.classList.remove('expanded');
+            if (mainContent) mainContent.classList.remove('expanded');
             if (collapseIcon) {
                 collapseIcon.classList.remove('fa-chevron-right');
                 collapseIcon.classList.add('fa-chevron-left');

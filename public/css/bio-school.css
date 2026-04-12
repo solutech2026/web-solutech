@@ -1,0 +1,120 @@
+/* ============================================
+   BIO SCHOOL - ESTILOS MODERNOS SIN ROOT
+   ============================================ */
+
+.school-theme .bio-header.school-header {
+    background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+}
+
+.school-theme .school-decoration {
+    position: absolute;
+    top: 0;
+    right: 20px;
+    font-size: 4rem;
+    opacity: 0.1;
+}
+
+.school-theme .bio-badge.category.school {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.school-theme .bio-badge.subcategory.student {
+    background: #ffd700;
+    color: #134e5e;
+}
+
+.school-theme .bio-badge.subcategory.teacher {
+    background: #4c9f70;
+    color: white;
+}
+
+.school-theme .bio-badge.subcategory.administrative {
+    background: #2c3e50;
+    color: white;
+}
+
+.school-theme .bio-company {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2rem;
+    display: inline-block;
+    font-size: 0.8rem;
+}
+
+.school-theme .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #71b280;
+}
+
+.school-theme .section-header i {
+    font-size: 1.25rem;
+    color: #134e5e;
+}
+
+.school-theme .section-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #134e5e;
+    margin: 0;
+}
+
+.school-theme .section-header.small h4 {
+    font-size: 0.85rem;
+    margin: 0;
+    color: #134e5e;
+}
+
+.school-theme .academic-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.school-theme .stat-card {
+    text-align: center;
+    padding: 1rem;
+    background: linear-gradient(135deg, #e8f5e9, #c8e6d9);
+    border-radius: 1rem;
+    border: 1px solid #71b280;
+}
+
+.school-theme .stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #134e5e;
+}
+
+.school-theme .stat-label {
+    font-size: 0.7rem;
+    color: #4a5568;
+    margin-top: 0.25rem;
+}
+
+.school-theme .info-card.highlight {
+    background: linear-gradient(135deg, #e8f5e9, #d4ecd9);
+    border: 1px solid #71b280;
+}
+
+.school-theme .info-card.warning {
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    border-left: 3px solid #ff9800;
+}
+
+.school-theme .info-card.emergency {
+    background: linear-gradient(135deg, #ffebee, #ffcdd2);
+    border-left: 3px solid #f44336;
+}
+
+@media (max-width: 768px) {
+    .school-theme .academic-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+}

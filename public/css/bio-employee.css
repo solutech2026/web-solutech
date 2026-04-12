@@ -1,0 +1,57 @@
+/* ============================================
+   BIO EMPLOYEE - ESTILOS MODERNOS SIN ROOT
+   ============================================ */
+
+.employee-theme .bio-header.employee-header {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}
+
+.employee-theme .bio-badge.category.employee {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.employee-theme .bio-company {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2rem;
+    display: inline-block;
+    font-size: 0.8rem;
+}
+
+.employee-theme .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #2a5298;
+}
+
+.employee-theme .section-header i {
+    font-size: 1.25rem;
+    color: #2a5298;
+}
+
+.employee-theme .section-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e3c72;
+    margin: 0;
+}
+
+.employee-theme .info-card.highlight {
+    background: linear-gradient(135deg, #e8f0fe, #d4e4fc);
+    border: 1px solid #2a5298;
+}
+
+.employee-theme .info-card.highlight i {
+    color: #2a5298;
+}
+
+.employee-theme .employee-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}

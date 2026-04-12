@@ -1,0 +1,450 @@
+/* ============================================
+   NFC FORMS - ESTILOS MODERNOS SIN ROOT
+   ============================================ */
+
+/* Contenedor principal */
+.nfc-form-container {
+    padding: 1.5rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
+.form-hero {
+    background: linear-gradient(135deg, #1a1a3e 0%, #0f0c29 100%);
+    border-radius: 1.5rem;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+}
+
+.form-hero .hero-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.form-hero .hero-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-hero .hero-icon i {
+    font-size: 1.75rem;
+    color: #818cf8;
+}
+
+.form-hero .hero-text h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+}
+
+.form-hero .hero-text p {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+}
+
+/* ============================================
+   FORM CARD
+   ============================================ */
+.form-card {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================
+   NFC ICON
+   ============================================ */
+.nfc-icon-large {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.nfc-icon-large i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+/* ============================================
+   FORM GROUPS
+   ============================================ */
+.form-group-modern {
+    margin-bottom: 1.5rem;
+}
+
+.form-group-modern label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.input-group-modern {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.input-group-modern .input-modern {
+    flex: 1;
+}
+
+.input-modern {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.input-modern:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+textarea.input-modern {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* ============================================
+   READER BUTTON
+   ============================================ */
+.btn-reader {
+    padding: 0.75rem 1.25rem;
+    background: linear-gradient(135deg, #10b981, #34d399);
+    border: none;
+    border-radius: 0.75rem;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.btn-reader:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-reader:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ============================================
+   READING STATUS
+   ============================================ */
+.reading-status {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.reading-status.info {
+    background: rgba(99, 102, 241, 0.1);
+    border-left: 3px solid #6366f1;
+    color: #6366f1;
+}
+
+.reading-status.success {
+    background: rgba(16, 185, 129, 0.1);
+    border-left: 3px solid #10b981;
+    color: #10b981;
+}
+
+.reading-status.error {
+    background: rgba(239, 68, 68, 0.1);
+    border-left: 3px solid #ef4444;
+    color: #ef4444;
+}
+
+.reading-status i {
+    font-size: 1rem;
+}
+
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   SELECT MODERN
+   ============================================ */
+.select-modern {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.select-modern:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* ============================================
+   CARD INFO
+   ============================================ */
+.card-info-glass {
+    background: #f8fafc;
+    border-radius: 1rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.info-label i {
+    width: 20px;
+    color: #6366f1;
+}
+
+.info-value {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.85rem;
+    font-family: monospace;
+}
+
+/* ============================================
+   ALERT MODERN
+   ============================================ */
+.alert-modern {
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+}
+
+.alert-modern.warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-left: 3px solid #f59e0b;
+    color: #92400e;
+}
+
+.alert-modern.info {
+    background: rgba(99, 102, 241, 0.1);
+    border-left: 3px solid #6366f1;
+    color: #3730a3;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn-primary-modern {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border: none;
+    border-radius: 0.75rem;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.btn-primary-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.btn-secondary-modern {
+    padding: 0.75rem 1.5rem;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 0.75rem;
+    color: #4b5563;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    width: 100%;
+}
+
+.btn-secondary-modern:hover {
+    background: #e5e7eb;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .nfc-form-container {
+        padding: 1rem;
+    }
+    
+    .form-card {
+        padding: 1.5rem;
+    }
+    
+    .form-hero .hero-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .input-group-modern {
+        flex-direction: column;
+    }
+    
+    .btn-reader {
+        justify-content: center;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-card {
+    animation: fadeIn 0.4s ease;
+}
+
+/* ============================================
+   READER CONFIGURATION
+   ============================================ */
+.reader-config-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+.reader-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.status-badge.connected {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.status-badge.disconnected {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.status-badge.testing {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.com-port-select {
+    font-family: monospace;
+}

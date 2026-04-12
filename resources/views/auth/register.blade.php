@@ -1,135 +1,179 @@
 @extends('layouts.guest')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/solubase-register.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+@endpush
+
 @section('content')
-<div class="register-container">
-    <div class="register-card">
-        <div class="text-center mb-4">
-            <img src="/img/logo_solutech1.png" alt="SoluTech" class="register-logo" 
-                 onerror="this.src='https://via.placeholder.com/80'">
-            <h3 class="register-title mb-2">
-                <span class="primary">Solu</span>
-                <span class="accent">Tech</span>
-            </h3>
-            <p class="register-subtitle">Crear una nueva cuenta</p>
-        </div>
+<div class="solubase-register-wrapper">
+    <div class="solubase-background-register">
+        <div class="gradient-orb-1-register"></div>
+        <div class="gradient-orb-2-register"></div>
+        <div class="gradient-orb-3-register"></div>
+        <div class="grid-pattern-register"></div>
+    </div>
 
-        @if($errors->any())
-            <div class="alert alert-danger">
-                @foreach($errors->all() as $error)
-                    <div><i class="fas fa-times-circle"></i> {{ $error }}</div>
-                @endforeach
+    <div class="solubase-register-container">
+        <div class="solubase-register-card">
+            <!-- Header -->
+            <div class="register-header">
+                <div class="logo-wrapper">
+                    <div class="logo-icon-register">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M24 4L4 14V34L24 44L44 34V14L24 4Z" stroke="url(#gradientRegister)" stroke-width="2" fill="none"/>
+                            <path d="M24 24L14 18V30L24 36L34 30V18L24 24Z" stroke="url(#gradientRegister)" stroke-width="2" fill="none"/>
+                            <defs>
+                                <linearGradient id="gradientRegister" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#6366f1"/>
+                                    <stop offset="100%" stop-color="#a855f7"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
+                
+                <h1 class="register-title-solubase">
+                    <span class="solubase-blue">Solu</span>
+                    <span class="solubase-purple">Base</span>
+                </h1>
+                <p class="register-subtitle-solubase">Crear una nueva cuenta</p>
+                <div class="header-badge">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Registro de usuarios</span>
+                </div>
             </div>
-        @endif
 
-        <form method="POST" action="{{ route('register') }}">
-            @csrf
+            @if($errors->any())
+                <div class="alert-modern alert-error-register">
+                    @foreach($errors->all() as $error)
+                        <div><i class="fas fa-times-circle"></i> {{ $error }}</div>
+                    @endforeach
+                </div>
+            @endif
 
-            <!-- Name -->
-            <div class="mb-3">
-                <label for="name" class="form-label">Nombre completo</label>
-                <div class="input-group">
-                    <span class="input-group-text">
+            <form method="POST" action="{{ route('register') }}" class="register-form-solubase">
+                @csrf
+
+                <!-- Name -->
+                <div class="input-group-register">
+                    <label class="input-label-register">
                         <i class="fas fa-user"></i>
-                    </span>
-                    <input type="text" 
-                           class="form-control" 
-                           id="name" 
-                           name="name" 
-                           value="{{ old('name') }}" 
-                           required 
-                           autofocus 
-                           autocomplete="name"
-                           placeholder="Ingrese su nombre completo">
+                        Nombre completo
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="text" 
+                               class="input-field-register" 
+                               id="name" 
+                               name="name" 
+                               value="{{ old('name') }}" 
+                               required 
+                               autofocus 
+                               autocomplete="name"
+                               placeholder="Ingrese su nombre completo">
+                        <div class="input-focus-border-register"></div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Email Address -->
-            <div class="mb-3">
-                <label for="email" class="form-label">Correo Electrónico</label>
-                <div class="input-group">
-                    <span class="input-group-text">
+                <!-- Email Address -->
+                <div class="input-group-register">
+                    <label class="input-label-register">
                         <i class="fas fa-envelope"></i>
-                    </span>
-                    <input type="email" 
-                           class="form-control" 
-                           id="email" 
-                           name="email" 
-                           value="{{ old('email') }}" 
-                           required 
-                           autocomplete="username"
-                           placeholder="correo@ejemplo.com">
+                        Correo electrónico
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="email" 
+                               class="input-field-register" 
+                               id="email" 
+                               name="email" 
+                               value="{{ old('email') }}" 
+                               required 
+                               autocomplete="username"
+                               placeholder="correo@ejemplo.com">
+                        <div class="input-focus-border-register"></div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Password -->
-            <div class="mb-3">
-                <label for="password" class="form-label">Contraseña</label>
-                <div class="input-group">
-                    <span class="input-group-text">
+                <!-- Password -->
+                <div class="input-group-register">
+                    <label class="input-label-register">
                         <i class="fas fa-lock"></i>
-                    </span>
-                    <input type="password" 
-                           class="form-control" 
-                           id="password" 
-                           name="password" 
-                           required 
-                           autocomplete="new-password"
-                           placeholder="Ingrese su contraseña">
-                    <button class="btn btn-outline-secondary password-toggle" type="button" id="togglePassword">
-                        <i class="fas fa-eye"></i>
-                    </button>
+                        Contraseña
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="password" 
+                               class="input-field-register" 
+                               id="password" 
+                               name="password" 
+                               required 
+                               autocomplete="new-password"
+                               placeholder="Ingrese su contraseña">
+                        <button class="password-toggle-register" type="button" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="input-focus-border-register"></div>
+                    </div>
+                    <div class="input-hint">
+                        <i class="fas fa-info-circle"></i>
+                        Mínimo 8 caracteres
+                    </div>
                 </div>
-                <small class="form-text text-muted">Mínimo 8 caracteres</small>
-            </div>
 
-            <!-- Confirm Password -->
-            <div class="mb-4">
-                <label for="password_confirmation" class="form-label">Confirmar Contraseña</label>
-                <div class="input-group">
-                    <span class="input-group-text">
+                <!-- Confirm Password -->
+                <div class="input-group-register">
+                    <label class="input-label-register">
                         <i class="fas fa-lock"></i>
-                    </span>
-                    <input type="password" 
-                           class="form-control" 
-                           id="password_confirmation" 
-                           name="password_confirmation" 
-                           required 
-                           autocomplete="new-password"
-                           placeholder="Confirme su contraseña">
-                    <button class="btn btn-outline-secondary password-toggle" type="button" id="toggleConfirmPassword">
-                        <i class="fas fa-eye"></i>
-                    </button>
+                        Confirmar contraseña
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="password" 
+                               class="input-field-register" 
+                               id="password_confirmation" 
+                               name="password_confirmation" 
+                               required 
+                               autocomplete="new-password"
+                               placeholder="Confirme su contraseña">
+                        <button class="password-toggle-register" type="button" id="toggleConfirmPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="input-focus-border-register"></div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="register-links">
-                <a href="{{ route('login') }}">
-                    <i class="fas fa-arrow-left"></i> ¿Ya tienes cuenta? Inicia sesión
-                </a>
-            </div>
+                <div class="register-actions">
+                    <button type="submit" class="btn-register-solubase">
+                        <span>Crear cuenta</span>
+                        <i class="fas fa-arrow-right"></i>
+                        <div class="btn-shine-register"></div>
+                    </button>
 
-            <button type="submit" class="btn btn-register w-100">
-                <i class="fas fa-user-plus"></i> Registrarse
-            </button>
+                    <div class="register-links-solubase">
+                        <a href="{{ route('login') }}" class="login-link">
+                            <i class="fas fa-arrow-left"></i>
+                            ¿Ya tienes cuenta? Inicia sesión
+                        </a>
+                        <a href="/" class="home-link">
+                            <i class="fas fa-home"></i>
+                            Volver al inicio
+                        </a>
+                    </div>
+                </div>
+            </form>
 
-            <div class="register-links mt-3">
-                <a href="/">
-                    <i class="fas fa-home"></i> Volver al inicio
-                </a>
+            <!-- Términos y condiciones -->
+            <div class="register-terms">
+                <p>
+                    Al registrarte, aceptas nuestros 
+                    <a href="#">Términos de servicio</a> y 
+                    <a href="#">Política de privacidad</a>
+                </p>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 @endsection
 
-@push('styles')
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="{{ asset('css/register.css') }}">
-@endpush
-
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // Toggle para contraseña
     document.getElementById('togglePassword')?.addEventListener('click', function() {

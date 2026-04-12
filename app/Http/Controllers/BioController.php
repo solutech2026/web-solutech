@@ -1,36 +1,61 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Public;
 
-use App\Models\BioProfile;
+use App\Http\Controllers\Controller;
+use App\Models\Person;
+use App\Models\AccessLog;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class BioController extends Controller
 {
     /**
-     * Muestra la vista de la Bio con datos estáticos.
+     * Muestra la biografía pública de una persona usando bio_url
      */
-    public function show()
+    public function show($url)
     {
-        // Datos estáticos de tu perfil
+        $person = Person::where('bio_url', $url)
+            ->with('company')
+            ->firstOrFail();
+
+        // Registrar la visita
+        AccessLog::create([
+            'person_id' => $person->id,
+            'company_id' => $person->company_id,
+            'access_type' => 'view',
+            'verification_method' => 'bio_url',
+            'access_time' => now(),
+            'status' => 'granted',
+            'gate' => 'Bio URL',
+            'reason' => 'Visualización de perfil público'
+        ]);
+
+        // Preparar datos para la vista
         $profile = [
-            'slug' => 'herbert',
-            'name' => 'Ing. Herbert Diaz',
-            'role' => 'Administración de Sistemas & Redes',
-            'summary' => 'Especialista en infraestructura tecnológica, servidores (Cloud/Local) y soporte integral niveles 1, 2 y 3. Gestión de bases de datos, políticas de respaldo y desarrollo de soluciones a medida para garantizar la continuidad operativa.',
-            'phone' => '584124714588',
-            'email' => 'solutech24@outlook.com', // Corregido el 'q' por '@'
-            'services' => [
-                ['label' => 'Soporte Nivel 1, 2 y 3', 'icon' => 'ShieldCheck'],
-                ['label' => 'Servidores Cloud y Locales', 'icon' => 'Cloud'],
-                ['label' => 'Administración de Redes', 'icon' => 'Network'],
-                ['label' => 'Bases de Datos y Respaldos', 'icon' => 'Database'],
-                ['label' => 'Desarrollo de Software', 'icon' => 'Code2'],
-                ['label' => 'Infraestructura TI', 'icon' => 'Server'],
-            ],
-            'photo_path' => '/img/img_herbert.png'
+            'slug' => $person->bio_url,
+            'name' => $person->full_name,
+            'role' => $person->position ?? $person->category_label,
+            'summary' => $person->bio ?? 'Sin información adicional',
+            'phone' => $person->phone ?? '',
+            'email' => $person->email ?? '',
+            'services' => $this->getServicesByCategory($person),
+            'photo_path' => $person->photo_url,
+            'company' => $person->company ? $person->company->name : null,
+            'category' => $person->category_label,
+            'subcategory' => $person->subcategory_label,
+            'document_id' => $person->document_id,
+            'emergency_contact' => $person->emergency_contact_name,
+            'emergency_phone' => $person->emergency_phone,
         ];
+
+        // Si la petición espera JSON (API)
+        if (request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $profile
+            ]);
+        }
 
         return Inertia::render('Bio/Show', [
             'profile' => $profile
@@ -38,30 +63,106 @@ class BioController extends Controller
     }
 
     /**
-     * Genera y descarga el archivo vCard dinámicamente.
+     * Obtener servicios según la categoría de la persona
      */
-    public function downloadVCard()
+    private function getServicesByCategory($person)
     {
-        // Datos estáticos de tu perfil (mismos que en show)
-        $name = 'Ing. Herbert Diaz';
-        $role = 'Ingeniero de Sistemas';
-        $phone = '584124714588';
-        $email = 'solutech24@outlook.com';
+        $services = [];
+
+        if ($person->category === 'employee') {
+            $services = [
+                ['label' => $person->position ?? 'Empleado', 'icon' => 'Briefcase'],
+                ['label' => $person->department ?? 'Departamento', 'icon' => 'Building'],
+                ['label' => 'Control de Acceso', 'icon' => 'ShieldCheck'],
+            ];
+        } elseif ($person->subcategory === 'student') {
+            $services = [
+                ['label' => 'Grado: ' . $person->grade_level_label, 'icon' => 'GraduationCap'],
+                ['label' => 'Año Escolar: ' . $person->academic_year, 'icon' => 'Calendar'],
+                ['label' => 'Promedio: ' . ($person->average_grade ?? 'N/A'), 'icon' => 'Star'],
+            ];
+        } elseif ($person->subcategory === 'teacher') {
+            $services = [
+                ['label' => $person->position ?? 'Docente', 'icon' => 'ChalkboardUser'],
+                ['label' => 'Tipo: ' . $person->teacher_type_label, 'icon' => 'UserGraduate'],
+                ['label' => 'Control de Acceso', 'icon' => 'ShieldCheck'],
+            ];
+        } elseif ($person->subcategory === 'administrative') {
+            $services = [
+                ['label' => $person->position ?? 'Personal Administrativo', 'icon' => 'Building'],
+                ['label' => $person->department ?? 'Departamento', 'icon' => 'Folder'],
+                ['label' => 'Control de Acceso', 'icon' => 'ShieldCheck'],
+            ];
+        }
+
+        return $services;
+    }
+
+    /**
+     * Genera y descarga el archivo vCard dinámicamente
+     */
+    public function downloadVCard($url)
+    {
+        $person = Person::where('bio_url', $url)
+            ->with('company')
+            ->firstOrFail();
 
         // Estructura del vCard
         $vcard = "BEGIN:VCARD\n"
             . "VERSION:3.0\n"
-            . "FN:{$name}\n"
-            . "ORG:Solutech\n"
-            . "TITLE:{$role}\n"
-            . "TEL;TYPE=CELL:{$phone}\n"
-            . "EMAIL:{$email}\n"
+            . "FN:{$person->full_name}\n"
+            . "ORG:" . ($person->company ? $person->company->name : 'Solubase') . "\n"
+            . "TITLE:{$person->position}\n"
+            . "TEL;TYPE=CELL:{$person->phone}\n"
+            . "EMAIL:{$person->email}\n"
+            . "NOTE:{$person->bio}\n"
+            . "URL:" . url('/bio/' . $person->bio_url) . "\n"
             . "END:VCARD";
 
-        $filename = str_replace(' ', '-', strtolower($name)) . ".vcf";
+        $filename = str_replace(' ', '-', strtolower($person->full_name)) . ".vcf";
 
         return response($vcard)
             ->header('Content-Type', 'text/vcard')
             ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
+    }
+
+    /**
+     * Obtener datos de la biografía en formato JSON (para API)
+     */
+    public function getData($url)
+    {
+        $person = Person::where('bio_url', $url)
+            ->with('company')
+            ->firstOrFail();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'name' => $person->full_name,
+                'document_id' => $person->document_id,
+                'email' => $person->email,
+                'phone' => $person->phone,
+                'company' => $person->company ? $person->company->name : null,
+                'position' => $person->position,
+                'bio' => $person->bio,
+                'photo_url' => $person->photo_url,
+                'category' => $person->category_label,
+                'subcategory' => $person->subcategory_label,
+                'grade_level' => $person->grade_level_label,
+                'academic_year' => $person->academic_year,
+                'average_grade' => $person->average_grade,
+                'emergency_contact' => $person->emergency_contact_name,
+                'emergency_phone' => $person->emergency_phone,
+            ]
+        ]);
+    }
+
+    /**
+     * Redireccionar a la página de la persona
+     */
+    public function redirectToProfile($url)
+    {
+        $person = Person::where('bio_url', $url)->firstOrFail();
+        return redirect()->route('admin.persons.show', $person->id);
     }
 }

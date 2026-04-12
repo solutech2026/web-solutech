@@ -7,7 +7,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { url, props } = usePage();
-  const { auth } = props; // Asumiendo que tienes auth en los props de Inertia
+  const { auth } = props;
 
   // Verificar si el usuario es administrador
   const isAdmin = auth?.user?.role === 'admin' || auth?.user?.is_admin === true;
@@ -80,17 +80,8 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Botón de Acceso - Solo para Administrador */}
-          {!auth?.user ? (
-            // Si no está autenticado, mostrar botón ACCEDER
-            <Link href="/login" className="nav-access-btn">
-              <svg viewBox="0 0 20 20" fill="currentColor" className="access-icon">
-                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-              </svg>
-              <span>Acceder</span>
-            </Link>
-          ) : isAdmin ? (
-            // Si es administrador autenticado, mostrar panel de admin
+          {/* Menú de Administrador - Solo visible cuando está autenticado */}
+          {auth?.user && isAdmin && (
             <div className="admin-menu">
               <button className="admin-menu-button">
                 <div className="admin-avatar">
@@ -123,7 +114,7 @@ const Navbar = () => {
                 </Link>
               </div>
             </div>
-          ) : null}
+          )}
 
           {/* Mobile Menu Toggle */}
           <button
@@ -180,17 +171,7 @@ const Navbar = () => {
               </Link>
             ))}
             
-            {/* Botón de Acceder para móvil - Solo administrador no autenticado */}
-            {!auth?.user && (
-              <Link href="/login" className="mobile-access-btn" onClick={() => setIsOpen(false)}>
-                <svg viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                </svg>
-                <span>Acceder</span>
-              </Link>
-            )}
-            
-            {/* Menú admin para móvil */}
+            {/* Menú admin para móvil - Solo visible cuando está autenticado */}
             {auth?.user && isAdmin && (
               <>
                 <div className="mobile-admin-header">
