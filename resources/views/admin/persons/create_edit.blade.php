@@ -197,7 +197,7 @@
                 </div>
 
                 <!-- Campos para Empleado -->
-                <div class="form-section employee-fields">
+                <div class="form-section employee-fields" style="display: none;">
                     <div class="section-title">
                         <i class="fas fa-briefcase"></i>
                         <h3>Información Laboral</h3>
@@ -486,6 +486,24 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/persons-form.css') }}">
+    <style>
+        /* Estilos adicionales para asegurar que las secciones se oculten correctamente */
+        .form-section.employee-fields,
+        .form-section.student-fields,
+        .form-section.teacher-fields,
+        .form-section.administrative-fields,
+        .form-section.schedule-fields {
+            display: none !important;
+        }
+        
+        .form-section.employee-fields.active,
+        .form-section.student-fields.active,
+        .form-section.teacher-fields.active,
+        .form-section.administrative-fields.active,
+        .form-section.schedule-fields.active {
+            display: block !important;
+        }
+    </style>
 @endpush
 
 @push('scripts')
@@ -513,11 +531,13 @@
         // ============================================
 
         function hideAllCategoryFields() {
-            if (employeeFields) employeeFields.classList.remove('active');
-            if (studentFields) studentFields.classList.remove('active');
-            if (teacherFields) teacherFields.classList.remove('active');
-            if (administrativeFields) administrativeFields.classList.remove('active');
-            if (scheduleFields) scheduleFields.classList.remove('active');
+            // Ocultar todas las secciones de campos
+            const allSections = [employeeFields, studentFields, teacherFields, administrativeFields, scheduleFields];
+            allSections.forEach(section => {
+                if (section) {
+                    section.classList.remove('active');
+                }
+            });
         }
 
         function enableFormFields(container) {
@@ -537,6 +557,24 @@
             });
         }
 
+        function clearPositionAndDepartment() {
+            // Limpiar los campos de position y department cuando no correspondan
+            const positionFields = document.querySelectorAll('input[name="position"]');
+            const departmentFields = document.querySelectorAll('select[name="department"]');
+            
+            positionFields.forEach(field => {
+                if (field && field.value !== 'Sin especificar') {
+                    field.value = '';
+                }
+            });
+            
+            departmentFields.forEach(field => {
+                if (field && field.value !== 'Sin especificar') {
+                    field.value = '';
+                }
+            });
+        }
+
         function updateFormByCategory() {
             const selectedCategory = document.querySelector('input[name="category"]:checked')?.value;
             const selectedSubcategory = subcategoryInput.value;
@@ -544,6 +582,7 @@
             hideAllCategoryFields();
 
             if (selectedCategory === 'employee') {
+                // Caso: Empleado
                 companyLabel.innerHTML = 'Empresa *';
                 if (employeeFields) {
                     employeeFields.classList.add('active');
@@ -555,11 +594,20 @@
                 subcategorySection.style.display = 'none';
                 subcategoryInput.value = '';
                 subcategoryOptions.forEach(opt => opt.classList.remove('active'));
+                
+                // Habilitar campos de position y department para empleados
+                const positionFields = document.querySelectorAll('input[name="position"]');
+                const departmentFields = document.querySelectorAll('select[name="department"]');
+                positionFields.forEach(field => field.disabled = false);
+                departmentFields.forEach(field => field.disabled = false);
+                
             } else if (selectedCategory === 'school') {
+                // Caso: Personal Escolar
                 companyLabel.innerHTML = 'Colegio *';
                 subcategorySection.style.display = 'block';
 
                 if (selectedSubcategory === 'student') {
+                    // Estudiante - NO debe tener position ni department
                     if (studentFields) {
                         studentFields.classList.add('active');
                         enableFormFields(studentFields);
@@ -568,7 +616,15 @@
                         scheduleFields.classList.add('active');
                         enableFormFields(scheduleFields);
                     }
+                    // Limpiar y deshabilitar campos de position y department
+                    clearPositionAndDepartment();
+                    const positionFields = document.querySelectorAll('input[name="position"]');
+                    const departmentFields = document.querySelectorAll('select[name="department"]');
+                    positionFields.forEach(field => field.disabled = true);
+                    departmentFields.forEach(field => field.disabled = true);
+                    
                 } else if (selectedSubcategory === 'teacher') {
+                    // Docente - TIENE position pero NO department
                     if (teacherFields) {
                         teacherFields.classList.add('active');
                         enableFormFields(teacherFields);
@@ -577,7 +633,17 @@
                         scheduleFields.classList.add('active');
                         enableFormFields(scheduleFields);
                     }
+                    // Solo habilitar position, deshabilitar department
+                    const positionFields = document.querySelectorAll('input[name="position"]');
+                    const departmentFields = document.querySelectorAll('select[name="department"]');
+                    positionFields.forEach(field => field.disabled = false);
+                    departmentFields.forEach(field => {
+                        field.disabled = true;
+                        field.value = '';
+                    });
+                    
                 } else if (selectedSubcategory === 'administrative') {
+                    // Administrativo - TIENE position y department
                     if (administrativeFields) {
                         administrativeFields.classList.add('active');
                         enableFormFields(administrativeFields);
@@ -586,6 +652,11 @@
                         scheduleFields.classList.add('active');
                         enableFormFields(scheduleFields);
                     }
+                    // Habilitar position y department
+                    const positionFields = document.querySelectorAll('input[name="position"]');
+                    const departmentFields = document.querySelectorAll('select[name="department"]');
+                    positionFields.forEach(field => field.disabled = false);
+                    departmentFields.forEach(field => field.disabled = false);
                 }
             }
         }
@@ -727,70 +798,40 @@
         }
 
         // ============================================
-        // FORZAR EL ENVÍO DE POSITION Y DEPARTMENT
+        // MANEJO DEL ENVÍO DEL FORMULARIO
         // ============================================
 
         const personForm = document.getElementById('personForm');
         if (personForm) {
             personForm.addEventListener('submit', function(e) {
-                console.log('=== FORMULARIO A PUNTO DE ENVIARSE ===');
-
-                // Buscar los campos
-                const positionField = document.querySelector('input[name="position"]');
-                const departmentField = document.querySelector('select[name="department"]');
-
-                console.log('Position field existe:', !!positionField);
-                console.log('Position field value:', positionField ? positionField.value : 'NO EXISTE');
-                console.log('Department field existe:', !!departmentField);
-                console.log('Department field value:', departmentField ? departmentField.value : 'NO EXISTE');
-
-                // Forzar que los campos estén habilitados
-                if (positionField) {
-                    positionField.disabled = false;
-                    positionField.removeAttribute('disabled');
-
-                    // Si está vacío, asignar un valor por defecto
-                    if (!positionField.value || positionField.value.trim() === '') {
-                        positionField.value = 'Sin especificar';
-                        console.log('Position vacío, asignado: Sin especificar');
-                    }
+                const selectedCategory = document.querySelector('input[name="category"]:checked')?.value;
+                const selectedSubcategory = subcategoryInput.value;
+                
+                // Para estudiantes, eliminar position y department del envío
+                if (selectedCategory === 'school' && selectedSubcategory === 'student') {
+                    const positionFields = document.querySelectorAll('input[name="position"]');
+                    const departmentFields = document.querySelectorAll('select[name="department"]');
+                    
+                    positionFields.forEach(field => {
+                        field.disabled = true;
+                        field.value = '';
+                    });
+                    
+                    departmentFields.forEach(field => {
+                        field.disabled = true;
+                        field.value = '';
+                    });
                 }
-
-                if (departmentField) {
-                    departmentField.disabled = false;
-                    departmentField.removeAttribute('disabled');
-
-                    // Si está vacío, asignar un valor por defecto
-                    if (!departmentField.value || departmentField.value === '') {
-                        departmentField.value = 'Sin especificar';
-                        console.log('Department vacío, asignado: Sin especificar');
-                    }
-                }
-
-                console.log('VALORES FINALES - Position:', positionField?.value);
-                console.log('VALORES FINALES - Department:', departmentField?.value);
-
+                
                 return true;
             });
         }
 
         // ============================================
-        // VERIFICAR CAMPOS AL CARGAR
+        // INICIALIZACIÓN
         // ============================================
 
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('=== VERIFICACIÓN DE CAMPOS AL CARGAR ===');
-
-            const positionField = document.querySelector('input[name="position"]');
-            const departmentField = document.querySelector('select[name="department"]');
-
-            console.log('Position field existe:', !!positionField);
-            console.log('Position field disabled:', positionField?.disabled);
-            console.log('Position field value:', positionField?.value);
-            console.log('Department field existe:', !!departmentField);
-            console.log('Department field disabled:', departmentField?.disabled);
-            console.log('Department field value:', departmentField?.value);
-
             // Inicializar categoría
             const selectedCategory = document.querySelector('input[name="category"]:checked');
             if (selectedCategory) {
@@ -809,19 +850,6 @@
             const existingScheduleRows = document.querySelectorAll('.schedule-row');
             if (existingScheduleRows.length > 0) {
                 scheduleIndex = existingScheduleRows.length;
-            }
-
-            // Verificar estructura del formulario
-            console.log('=== ESTRUCTURA DEL FORMULARIO ===');
-            if (personForm) {
-                const allInputs = personForm.querySelectorAll('input, select, textarea');
-                allInputs.forEach(input => {
-                    if (input.name === 'position' || input.name === 'department') {
-                        console.log(
-                            `- ${input.name}: ${input.value} (tipo: ${input.tagName}, disabled: ${input.disabled})`
-                            );
-                    }
-                });
             }
         });
     </script>
