@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Person;
 use App\Models\Company;
-use App\Models\NFCCard;
+use App\Models\NfcCard;
 use App\Models\AccessLog;
 use Spatie\Permission\Models\Role;
 
@@ -25,7 +25,7 @@ class DashboardController extends Controller
         $totalPersons = Person::count();
         $totalEmployees = Person::where('type', 'employee')->count();
         $totalVisitors = Person::where('type', 'visitor')->count();
-        $activeCards = NFCCard::where('status', 'active')->count();
+        $activeCards = NfcCard::where('status', 'active')->count();
         $accessToday = AccessLog::whereDate('access_time', today())->count();
         
         return view('admin.dashboard', compact(
@@ -41,7 +41,7 @@ class DashboardController extends Controller
         $request->validate(['code' => 'required|string']);
         
         $cardCode = strtoupper($request->code);
-        $card = NFCCard::where('card_code', $cardCode)
+        $card = NfcCard::where('card_code', $cardCode)
             ->where('status', 'active')
             ->with('person')
             ->first();
@@ -239,7 +239,7 @@ class DashboardController extends Controller
         $person = Person::findOrFail($id);
         
         if ($person->nfc_card_id) {
-            NFCCard::where('card_code', $person->nfc_card_id)->update(['person_id' => null]);
+            NfcCard::where('card_code', $person->nfc_card_id)->update(['person_id' => null]);
         }
         
         $person->delete();
@@ -252,7 +252,7 @@ class DashboardController extends Controller
         $request->validate(['card_id' => 'required|exists:nfc_cards,id']);
 
         $person = Person::findOrFail($id);
-        $card = NFCCard::findOrFail($request->card_id);
+        $card = NfcCard::findOrFail($request->card_id);
 
         if ($card->person_id) {
             return back()->with('error', 'Esta tarjeta ya está asignada a otra persona');
@@ -277,7 +277,7 @@ class DashboardController extends Controller
             $q->orderBy('access_time', 'desc')->limit(20);
         }])->findOrFail($id);
         
-        $availableCards = NFCCard::whereNull('person_id')->where('status', 'active')->get();
+        $availableCards = NfcCard::whereNull('person_id')->where('status', 'active')->get();
         $companies = Company::where('is_active', true)->get();
         
         return view('admin.persons.detail', compact('person', 'availableCards', 'companies'));
@@ -287,7 +287,7 @@ class DashboardController extends Controller
     
     public function nfcCards()
     {
-        $cards = NFCCard::with('person')->orderBy('created_at', 'desc')->get();
+        $cards = NfcCard::with('person')->orderBy('created_at', 'desc')->get();
         return view('admin.nfc-cards.index', compact('cards'));
     }
 
@@ -298,7 +298,7 @@ class DashboardController extends Controller
             'notes' => 'nullable|string'
         ]);
 
-        NFCCard::create([
+        NfcCard::create([
             'card_code' => strtoupper($request->card_code),
             'notes' => $request->notes,
             'status' => 'active'
@@ -309,7 +309,7 @@ class DashboardController extends Controller
 
     public function deleteNFCCard($id)
     {
-        $card = NFCCard::findOrFail($id);
+        $card = NfcCard::findOrFail($id);
         
         if ($card->person_id) {
             Person::where('id', $card->person_id)->update(['nfc_card_id' => null]);
