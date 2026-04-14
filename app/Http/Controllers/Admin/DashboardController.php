@@ -15,27 +15,27 @@ use Spatie\Permission\Models\Role;
 
 class DashboardController extends Controller
 {
-    // ============ DASHBOARD PRINCIPAL ============
-    
+    /**
+     * Dashboard principal
+     */
     public function index()
     {
-        $totalUsers = User::count();
-        $adminCount = User::role(['super-admin', 'admin'])->count();
-        
-        $totalPersons = Person::count();
-        $totalEmployees = Person::where('type', 'employee')->count();
-        $totalVisitors = Person::where('type', 'visitor')->count();
-        $activeCards = NfcCard::where('status', 'active')->count();
-        $accessToday = AccessLog::whereDate('access_time', today())->count();
-        
-        return view('admin.dashboard', compact(
-            'totalUsers', 'adminCount', 'totalPersons',
-            'totalEmployees', 'totalVisitors', 'activeCards', 'accessToday'
-        ));
+        $stats = [
+            'total_users' => User::count(),
+            'admin_count' => User::role(['super-admin', 'admin'])->count(),
+            'total_persons' => Person::count(),
+            'total_employees' => Person::where('type', 'employee')->count(),
+            'total_visitors' => Person::where('type', 'visitor')->count(),
+            'active_cards' => NfcCard::where('status', 'active')->count(),
+            'access_today' => AccessLog::whereDate('access_time', today())->count(),
+        ];
+
+        return view('admin.dashboard', compact('stats'));
     }
 
-    // ============ VALIDACIÓN DE ACCESO (API) ============
-    
+    /**
+     * Validación de acceso por NFC (API)
+     */
     public function validateAccess(Request $request)
     {
         $request->validate(['code' => 'required|string']);
@@ -43,69 +43,39 @@ class DashboardController extends Controller
         $cardCode = strtoupper($request->code);
         $card = NfcCard::where('card_code', $cardCode)
             ->where('status', 'active')
-            ->with('person')
+            ->with('person.company')
             ->first();
         
+        // Tarjeta no válida
         if (!$card) {
-            AccessLog::create([
-                'access_type' => 'entry',
-                'verification_method' => 'manual',
-                'access_time' => now(),
-                'status' => 'denied',
-                'reason' => 'Tarjeta no válida',
-                'ip_address' => $request->ip()
-            ]);
-            
-            return response()->json(['success' => false, 'message' => 'Tarjeta no válida o inactiva']);
+            $this->logAccess(null, null, 'denied', 'Tarjeta no válida', $request);
+            return $this->jsonResponse(false, 'Tarjeta no válida o inactiva');
         }
         
+        // Persona no activa
         if (!$card->person || !$card->person->is_active) {
-            AccessLog::create([
-                'person_id' => $card->person ? $card->person->id : null,
-                'nfc_card_id' => $card->id,
-                'access_type' => 'entry',
-                'verification_method' => 'manual',
-                'access_time' => now(),
-                'status' => 'denied',
-                'reason' => 'Persona no activa',
-                'ip_address' => $request->ip()
-            ]);
-            
-            return response()->json(['success' => false, 'message' => 'Persona no activa en el sistema']);
+            $this->logAccess($card->person->id ?? null, $card->id, 'denied', 'Persona no activa', $request);
+            return $this->jsonResponse(false, 'Persona no activa en el sistema');
         }
         
-        AccessLog::create([
-            'company_id' => $card->person->company_id,
-            'person_id' => $card->person->id,
-            'nfc_card_id' => $card->id,
-            'access_type' => 'entry',
-            'verification_method' => 'manual',
-            'access_time' => now(),
-            'status' => 'granted',
-            'gate' => $request->gate ?? 'Puerta Principal',
-            'ip_address' => $request->ip()
-        ]);
+        // Acceso permitido
+        $this->logAccess($card->person->id, $card->id, 'granted', null, $request);
         
-        $card->last_used_at = now();
-        $card->save();
+        // Actualizar timestamps
+        $card->update(['last_used_at' => now()]);
+        $card->person->update(['last_access_at' => now()]);
         
-        $card->person->last_access_at = now();
-        $card->person->save();
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Acceso permitido',
-            'person' => [
-                'name' => $card->person->name,
-                'type' => $card->person->type,
-                'company' => $card->person->company ? $card->person->company->name : null,
-                'bio_url' => $card->person->bio_url ? url($card->person->bio_url) : null
-            ]
+        return $this->jsonResponse(true, 'Acceso permitido', [
+            'name' => $card->person->name,
+            'type' => $card->person->type,
+            'company' => $card->person->company?->name,
+            'bio_url' => $card->person->bio_url ? url($card->person->bio_url) : null
         ]);
     }
 
-    // ============ GESTIÓN DE USUARIOS DEL SISTEMA ============
-    
+    /**
+     * Gestión de Usuarios del Sistema
+     */
     public function users()
     {
         $users = User::with('roles')->get();
@@ -119,7 +89,7 @@ class DashboardController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
-            'role' => 'required|string'
+            'role' => 'required|exists:roles,name'
         ]);
 
         $user = User::create([
@@ -140,7 +110,7 @@ class DashboardController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
-            'role' => 'required|string'
+            'role' => 'required|exists:roles,name'
         ]);
 
         $user->update([
@@ -148,7 +118,7 @@ class DashboardController extends Controller
             'email' => $request->email,
         ]);
 
-        if ($request->password) {
+        if ($request->filled('password')) {
             $user->update(['password' => Hash::make($request->password)]);
         }
 
@@ -159,24 +129,23 @@ class DashboardController extends Controller
 
     public function deleteUser($id)
     {
-        $user = User::findOrFail($id);
-        
-        if ($user->id === Auth::id()) {
+        if ($id == Auth::id()) {
             return redirect()->route('admin.users.index')->with('error', 'No puedes eliminar tu propio usuario');
         }
         
-        $user->delete();
+        User::findOrFail($id)->delete();
         
         return redirect()->route('admin.users.index')->with('success', 'Usuario eliminado exitosamente');
     }
 
-    // ============ GESTIÓN DE PERSONAS ============
-    
+    /**
+     * Gestión de Personas
+     */
     public function persons()
     {
-        $persons = Person::with('company')->orderBy('created_at', 'desc')->get();
+        $persons = Person::with('company')->latest()->get();
         $companies = Company::where('is_active', true)->get();
-        $availableCards = NFCCard::whereNull('person_id')->where('status', 'active')->get();
+        $availableCards = NfcCard::whereNull('person_id')->where('status', 'active')->get();
         
         return view('admin.persons.index', compact('persons', 'companies', 'availableCards'));
     }
@@ -184,6 +153,17 @@ class DashboardController extends Controller
     public function getPerson($id)
     {
         return response()->json(Person::findOrFail($id));
+    }
+
+    public function personDetail($id)
+    {
+        $person = Person::with(['company', 'accessLogs' => fn($q) => $q->latest()->limit(20)])
+            ->findOrFail($id);
+        
+        $availableCards = NfcCard::whereNull('person_id')->where('status', 'active')->get();
+        $companies = Company::where('is_active', true)->get();
+        
+        return view('admin.persons.detail', compact('person', 'availableCards', 'companies'));
     }
 
     public function storePerson(Request $request)
@@ -196,7 +176,7 @@ class DashboardController extends Controller
             'document_id' => 'nullable|string|unique:persons',
         ]);
 
-        $person = Person::create([
+        Person::create([
             'name' => $request->name,
             'type' => $request->type,
             'company_id' => $request->company_id,
@@ -238,6 +218,7 @@ class DashboardController extends Controller
     {
         $person = Person::findOrFail($id);
         
+        // Liberar tarjeta asignada
         if ($person->nfc_card_id) {
             NfcCard::where('card_code', $person->nfc_card_id)->update(['person_id' => null]);
         }
@@ -258,36 +239,25 @@ class DashboardController extends Controller
             return back()->with('error', 'Esta tarjeta ya está asignada a otra persona');
         }
 
-        $card->person_id = $person->id;
-        $card->assigned_at = now();
-        $card->save();
+        $card->update([
+            'person_id' => $person->id,
+            'assigned_at' => now()
+        ]);
 
-        $person->nfc_card_id = $card->card_code;
-        if (!$person->bio_url) {
-            $person->bio_url = Person::generateUniqueBioUrl();
-        }
-        $person->save();
+        $person->update([
+            'nfc_card_id' => $card->card_code,
+            'bio_url' => $person->bio_url ?? Person::generateUniqueBioUrl()
+        ]);
 
-        return redirect()->route('admin.persons.index')->with('success', "Tarjeta asignada a {$person->name}");
+        return back()->with('success', "Tarjeta asignada a {$person->name}");
     }
 
-    public function personDetail($id)
-    {
-        $person = Person::with(['company', 'accessLogs' => function($q) {
-            $q->orderBy('access_time', 'desc')->limit(20);
-        }])->findOrFail($id);
-        
-        $availableCards = NfcCard::whereNull('person_id')->where('status', 'active')->get();
-        $companies = Company::where('is_active', true)->get();
-        
-        return view('admin.persons.detail', compact('person', 'availableCards', 'companies'));
-    }
-
-    // ============ GESTIÓN DE TARJETAS NFC ============
-    
+    /**
+     * Gestión de Tarjetas NFC
+     */
     public function nfcCards()
     {
-        $cards = NfcCard::with('person')->orderBy('created_at', 'desc')->get();
+        $cards = NfcCard::with('person')->latest()->get();
         return view('admin.nfc-cards.index', compact('cards'));
     }
 
@@ -320,39 +290,9 @@ class DashboardController extends Controller
         return redirect()->route('admin.nfc-cards.index')->with('success', 'Tarjeta eliminada correctamente');
     }
 
-    // ============ REPORTES ============
-    
-    public function reports()
-    {
-        $companies = Company::where('is_active', true)->get();
-        return view('admin.reports.index', compact('companies'));
-    }
-
-    public function generateReport(Request $request)
-    {
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
-            'type' => 'required|string'
-        ]);
-
-        return redirect()->route('admin.reports.index')->with('success', 'Reporte generado exitosamente');
-    }
-
-    // ============ CONFIGURACIÓN ============
-    
-    public function settings()
-    {
-        return view('admin.settings.index');
-    }
-
-    public function updateSettings(Request $request)
-    {
-        return redirect()->route('admin.settings.index')->with('success', 'Configuración actualizada exitosamente');
-    }
-
-    // ============ PERFIL DE USUARIO ============
-    
+    /**
+     * Perfil de Usuario
+     */
     public function profile()
     {
         return view('admin.profile.index');
@@ -400,8 +340,49 @@ class DashboardController extends Controller
         return redirect()->route('admin.profile.index')->with('success', 'Contraseña cambiada correctamente');
     }
 
-    public function logoutOtherSessions(Request $request)
+    /**
+     * Configuración (placeholder)
+     */
+    public function settings()
     {
-        return redirect()->route('admin.profile.index')->with('success', 'Sesiones cerradas correctamente');
+        return view('admin.settings.index');
+    }
+
+    public function updateSettings(Request $request)
+    {
+        // Implementar lógica de configuración
+        return redirect()->route('admin.settings.index')->with('success', 'Configuración actualizada exitosamente');
+    }
+
+    // ============ MÉTODOS PRIVADOS ============
+
+    /**
+     * Registrar acceso en el log
+     */
+    private function logAccess($personId, $cardId, $status, $reason = null, $request)
+    {
+        AccessLog::create([
+            'person_id' => $personId,
+            'nfc_card_id' => $cardId,
+            'access_type' => 'entry',
+            'verification_method' => 'manual',
+            'access_time' => now(),
+            'status' => $status,
+            'reason' => $reason,
+            'gate' => $request->gate ?? 'Puerta Principal',
+            'ip_address' => $request->ip()
+        ]);
+    }
+
+    /**
+     * Respuesta JSON estandarizada
+     */
+    private function jsonResponse($success, $message, $data = null)
+    {
+        $response = ['success' => $success, 'message' => $message];
+        if ($data) {
+            $response['person'] = $data;
+        }
+        return response()->json($response);
     }
 }

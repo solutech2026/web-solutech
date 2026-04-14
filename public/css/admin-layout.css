@@ -1,0 +1,166 @@
+/* ========================================
+   ADMIN LAYOUT - PROXICARD
+   ======================================== */
+
+/* Reset y estilos base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f8fafc;
+    color: #1e293b;
+    overflow-x: hidden;
+}
+
+/* App Container */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    background: #f8fafc;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    margin-left: 280px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Cuando el sidebar está colapsado */
+.sidebar.collapsed ~ .main-content,
+body.sidebar-collapsed .main-content {
+    margin-left: 80px;
+}
+
+/* Content Area */
+.content-area {
+    flex: 1;
+    padding: 1rem;
+    margin-top: 70px;
+    min-height: calc(100vh - 70px - 60px);
+}
+
+/* Footer */
+.admin-footer {
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    padding: 1rem 2rem;
+    margin-left: 280px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar.collapsed ~ .main-content .admin-footer,
+body.sidebar-collapsed .admin-footer {
+    margin-left: 80px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.footer-content p {
+    margin: 0;
+}
+
+.footer-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.footer-links a {
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: #667eea;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .admin-footer {
+        margin-left: 0;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .content-area {
+        padding: 0.5rem;
+    }
+    
+    .footer-content {
+        font-size: 0.7rem;
+    }
+    
+    .footer-links {
+        gap: 1rem;
+    }
+}
+
+/* Utilidades */
+.text-primary-custom {
+    color: #667eea;
+}
+
+.bg-primary-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.content-area > .container-fluid {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #667eea;
+}

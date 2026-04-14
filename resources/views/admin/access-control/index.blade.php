@@ -1,37 +1,48 @@
 @extends('layouts.admin')
 
 @section('title', 'Control de Acceso')
-
 @section('header', 'Control de Acceso')
 
 @section('content')
 <div class="access-control-container">
     <!-- Filtros -->
     <div class="filter-card">
-        <h4>
-            <i class="fas fa-filter"></i> Filtros de Búsqueda
-        </h4>
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Empresa / Colegio</label>
-                <select class="form-select" id="companyFilter">
-                    <option value="all">Todas las ubicaciones</option>
-                    @foreach($companies as $company)
-                        <option value="{{ $company->id }}">{{ $company->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Categoría</label>
-                <select class="form-select" id="categoryFilter">
-                    <option value="all">Todos</option>
-                    <option value="employee">Empleados</option>
-                    <option value="school">Personal Escolar</option>
-                </select>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Buscar</label>
-                <input type="text" class="form-control" id="searchInput" placeholder="Nombre, apellido, cédula o NFC...">
+        <div class="filter-header">
+            <i class="fas fa-sliders-h"></i>
+            <h4>Filtros de Búsqueda</h4>
+        </div>
+        <div class="filter-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label-modern">
+                        <i class="fas fa-building"></i> Empresa / Colegio
+                    </label>
+                    <select class="form-select-modern" id="companyFilter">
+                        <option value="all">Todas las ubicaciones</option>
+                        @foreach($companies as $company)
+                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label-modern">
+                        <i class="fas fa-tag"></i> Categoría
+                    </label>
+                    <select class="form-select-modern" id="categoryFilter">
+                        <option value="all">Todos</option>
+                        <option value="employee">Empleados</option>
+                        <option value="school">Personal Escolar</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label-modern">
+                        <i class="fas fa-search"></i> Buscar
+                    </label>
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="form-control-modern" id="searchInput" placeholder="Nombre, apellido, cédula o NFC...">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -40,14 +51,16 @@
     <ul class="nav access-tabs" id="accessTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="persons-tab" data-bs-toggle="tab" data-bs-target="#persons" type="button" role="tab">
-                <i class="fas fa-address-card"></i> Personas Registradas
-                <span class="badge">{{ $persons->count() }}</span>
+                <i class="fas fa-address-card"></i>
+                <span>Personas Registradas</span>
+                <span class="tab-badge">{{ $persons->count() }}</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs" type="button" role="tab">
-                <i class="fas fa-history"></i> Historial de Accesos
-                <span class="badge">{{ $accessLogs->count() }}</span>
+                <i class="fas fa-history"></i>
+                <span>Historial de Accesos</span>
+                <span class="tab-badge">{{ $accessLogs->count() }}</span>
             </button>
         </li>
     </ul>
@@ -58,14 +71,16 @@
         <div class="tab-pane fade show active" id="persons" role="tabpanel">
             <div class="persons-grid" id="personsGrid">
                 @foreach($persons as $person)
-                <div class="person-card" data-category="{{ $person->category }}" data-company="{{ $person->company_id }}">
-                    <div class="person-header">
+                <div class="person-card" data-category="{{ $person->category }}" data-company="{{ $person->company_id }}" data-name="{{ strtolower($person->full_name) }}" data-document="{{ strtolower($person->document_id ?? '') }}">
+                    <div class="person-card-header">
                         <div class="person-avatar">
-                            {{ strtoupper(substr($person->name, 0, 1)) }}{{ strtoupper(substr($person->lastname ?? $person->name, 0, 1)) }}
+                            <span>{{ strtoupper(substr($person->name, 0, 1)) }}{{ strtoupper(substr($person->lastname ?? $person->name, 0, 1)) }}</span>
+                            <div class="avatar-status {{ $person->is_active ? 'active' : 'inactive' }}"></div>
                         </div>
-                        <div class="person-info">
-                            <div class="person-name">{{ $person->full_name }}</div>
+                        <div class="person-header-info">
+                            <h4 class="person-name">{{ $person->full_name }}</h4>
                             <span class="person-type {{ $person->category }}">
+                                <i class="fas {{ $person->category == 'employee' ? 'fa-briefcase' : 'fa-graduation-cap' }}"></i>
                                 {{ $person->category_label }}
                                 @if($person->subcategory)
                                     <small>({{ $person->subcategory_label }})</small>
@@ -73,60 +88,63 @@
                             </span>
                         </div>
                     </div>
+                    
                     <div class="person-details">
-                        <div class="person-detail-item">
+                        <div class="detail-item">
                             <i class="fas fa-building"></i>
                             <span>{{ $person->company->name ?? 'N/A' }}</span>
                         </div>
                         @if($person->document_id)
-                        <div class="person-detail-item">
+                        <div class="detail-item">
                             <i class="fas fa-id-card"></i>
                             <span>{{ $person->document_id }}</span>
                         </div>
                         @endif
                         @if($person->email)
-                        <div class="person-detail-item">
+                        <div class="detail-item">
                             <i class="fas fa-envelope"></i>
                             <span>{{ $person->email }}</span>
                         </div>
                         @endif
                         @if($person->phone)
-                        <div class="person-detail-item">
+                        <div class="detail-item">
                             <i class="fas fa-phone"></i>
                             <span>{{ $person->phone }}</span>
                         </div>
                         @endif
                         @if($person->position)
-                        <div class="person-detail-item">
+                        <div class="detail-item">
                             <i class="fas fa-user-tie"></i>
                             <span>{{ $person->position }}</span>
                         </div>
                         @endif
-                        @if($person->nfc_card_id)
-                        <div class="person-detail-item">
+                        <div class="detail-item">
                             <i class="fas fa-id-card"></i>
-                            <span class="badge-nfc">NFC Asignada</span>
+                            @if($person->nfc_card_id)
+                                <span class="nfc-badge assigned">
+                                    <i class="fas fa-check-circle"></i> NFC Asignada
+                                </span>
+                            @else
+                                <span class="nfc-badge unassigned">
+                                    <i class="fas fa-times-circle"></i> Sin tarjeta NFC
+                                </span>
+                            @endif
                         </div>
-                        @else
-                        <div class="person-detail-item">
-                            <i class="fas fa-id-card"></i>
-                            <span class="badge-nfc-warning">Sin tarjeta NFC</span>
-                        </div>
-                        @endif
                     </div>
-                    <div class="person-footer">
-                        <a href="{{ route('admin.persons.show', $person->id) }}" class="btn btn-info">
-                            <i class="fas fa-eye"></i> Ver
+                    
+                    <div class="person-card-footer">
+                        <a href="{{ route('admin.persons.show', $person->id) }}" class="btn-icon btn-info" title="Ver detalles">
+                            <i class="fas fa-eye"></i>
                         </a>
-                        <a href="{{ route('admin.persons.edit', $person->id) }}" class="btn btn-warning">
-                            <i class="fas fa-edit"></i> Editar
+                        <a href="{{ route('admin.persons.edit', $person->id) }}" class="btn-icon btn-warning" title="Editar">
+                            <i class="fas fa-edit"></i>
                         </a>
                         @if(!$person->nfc_card_id && $availableCards->count() > 0)
-                            <button class="btn btn-primary" onclick="openAssignNFCModal({{ $person->id }}, '{{ $person->full_name }}')">
-                                <i class="fas fa-id-card"></i> Asignar NFC
+                            <button class="btn-icon btn-primary" onclick="openAssignNFCModal({{ $person->id }}, '{{ $person->full_name }}')" title="Asignar NFC">
+                                <i class="fas fa-id-card"></i>
                             </button>
                         @endif
-                        <button class="btn btn-danger" onclick="deletePerson({{ $person->id }})">
+                        <button class="btn-icon btn-danger" onclick="deletePerson({{ $person->id }})" title="Eliminar">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -145,19 +163,23 @@
 
         <!-- Pestaña: Historial de Accesos -->
         <div class="tab-pane fade" id="logs" role="tabpanel">
-            <div class="content-card">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4><i class="fas fa-history"></i> Registros de Acceso</h4>
-                    <button class="btn-outline-primary" onclick="exportLogs()">
+            <div class="logs-card">
+                <div class="logs-header">
+                    <div>
+                        <i class="fas fa-history"></i>
+                        <h4>Registros de Acceso</h4>
+                    </div>
+                    <button class="btn-export" onclick="exportLogs()">
                         <i class="fas fa-download"></i> Exportar
                     </button>
                 </div>
-                <div class="table-responsive">
-                    <table class="logs-table">
+                <div class="table-responsive-modern">
+                    <table class="logs-table-modern">
                         <thead>
                             <tr>
                                 <th>Fecha/Hora</th>
                                 <th>Persona</th>
+                                <th>Documento</th>
                                 <th>Ubicación</th>
                                 <th>Método</th>
                                 <th>Estado</th>
@@ -166,24 +188,40 @@
                         <tbody>
                             @forelse($accessLogs as $log)
                             <tr>
-                                <td>{{ $log->access_time->format('d/m/Y H:i:s') }}</td>
-                                <td>{{ $log->person->full_name ?? 'N/A' }}</td>
+                                <td>
+                                    <span class="date-time">
+                                        <i class="far fa-calendar-alt"></i>
+                                        {{ $log->access_time->format('d/m/Y H:i:s') }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="person-cell">
+                                        <div class="cell-avatar">
+                                            {{ substr($log->person->full_name ?? 'N/A', 0, 2) }}
+                                        </div>
+                                        <span>{{ $log->person->full_name ?? 'N/A' }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ $log->person->document_id ?? 'N/A' }}</td>
                                 <td>{{ $log->company->name ?? 'N/A' }}</td>
                                 <td>
-                                    <span class="badge {{ $log->verification_method == 'nfc' ? 'badge-nfc' : 'badge-secondary' }}">
-                                        {{ strtoupper($log->verification_method) }}
+                                    <span class="method-badge {{ $log->verification_method ?? 'nfc' }}">
+                                        <i class="fas {{ $log->verification_method == 'nfc' ? 'fa-microchip' : 'fa-qrcode' }}"></i>
+                                        {{ strtoupper($log->verification_method ?? 'NFC') }}
                                     </span>
                                 </td>
                                 <td>
                                     <span class="status-badge {{ $log->status }}">
+                                        <i class="fas {{ $log->status == 'granted' ? 'fa-check-circle' : 'fa-times-circle' }}"></i>
                                         {{ $log->status == 'granted' ? 'Permitido' : 'Denegado' }}
                                     </span>
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">
-                                    <i class="fas fa-door-open"></i> No hay registros de acceso
+                                <td colspan="6" class="empty-logs">
+                                    <i class="fas fa-door-open"></i>
+                                    <p>No hay registros de acceso</p>
                                 </td>
                             </tr>
                             @endforelse
@@ -198,27 +236,34 @@
 <!-- Modal Asignar Tarjeta NFC -->
 <div class="modal fade" id="assignNFCModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
+        <div class="modal-content-modern">
+            <div class="modal-header-modern">
+                <h5>
                     <i class="fas fa-id-card"></i> Asignar Tarjeta NFC
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="modal-close" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <form id="assignNFCForm" method="POST">
                 @csrf
                 @method('PUT')
-                <div class="modal-body">
-                    <div class="info-card-modal">
-                        <i class="fas fa-user-circle"></i>
-                        <div>
-                            <label>Persona</label>
-                            <p id="assignPersonName" style="font-weight: bold;"></p>
+                <div class="modal-body-modern">
+                    <div class="info-person">
+                        <div class="info-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="info-text">
+                            <label>Persona seleccionada</label>
+                            <p id="assignPersonName"></p>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>Seleccionar Tarjeta NFC *</label>
-                        <select name="card_id" id="nfcCardSelect" class="form-select" required>
+                    
+                    <div class="form-group-modern">
+                        <label class="form-label-modern">
+                            <i class="fas fa-microchip"></i> Seleccionar Tarjeta NFC
+                        </label>
+                        <select name="card_id" id="nfcCardSelect" class="form-select-modern" required>
                             <option value="">-- Seleccionar tarjeta disponible --</option>
                             @foreach($availableCards as $card)
                                 <option value="{{ $card->id }}">
@@ -227,87 +272,41 @@
                                 </option>
                             @endforeach
                         </select>
-                        <small class="text-muted">
+                        <small class="form-text-modern">
                             <i class="fas fa-info-circle"></i> 
                             Solo se muestran tarjetas NFC disponibles (sin asignar)
                         </small>
                     </div>
-                    <div class="alert-info">
+                    
+                    <div class="alert-info-modern">
                         <i class="fas fa-info-circle"></i>
-                        Al asignar esta tarjeta, la persona podrá utilizarla para el control de acceso.
+                        <span>Al asignar esta tarjeta, la persona podrá utilizarla para el control de acceso.</span>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn-primary">Asignar Tarjeta</button>
+                <div class="modal-footer-modern">
+                    <button type="button" class="btn-secondary-modern" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-primary-modern">
+                        <i class="fas fa-id-card"></i> Asignar Tarjeta
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-@if($availableCards->isEmpty())
-<div class="alert-warning">
+@if($availableCards->isEmpty() && !$persons->isEmpty())
+<div class="alert-warning-modern">
     <i class="fas fa-exclamation-triangle"></i>
-    No hay tarjetas NFC disponibles para asignar. 
-    <a href="{{ route('admin.nfc-cards.create') }}">Registra una nueva tarjeta</a> primero.
+    <span>No hay tarjetas NFC disponibles para asignar.</span>
+    <a href="{{ route('admin.nfc-cards.create') }}">Registra una nueva tarjeta</a>
 </div>
 @endif
 @endsection
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/access-control.css') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 @endpush
 
 @push('scripts')
-<script>
-    function filterPersons() {
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        const category = document.getElementById('categoryFilter').value;
-        const company = document.getElementById('companyFilter').value;
-        
-        document.querySelectorAll('.person-card').forEach(card => {
-            let show = true;
-            const text = card.innerText.toLowerCase();
-            const cardCategory = card.dataset.category;
-            const cardCompany = card.dataset.company;
-            
-            if (search && !text.includes(search)) show = false;
-            if (category !== 'all' && cardCategory !== category) show = false;
-            if (company !== 'all' && cardCompany !== company) show = false;
-            
-            card.style.display = show ? 'flex' : 'none';
-        });
-    }
-    
-    function openAssignNFCModal(personId, personName) {
-        document.getElementById('assignPersonName').innerText = personName;
-        document.getElementById('assignNFCForm').action = `/admin/access-control/${personId}/assign-nfc`;
-        new bootstrap.Modal(document.getElementById('assignNFCModal')).show();
-    }
-    
-    function deletePerson(id) {
-        if (confirm('¿Eliminar esta persona? Esta acción no se puede deshacer.')) {
-            fetch(`/admin/access-control/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            }).then(() => location.reload());
-        }
-    }
-    
-    function exportLogs() {
-        const params = new URLSearchParams({
-            company: document.getElementById('companyFilter').value,
-            search: document.getElementById('searchInput').value
-        });
-        window.location.href = `/admin/access-control/export-logs?${params.toString()}`;
-    }
-    
-    document.getElementById('searchInput')?.addEventListener('keyup', filterPersons);
-    document.getElementById('categoryFilter')?.addEventListener('change', filterPersons);
-    document.getElementById('companyFilter')?.addEventListener('change', filterPersons);
-</script>
+<script src="{{ asset('js/access-control.js') }}"></script>
 @endpush

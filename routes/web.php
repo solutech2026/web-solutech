@@ -7,9 +7,11 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\AccessControlController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\NFCCardController;
 use App\Http\Controllers\Admin\PersonController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Api\AccessController as ApiAccessController;
 use App\Http\Controllers\Api\NewsletterController;
 use App\Http\Controllers\Public\BioController as PublicBioController;
@@ -20,31 +22,28 @@ use Inertia\Inertia;
 // 1. RUTAS PÚBLICAS
 // ============================================================================
 
-// Home y páginas estáticas
 Route::get('/', [HomeController::class, 'Index'])->name('home');
 Route::get('/terms', [HomeController::class, 'terms'])->name('terms');
 Route::get('/privacy', [HomeController::class, 'privacy'])->name('privacy');
 Route::get('/legal', [HomeController::class, 'legal'])->name('legal');
 
-// Servicios y acerca de
 Route::get('/servicio', fn() => Inertia::render('Service/Service'))->name('servicio');
 Route::get('/about-us', fn() => Inertia::render('About/About'))->name('about');
 Route::get('/contacto', [ContactController::class, 'index'])->name('contacto');
 
 // Rutas públicas de Bio
 Route::prefix('bio')->name('bio.')->group(function () {
-    Route::get('/{url}', [App\Http\Controllers\Public\BioController::class, 'show'])->name('public');
-    Route::get('/{url}/data', [App\Http\Controllers\Public\BioController::class, 'getData'])->name('public.data');
-    Route::get('/{url}/vcard', [App\Http\Controllers\Public\BioController::class, 'downloadVCard'])->name('public.vcard');
+    Route::get('/{url}', [PublicBioController::class, 'show'])->name('public');
+    Route::get('/{url}/data', [PublicBioController::class, 'getData'])->name('public.data');
+    Route::get('/{url}/vcard', [PublicBioController::class, 'downloadVCard'])->name('public.vcard');
 });
 
 // ============================================================================
-// 2. API PÚBLICAS (NFC, Newsletter, Contacto, Health)
+// 2. API PÚBLICAS
 // ============================================================================
 
 Route::prefix('api')->name('api.')->group(function () {
-
-    // 2.1 Health Check
+    // Health Check
     Route::get('/health', fn() => response()->json([
         'status' => 'online',
         'service' => 'Solubase API',
@@ -52,7 +51,7 @@ Route::prefix('api')->name('api.')->group(function () {
         'version' => '2.0.0'
     ]));
 
-    // 2.2 Acceso NFC
+    // Acceso NFC
     Route::prefix('access')->name('access.')->group(function () {
         Route::post('/validate', [ApiAccessController::class, 'validateAccess'])->name('validate');
         Route::get('/logs', [ApiAccessController::class, 'getLogs'])->name('logs');
@@ -61,20 +60,22 @@ Route::prefix('api')->name('api.')->group(function () {
         Route::get('/person/{id}/last', [ApiAccessController::class, 'getLastAccess'])->name('person.last');
     });
 
-    // 2.3 Newsletter
+    // Newsletter
     Route::prefix('newsletter')->name('newsletter.')->group(function () {
         Route::post('/subscribe', [NewsletterController::class, 'subscribe'])->name('subscribe');
         Route::post('/unsubscribe', [NewsletterController::class, 'unsubscribe'])->name('unsubscribe');
         Route::get('/check', [NewsletterController::class, 'check'])->name('check');
     });
 
-    // 2.4 Contacto
+    // Contacto
     Route::post('/contact/send', [PageController::class, 'sendContact'])->name('contact.send');
 });
 
 // ============================================================================
 // 3. RUTAS DE AUTENTICACIÓN BREEZE
 // ============================================================================
+
+require __DIR__ . '/auth.php';
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -91,19 +92,20 @@ Route::middleware('auth')->group(function () {
 // ============================================================================
 
 Route::prefix('admin')->name('admin.')->group(function () {
-
-    // 4.1 Autenticación Admin
+    // Autenticación Admin
     Route::controller(AuthController::class)->group(function () {
         Route::get('/login', 'showLoginForm')->name('login');
         Route::post('/login', 'login')->name('login.submit');
         Route::post('/logout', 'logout')->name('logout');
     });
 
-    // 4.2 Rutas Protegidas
+    // Rutas protegidas
     Route::middleware(['auth'])->group(function () {
-
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // Empresas y Colegios
+        Route::resource('companies', CompanyController::class);
 
         // Control de Acceso
         Route::prefix('access-control')->name('access-control.')->controller(AccessControlController::class)->group(function () {
@@ -164,7 +166,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/{id}/unassign-nfc', 'unassignNfc')->name('unassign-nfc');
         });
 
-        // Usuarios
+        // Usuarios del Sistema
         Route::prefix('users')->name('users.')->controller(DashboardController::class)->group(function () {
             Route::get('/', 'users')->name('index');
             Route::post('/store', 'storeUser')->name('store');
@@ -173,10 +175,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
 
         // Reportes
-        Route::prefix('reports')->name('reports.')->controller(DashboardController::class)->group(function () {
-            Route::get('/', 'reports')->name('index');
+        Route::prefix('reports')->name('reports.')->controller(ReportController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
             Route::post('/generate', 'generateReport')->name('generate');
+            Route::post('/export/access', 'exportAccessCsv')->name('export.access');
+            Route::post('/export/persons', 'exportPersonsCsv')->name('export.persons');
+            Route::post('/export/cards', 'exportCardsCsv')->name('export.cards');
+            Route::get('/export/pdf/{type}', 'exportPdf')->name('export.pdf');
+            Route::get('/statistics', 'getStatistics')->name('statistics');
         });
+
+        // Empresas activas (para selects)
+        Route::get('/companies/active', [CompanyController::class, 'getActiveCompanies'])->name('companies.active');
 
         // Configuración
         Route::prefix('settings')->name('settings.')->controller(DashboardController::class)->group(function () {
@@ -195,14 +205,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 // ============================================================================
-// 5. RUTAS DE DEBUG / BOOST (Ignorar)
+// 5. RUTAS DE DEBUG (Ignorar)
 // ============================================================================
 
 Route::any('/_boost/{any}', fn() => response()->json(['message' => 'Not found'], 404))
     ->where('any', '.*');
-
-// ============================================================================
-// 6. ARCHIVOS ADICIONALES
-// ============================================================================
-
-require __DIR__ . '/auth.php';
