@@ -46,22 +46,18 @@ class DashboardController extends Controller
             ->with('person.company')
             ->first();
         
-        // Tarjeta no válida
         if (!$card) {
             $this->logAccess(null, null, 'denied', 'Tarjeta no válida', $request);
             return $this->jsonResponse(false, 'Tarjeta no válida o inactiva');
         }
         
-        // Persona no activa
         if (!$card->person || !$card->person->is_active) {
             $this->logAccess($card->person->id ?? null, $card->id, 'denied', 'Persona no activa', $request);
             return $this->jsonResponse(false, 'Persona no activa en el sistema');
         }
         
-        // Acceso permitido
         $this->logAccess($card->person->id, $card->id, 'granted', null, $request);
         
-        // Actualizar timestamps
         $card->update(['last_used_at' => now()]);
         $card->person->update(['last_access_at' => now()]);
         
@@ -218,7 +214,6 @@ class DashboardController extends Controller
     {
         $person = Person::findOrFail($id);
         
-        // Liberar tarjeta asignada
         if ($person->nfc_card_id) {
             NfcCard::where('card_code', $person->nfc_card_id)->update(['person_id' => null]);
         }
@@ -338,20 +333,6 @@ class DashboardController extends Controller
         $user->update(['password' => Hash::make($request->password)]);
 
         return redirect()->route('admin.profile.index')->with('success', 'Contraseña cambiada correctamente');
-    }
-
-    /**
-     * Configuración (placeholder)
-     */
-    public function settings()
-    {
-        return view('admin.settings.index');
-    }
-
-    public function updateSettings(Request $request)
-    {
-        // Implementar lógica de configuración
-        return redirect()->route('admin.settings.index')->with('success', 'Configuración actualizada exitosamente');
     }
 
     // ============ MÉTODOS PRIVADOS ============

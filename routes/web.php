@@ -10,6 +10,8 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\NFCCardController;
+use App\Http\Controllers\Admin\NFCReaderController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\PersonController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Api\AccessController as ApiAccessController;
@@ -127,24 +129,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::prefix('nfc-cards')->name('nfc-cards.')->controller(NFCCardController::class)->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
-            Route::post('/store', 'store')->name('store');
+            Route::post('/', 'store')->name('store');
             Route::get('/{id}', 'show')->name('show');
             Route::delete('/{id}', 'destroy')->name('destroy');
-            Route::get('/{id}/assign', 'assignForm')->name('assign');
-            Route::put('/{id}/assign', 'assign')->name('assign.store');
+            Route::get('/{id}/assign', 'assignForm')->name('assign.form');
+            Route::post('/{id}/assign', 'assign')->name('assign');
             Route::post('/{id}/unassign', 'unassign')->name('unassign');
             Route::get('/export/csv', 'export')->name('export');
-            Route::get('/reader/config', 'readerConfig')->name('reader');
-            Route::post('/reader/save-config', 'saveReaderConfig')->name('save-config');
-            Route::get('/reader/get-config', 'getReaderConfig')->name('get-config');
-            Route::get('/scan-network', 'scanNetworkDevices')->name('scan-network');
-            Route::get('/paired-devices', 'getPairedDevices')->name('paired-devices');
-            Route::post('/pair-device', 'pairDevice')->name('pair-device');
-            Route::delete('/unpair-device', 'unpairDevice')->name('unpair-device');
-            Route::post('/reader/test-wired', 'testWiredConnection')->name('test-wired');
-            Route::post('/reader/test-network', 'testNetworkConnection')->name('test-network');
-            Route::post('/reader/read-card', 'readCard')->name('read-card');
-            Route::get('/reader/generate-qr', 'generateQRCode')->name('generate-qr');
+            Route::get('/dispositivos', 'dispositivosIndex')->name('dispositivos');
         });
 
         // Personas
@@ -188,10 +180,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Empresas activas (para selects)
         Route::get('/companies/active', [CompanyController::class, 'getActiveCompanies'])->name('companies.active');
 
-        // Configuración
-        Route::prefix('settings')->name('settings.')->controller(DashboardController::class)->group(function () {
-            Route::get('/', 'settings')->name('index');
-            Route::post('/update', 'updateSettings')->name('update');
+        // Configuración del Sistema
+        Route::prefix('settings')->name('settings.')->controller(SettingsController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('/update', 'update')->name('update');
+            Route::post('/backup', 'backup')->name('backup');
+            Route::post('/reset', 'reset')->name('reset');
+            Route::get('/download-backup/{filename}', 'downloadBackup')
+                ->name('download-backup')
+                ->where('filename', '.*');
         });
 
         // Perfil Admin
@@ -205,7 +202,39 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 // ============================================================================
-// 5. RUTAS DE DEBUG (Ignorar)
+// 5. RUTAS PARA LECTORES NFC
+// ============================================================================
+
+Route::get('/lectores', [App\Http\Controllers\Admin\NFCReaderController::class, 'index'])->name('lectores.index');
+Route::get('/lectores/nuevo', [App\Http\Controllers\Admin\NFCReaderController::class, 'config'])->name('lectores.nuevo');
+Route::get('/lectores/{id}/editar', [App\Http\Controllers\Admin\NFCReaderController::class, 'config'])->name('lectores.editar');
+Route::post('/lectores/guardar/{id?}', [App\Http\Controllers\Admin\NFCReaderController::class, 'save'])->name('lectores.guardar');
+Route::delete('/lectores/{id}', [App\Http\Controllers\Admin\NFCReaderController::class, 'delete'])->name('lectores.eliminar');
+Route::post('/lectores/{id}/test', [App\Http\Controllers\Admin\NFCReaderController::class, 'test'])->name('lectores.test');
+
+// ============================================================================
+// 6. RUTAS DE PRUEBA (DEBUG)
+// ============================================================================
+
+Route::get('/prueba', function () {
+    return response()->json([
+        'status' => 'success',
+        'message' => 'OK - Ruta funciona correctamente',
+        'timestamp' => now()->toDateTimeString()
+    ]);
+});
+
+Route::get('/prueba-vista', function () {
+    return '<h1>✅ Ruta de prueba funcionando!</h1><p>Si ves esto, las rutas están correctamente configuradas.</p>';
+});
+
+// RUTA DE PRUEBA - AL PRINCIPIO DEL ARCHIVO
+Route::get('/test-nuevo', function () {
+    return 'Ruta de prueba funcionando';
+})->name('test.nuevo');
+
+// ============================================================================
+// 7. RUTAS DE DEBUG (Ignorar - No eliminar)
 // ============================================================================
 
 Route::any('/_boost/{any}', fn() => response()->json(['message' => 'Not found'], 404))

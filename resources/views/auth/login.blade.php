@@ -1,3 +1,4 @@
+{{-- resources/views/auth/login.blade.php --}}
 @extends('layouts.guest')
 
 @push('styles')
@@ -46,6 +47,12 @@
                                 <div class="stat-label">Uptime</div>
                             </div>
                         </div>
+                        
+                        <!-- Mensaje de administración -->
+                        <div class="admin-message">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Acceso autorizado únicamente por administración</span>
+                        </div>
                     </div>
                 </div>
 
@@ -54,11 +61,11 @@
                     <div class="form-card-modern">
                         <div class="form-header-modern">
                             <div class="welcome-badge">
-                                <i class="fas fa-hand-peace"></i>
-                                <span>Bienvenido de vuelta</span>
+                                <i class="fas fa-lock"></i>
+                                <span>Acceso Restringido</span>
                             </div>
                             <h2>Iniciar Sesión</h2>
-                            <p>Ingresa tus credenciales para acceder a tu cuenta</p>
+                            <p>Ingresa tus credenciales asignadas por el administrador</p>
                         </div>
 
                         @if (session('error'))
@@ -104,32 +111,23 @@
                                 <div class="input-focus-border"></div>
                             </div>
 
+                            <!-- Solo opción de recordarme, sin "olvidé contraseña" -->
                             <div class="form-options-modern">
                                 <label class="checkbox-modern">
                                     <input type="checkbox" name="remember">
                                     <span class="checkmark-modern"></span>
-                                    <span>Recordarme</span>
+                                    <span>Recordarme en este dispositivo</span>
                                 </label>
-                                @if (Route::has('password.request'))
-                                    <a href="{{ route('password.request') }}" class="forgot-link-modern">
-                                        ¿Olvidaste tu contraseña?
-                                    </a>
-                                @endif
                             </div>
 
                             <button type="submit" class="btn-login-modern">
-                                <span>Acceder</span>
+                                <span>Acceder al sistema</span>
                                 <i class="fas fa-arrow-right"></i>
                                 <div class="btn-shine"></div>
                             </button>
 
-                            @if (Route::has('register'))
-                                <div class="register-link-modern">
-                                    ¿No tienes cuenta?
-                                    <a href="{{ route('register') }}">Crear cuenta gratuita</a>
-                                </div>
-                            @endif
-
+                            <!-- Eliminado: enlace de registro y "¿Olvidaste contraseña?" -->
+                            
                             <div class="back-home-modern">
                                 <a href="/">
                                     <i class="fas fa-arrow-left"></i> Volver al inicio
@@ -137,22 +135,7 @@
                             </div>
                         </form>
 
-                        <div class="social-login">
-                            <div class="divider">
-                                <span>O continúa con</span>
-                            </div>
-                            <div class="social-buttons">
-                                <button class="social-btn">
-                                    <i class="fab fa-google"></i>
-                                </button>
-                                <button class="social-btn">
-                                    <i class="fab fa-github"></i>
-                                </button>
-                                <button class="social-btn">
-                                    <i class="fab fa-microsoft"></i>
-                                </button>
-                            </div>
-                        </div>
+                        <!-- Eliminada la sección completa de social login -->
                     </div>
                 </div>
             </div>

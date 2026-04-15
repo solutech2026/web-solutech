@@ -1,187 +1,204 @@
 @extends('layouts.admin')
 
 @section('title', 'Tarjetas NFC')
-
 @section('header', 'Tarjetas NFC')
 
 @section('content')
-<div class="nfc-container">
-    <!-- Hero Section -->
-    <div class="page-hero">
-        <div class="hero-content">
-            <div class="hero-left">
-                <div class="hero-icon">
-                    <i class="fas fa-id-card"></i>
-                </div>
-                <div class="hero-text">
-                    <h1>Gestión de Tarjetas NFC</h1>
-                    <p>Administra las tarjetas de acceso para empleados y estudiantes</p>
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">
+                <i class="fas fa-id-card text-primary me-2"></i>
+                Gestión de Tarjetas NFC
+            </h1>
+            <p class="text-muted mb-0">Administra las tarjetas de acceso</p>
+        </div>
+        <div>
+            <a href="{{ route('admin.nfc-cards.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nueva Tarjeta
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary bg-opacity-10 border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Tarjetas</h6>
+                            <h2 class="mb-0">{{ $cards->count() }}</h2>
+                        </div>
+                        <i class="fas fa-id-card fa-2x text-primary"></i>
+                    </div>
                 </div>
             </div>
-            <div class="hero-right">
-                <a href="{{ route('admin.nfc-cards.reader') }}" class="btn-reader-config">
-                    <i class="fas fa-rss"></i>
-                    <span>Configurar Lector</span>
-                </a>
-                <a href="{{ route('admin.nfc-cards.create') }}" class="btn-primary-modern">
-                    <i class="fas fa-plus"></i>
-                    <span>Nueva Tarjeta</span>
-                </a>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success bg-opacity-10 border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Asignadas</h6>
+                            <h2 class="mb-0">{{ $cards->whereNotNull('assigned_to')->count() }}</h2>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning bg-opacity-10 border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Sin Asignar</h6>
+                            <h2 class="mb-0">{{ $cards->whereNull('assigned_to')->count() }}</h2>
+                        </div>
+                        <i class="fas fa-clock fa-2x text-warning"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="stats-grid-modern">
-        <div class="stat-card-glass">
-            <div class="stat-icon-circle blue">
-                <i class="fas fa-id-card"></i>
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Buscar por código, UID o persona...">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select id="statusFilter" class="form-select">
+                        <option value="all">Todas las tarjetas</option>
+                        <option value="assigned">Asignadas</option>
+                        <option value="unassigned">Sin Asignar</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-secondary w-100" onclick="exportCards()">
+                        <i class="fas fa-download"></i> Exportar
+                    </button>
+                </div>
             </div>
-            <div class="stat-info-glass">
-                <h3>{{ $cards->count() }}</h3>
-                <p>Total Tarjetas</p>
-            </div>
-        </div>
-
-        <div class="stat-card-glass">
-            <div class="stat-icon-circle green">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="stat-info-glass">
-                <h3>{{ $cards->whereNotNull('assigned_to')->count() }}</h3>
-                <p>Asignadas</p>
-            </div>
-        </div>
-
-        <div class="stat-card-glass">
-            <div class="stat-icon-circle orange">
-                <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-info-glass">
-                <h3>{{ $cards->whereNull('assigned_to')->count() }}</h3>
-                <p>Sin Asignar</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filters Bar -->
-    <div class="filters-bar-modern">
-        <div class="search-wrapper">
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Buscar por código, UID o persona asignada...">
-        </div>
-        
-        <div class="filters-group">
-            <select id="statusFilter" class="filter-select-modern">
-                <option value="all">Todas las tarjetas</option>
-                <option value="assigned">Asignadas</option>
-                <option value="unassigned">Sin Asignar</option>
-            </select>
-            <button class="btn-export-modern" onclick="exportCards()">
-                <i class="fas fa-download"></i> Exportar
-            </button>
         </div>
     </div>
 
     <!-- Cards Grid -->
-    <div class="cards-grid-modern" id="cardsGrid">
-        @foreach($cards as $card)
-        <div class="nfc-card-modern" 
-             data-id="{{ $card->id }}"
-             data-assigned="{{ $card->assigned_to ? 'true' : 'false' }}">
-            
-            <div class="card-chip-modern"></div>
-            <div class="card-badge-modern {{ $card->assigned_to ? 'assigned' : 'unassigned' }}">
-                {{ $card->assigned_to ? 'Asignada' : 'Sin Asignar' }}
-            </div>
-            
-            <div class="card-body-modern">
-                <div class="card-code-modern">{{ $card->card_code }}</div>
-                @if($card->card_uid)
-                <div class="card-uid-modern">UID: {{ $card->card_uid }}</div>
-                @endif
+    <div class="row" id="cardsGrid">
+        @forelse($cards as $card)
+        <div class="col-md-6 col-lg-4 mb-4 card-item" data-assigned="{{ $card->assigned_to ? 'assigned' : 'unassigned' }}">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="bg-light rounded p-2">
+                            <i class="fas fa-microchip fa-2x text-primary"></i>
+                        </div>
+                        <span class="badge {{ $card->assigned_to ? 'bg-success' : 'bg-warning' }}">
+                            {{ $card->assigned_to ? 'Asignada' : 'Sin Asignar' }}
+                        </span>
+                    </div>
+                    
+                    <h5 class="card-title text-center mb-3">{{ $card->card_code }}</h5>
+                    
+                    @if($card->card_uid)
+                    <p class="small text-muted text-center mb-3">
+                        <i class="fas fa-key"></i> UID: {{ $card->card_uid }}
+                    </p>
+                    @endif
+                    
+                    @if($card->assignedPerson)
+                    <hr>
+                    <div class="small">
+                        <p class="mb-1">
+                            <i class="fas fa-user text-primary me-1"></i>
+                            <strong>{{ $card->assignedPerson->full_name }}</strong>
+                        </p>
+                        @if($card->assignedPerson->company)
+                        <p class="mb-1 text-muted">
+                            <i class="fas fa-building me-1"></i> {{ $card->assignedPerson->company->name }}
+                        </p>
+                        @endif
+                        @if($card->assignedPerson->document_id)
+                        <p class="mb-1 text-muted">
+                            <i class="fas fa-id-card me-1"></i> {{ $card->assignedPerson->document_id }}
+                        </p>
+                        @endif
+                    </div>
+                    @endif
+                    
+                    @if($card->notes)
+                    <hr>
+                    <p class="small text-muted mb-0">
+                        <i class="fas fa-sticky-note me-1"></i> {{ Str::limit($card->notes, 50) }}
+                    </p>
+                    @endif
+                </div>
                 
-                @if($card->assignedPerson)
-                <div class="card-person-modern">
-                    <i class="fas fa-user"></i>
-                    <span>{{ $card->assignedPerson->full_name }}</span>
+                <div class="card-footer bg-transparent border-top-0">
+                    <div class="btn-group w-100">
+                        <button class="btn btn-sm btn-outline-info" onclick="showCardDetails({{ $card->id }})">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                        @if(!$card->assigned_to)
+                        <a href="{{ route('admin.nfc-cards.assign.form', $card->id) }}" class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-link"></i> Asignar
+                        </a>
+                        @endif
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteCard({{ $card->id }})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="card-company-modern">
-                    <i class="fas fa-building"></i> {{ $card->assignedPerson->company->name ?? 'N/A' }}
-                </div>
-                @endif
-                
-                @if($card->notes)
-                <div class="card-notes-modern">
-                    <i class="fas fa-sticky-note"></i> {{ Str::limit($card->notes, 50) }}
-                </div>
-                @endif
             </div>
-            
-            <div class="card-footer-modern">
-                <button class="action-btn view" onclick="showCardDetails({{ $card->id }})">
-                    <i class="fas fa-eye"></i> Ver
-                </button>
-                @if(!$card->assigned_to)
-                <a href="{{ route('admin.nfc-cards.assign', $card->id) }}" class="action-btn assign">
-                    <i class="fas fa-link"></i> Asignar
+        </div>
+        @empty
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-id-card fa-4x text-muted mb-3"></i>
+                <h4>No hay tarjetas registradas</h4>
+                <p class="text-muted">Comienza registrando tarjetas NFC</p>
+                <a href="{{ route('admin.nfc-cards.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Registrar primera tarjeta
                 </a>
-                @endif
-                <button class="action-btn delete" onclick="deleteCard({{ $card->id }})">
-                    <i class="fas fa-trash"></i>
-                </button>
             </div>
         </div>
-        @endforeach
+        @endforelse
     </div>
-
-    <!-- Empty State -->
-    @if($cards->isEmpty())
-    <div class="empty-state-modern">
-        <div class="empty-icon">
-            <i class="fas fa-id-card"></i>
-        </div>
-        <h3>No hay tarjetas registradas</h3>
-        <p>Comienza registrando tarjetas NFC para el control de acceso</p>
-        <div class="empty-actions">
-            <a href="{{ route('admin.nfc-cards.reader') }}" class="btn-reader-config">
-                <i class="fas fa-rss"></i> Configurar Lector
-            </a>
-            <a href="{{ route('admin.nfc-cards.create') }}" class="btn-primary-modern">
-                <i class="fas fa-plus"></i> Registrar primera tarjeta
-            </a>
-        </div>
-    </div>
-    @endif
 </div>
 
 <!-- Modal Detalles -->
-<div class="modal fade modern-modal" id="cardModal" tabindex="-1">
+<div class="modal fade" id="cardModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="fas fa-id-card"></i> Detalles de la Tarjeta
+                    <i class="fas fa-id-card text-primary me-2"></i>
+                    Detalles de la Tarjeta
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="cardModalBody">
-                <div class="text-center">
-                    <div class="loading-spinner">Cargando...</div>
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary"></div>
+                    <p class="mt-2">Cargando...</p>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary-modern" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 @endsection
-
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/nfc-cards.css') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-@endpush
 
 @push('scripts')
 <script>
@@ -189,16 +206,16 @@
         const search = document.getElementById('searchInput').value.toLowerCase();
         const status = document.getElementById('statusFilter').value;
         
-        document.querySelectorAll('.nfc-card-modern').forEach(card => {
+        document.querySelectorAll('.card-item').forEach(card => {
             let show = true;
             const text = card.innerText.toLowerCase();
-            const isAssigned = card.dataset.assigned === 'true';
+            const isAssigned = card.dataset.assigned === 'assigned';
             
             if (search && !text.includes(search)) show = false;
             if (status === 'assigned' && !isAssigned) show = false;
             if (status === 'unassigned' && isAssigned) show = false;
             
-            card.style.display = show ? 'flex' : 'none';
+            card.style.display = show ? '' : 'none';
         });
     }
     
@@ -209,8 +226,8 @@
                 const modalBody = document.getElementById('cardModalBody');
                 modalBody.innerHTML = `
                     <div class="text-center">
-                        <div class="card-chip-modern" style="position: relative; margin: 0 auto 1rem;"></div>
-                        <h4 class="card-code-modern" style="color: #1f2937;">${card.card_code}</h4>
+                        <i class="fas fa-id-card fa-3x text-primary mb-3"></i>
+                        <h4>${card.card_code}</h4>
                         ${card.card_uid ? `<p><strong>UID:</strong> <code>${card.card_uid}</code></p>` : ''}
                         <hr>
                         <div class="text-start">
@@ -220,10 +237,10 @@
                                 </span>
                             </p>
                             ${card.assigned_person ? `
-                                <p><strong>Asignada a:</strong> ${card.assigned_person.name} ${card.assigned_person.lastname || ''}</p>
-                                ${card.assigned_person.company ? `<p><strong>Empresa/Colegio:</strong> ${card.assigned_person.company.name}</p>` : ''}
-                                <p><strong>Cédula:</strong> ${card.assigned_person.document_id || 'No registrada'}</p>
-                                <p><strong>Email:</strong> ${card.assigned_person.email || 'No registrado'}</p>
+                                <p><strong>Asignada a:</strong> ${card.assigned_person.full_name}</p>
+                                ${card.assigned_person.document_id ? `<p><strong>Cédula:</strong> ${card.assigned_person.document_id}</p>` : ''}
+                                ${card.assigned_person.email ? `<p><strong>Email:</strong> ${card.assigned_person.email}</p>` : ''}
+                                ${card.assigned_person.company ? `<p><strong>Empresa:</strong> ${card.assigned_person.company.name}</p>` : ''}
                             ` : ''}
                             <p><strong>Notas:</strong> ${card.notes || 'Sin notas'}</p>
                             <p><strong>Registrada:</strong> ${new Date(card.created_at).toLocaleString()}</p>
@@ -234,31 +251,25 @@
                 new bootstrap.Modal(document.getElementById('cardModal')).show();
             })
             .catch(error => {
-                console.error('Error:', error);
                 document.getElementById('cardModalBody').innerHTML = '<div class="alert alert-danger">Error al cargar los detalles</div>';
             });
     }
     
     function deleteCard(id) {
-        if (confirm('¿Eliminar esta tarjeta? Esta acción no se puede deshacer.')) {
+        if (confirm('¿Eliminar esta tarjeta?')) {
             fetch(`/admin/nfc-cards/${id}`, {
                 method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
             }).then(response => {
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    alert('Error al eliminar la tarjeta');
-                }
+                if (response.ok) location.reload();
+                else alert('Error al eliminar');
             });
         }
     }
     
     function exportCards() {
         const status = document.getElementById('statusFilter').value;
-        window.location.href = `/admin/nfc-cards/export?status=${status}`;
+        window.location.href = `/admin/nfc-cards/export/csv?status=${status}`;
     }
     
     document.getElementById('searchInput')?.addEventListener('keyup', filterCards);

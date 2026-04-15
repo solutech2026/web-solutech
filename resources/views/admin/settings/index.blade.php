@@ -1,348 +1,407 @@
+{{-- resources/views/admin/settings/index.blade.php --}}
 @extends('layouts.admin')
 
 @section('title', 'Configuración del Sistema')
-
 @section('header', 'Configuración')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/settings.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+@endpush
+
 @section('content')
-<div class="settings-container">
-    <div class="row">
-        <!-- Configuración General -->
-        <div class="col-md-6 mb-4">
-            <div class="settings-card">
-                <h4 class="mb-3">
-                    <i class="fas fa-globe"></i> Configuración General
-                </h4>
-                <form id="generalSettingsForm">
-                    @csrf
-                    <div class="mb-3">
-                        <label class="form-label">Nombre del Sistema</label>
-                        <input type="text" class="form-control" name="system_name" value="SoluTech Access Control">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Zona Horaria</label>
-                        <select class="form-select" name="timezone">
-                            <option value="America/Caracas" selected>Caracas (UTC-4)</option>
-                            <option value="America/New_York">Nueva York (UTC-5)</option>
-                            <option value="Europe/Madrid">Madrid (UTC+1)</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Formato de Fecha</label>
-                        <select class="form-select" name="date_format">
-                            <option value="d/m/Y" selected>DD/MM/YYYY</option>
-                            <option value="m/d/Y">MM/DD/YYYY</option>
-                            <option value="Y-m-d">YYYY-MM-DD</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Idioma</label>
-                        <select class="form-select" name="language">
-                            <option value="es" selected>Español</option>
-                            <option value="en">English</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Configuración de Notificaciones -->
-            <div class="settings-card">
-                <h4 class="mb-3">
-                    <i class="fas fa-bell"></i> Notificaciones
-                </h4>
-                <form id="notificationsForm">
-                    <div class="mb-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
-                            <label class="form-check-label" for="emailNotifications">
-                                Notificaciones por correo electrónico
-                            </label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="accessAlerts">
-                            <label class="form-check-label" for="accessAlerts">
-                                Alertas de accesos sospechosos
-                            </label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Correos para notificaciones</label>
-                        <input type="text" class="form-control" placeholder="correo1@ejemplo.com, correo2@ejemplo.com">
-                        <small class="form-text text-muted">Separar múltiples correos con comas</small>
-                    </div>
-                </form>
-            </div>
+<div class="settings-wrapper">
+    <div class="settings-header">
+        <div class="header-info">
+            <h1 class="settings-title">
+                <i class="fas fa-sliders-h"></i>
+                Panel de Configuración
+            </h1>
+            <p class="settings-subtitle">Gestiona la configuración global del sistema de control de acceso</p>
         </div>
-
-        <div class="col-md-6 mb-4">
-            <!-- Configuración de Seguridad -->
-            <div class="settings-card">
-                <h4 class="mb-3">
-                    <i class="fas fa-shield-alt"></i> Seguridad
-                </h4>
-                <form id="securitySettingsForm">
-                    <div class="mb-3">
-                        <label class="form-label">Intentos máximos de login</label>
-                        <input type="number" class="form-control" name="max_attempts" value="5" min="1" max="10">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tiempo de bloqueo (minutos)</label>
-                        <input type="number" class="form-control" name="lockout_time" value="15" min="1" max="60">
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="twoFactorAuth">
-                            <label class="form-check-label" for="twoFactorAuth">
-                                Autenticación de dos factores (2FA)
-                            </label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="sessionTimeout" checked>
-                            <label class="form-check-label" for="sessionTimeout">
-                                Cierre automático de sesión por inactividad
-                            </label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tiempo de inactividad (minutos)</label>
-                        <input type="number" class="form-control" name="session_timeout" value="30" min="5" max="120">
-                    </div>
-                </form>
-            </div>
-
-            <!-- Configuración de Respaldos -->
-            <div class="settings-card">
-                <h4 class="mb-3">
-                    <i class="fas fa-database"></i> Respaldos
-                </h4>
-                <form id="backupSettingsForm">
-                    <div class="mb-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="autoBackup" checked>
-                            <label class="form-check-label" for="autoBackup">
-                                Respaldo automático
-                            </label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Frecuencia de respaldo</label>
-                        <select class="form-select" name="backup_frequency">
-                            <option value="daily">Diario</option>
-                            <option value="weekly" selected>Semanal</option>
-                            <option value="monthly">Mensual</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Hora de respaldo</label>
-                        <input type="time" class="form-control" name="backup_time" value="02:00">
-                    </div>
-                    <div class="mb-3">
-                        <button type="button" class="btn btn-outline-primary" onclick="manualBackup()">
-                            <i class="fas fa-database"></i> Realizar Respaldo Ahora
-                        </button>
-                    </div>
-                </form>
+        <div class="header-actions">
+            <div class="last-saved" id="lastSavedInfo">
+                <i class="fas fa-clock"></i>
+                <span>Última modificación: {{ $lastUpdated ?? 'Nunca' }}</span>
             </div>
         </div>
     </div>
 
-    <!-- Configuración de Integraciones -->
-    <div class="row">
-        <div class="col-12 mb-4">
-            <div class="settings-card">
-                <h4 class="mb-3">
-                    <i class="fas fa-plug"></i> Integraciones
-                </h4>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="integration-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="fab fa-whatsapp"></i>
-                                    <strong>WhatsApp API</strong>
-                                    <p class="text-muted small mb-0 mt-1">Enviar notificaciones por WhatsApp</p>
-                                </div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="whatsappIntegration">
-                                </div>
-                            </div>
+    <form id="settingsForm">
+        @csrf
+        <div class="settings-grid">
+            <!-- Tarjeta: Configuración General -->
+            <div class="settings-card card-general">
+                <div class="card-header">
+                    <div class="header-icon">
+                        <i class="fas fa-globe-americas"></i>
+                    </div>
+                    <div class="header-text">
+                        <h3>Configuración General</h3>
+                        <p>Personaliza la información principal del sistema</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-tag"></i>
+                            Nombre del Sistema
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="system_name" 
+                               name="general[system_name]" 
+                               value="{{ $settings['system_name'] ?? 'SoluTech Access Control' }}"
+                               placeholder="Ej: ProxiCard Access">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-clock"></i>
+                                Zona Horaria
+                            </label>
+                            <select class="form-control" id="timezone" name="general[timezone]">
+                                <option value="America/Caracas" {{ ($settings['timezone'] ?? '') == 'America/Caracas' ? 'selected' : '' }}>Caracas (UTC-4)</option>
+                                <option value="America/New_York" {{ ($settings['timezone'] ?? '') == 'America/New_York' ? 'selected' : '' }}>Nueva York (UTC-5)</option>
+                                <option value="Europe/Madrid" {{ ($settings['timezone'] ?? '') == 'Europe/Madrid' ? 'selected' : '' }}>Madrid (UTC+1)</option>
+                                <option value="America/Mexico_City" {{ ($settings['timezone'] ?? '') == 'America/Mexico_City' ? 'selected' : '' }}>Ciudad de México (UTC-6)</option>
+                                <option value="America/Bogota" {{ ($settings['timezone'] ?? '') == 'America/Bogota' ? 'selected' : '' }}>Bogotá (UTC-5)</option>
+                            </select>
                         </div>
-                        <div class="integration-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="fas fa-id-card"></i>
-                                    <strong>Lectores NFC</strong>
-                                    <p class="text-muted small mb-0 mt-1">Configurar lectores de tarjetas NFC</p>
-                                </div>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="configureNFCReaders()">
-                                    <i class="fas fa-cog"></i> Configurar
-                                </button>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-alt"></i>
+                                Formato de Fecha
+                            </label>
+                            <select class="form-control" id="date_format" name="general[date_format]">
+                                <option value="d/m/Y" {{ ($settings['date_format'] ?? '') == 'd/m/Y' ? 'selected' : '' }}>DD/MM/YYYY</option>
+                                <option value="m/d/Y" {{ ($settings['date_format'] ?? '') == 'm/d/Y' ? 'selected' : '' }}>MM/DD/YYYY</option>
+                                <option value="Y-m-d" {{ ($settings['date_format'] ?? '') == 'Y-m-d' ? 'selected' : '' }}>YYYY-MM-DD</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-language"></i>
+                                Idioma Principal
+                            </label>
+                            <select class="form-control" id="language" name="general[language]">
+                                <option value="es" {{ ($settings['language'] ?? '') == 'es' ? 'selected' : '' }}>Español</option>
+                                <option value="en" {{ ($settings['language'] ?? '') == 'en' ? 'selected' : '' }}>English</option>
+                                <option value="pt" {{ ($settings['language'] ?? '') == 'pt' ? 'selected' : '' }}>Português</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta: Seguridad -->
+            <div class="settings-card card-security">
+                <div class="card-header">
+                    <div class="header-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="header-text">
+                        <h3>Seguridad y Acceso</h3>
+                        <p>Configura las políticas de seguridad del sistema</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-key"></i>
+                                Intentos máximos de login
+                            </label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="max_attempts" 
+                                   name="security[max_attempts]" 
+                                   value="{{ $settings['max_attempts'] ?? 5 }}"
+                                   min="1" 
+                                   max="10">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-hourglass-half"></i>
+                                Tiempo de bloqueo (minutos)
+                            </label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="lockout_time" 
+                                   name="security[lockout_time]" 
+                                   value="{{ $settings['lockout_time'] ?? 15 }}"
+                                   min="1" 
+                                   max="60">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-hourglass-end"></i>
+                            Tiempo de inactividad (minutos)
+                        </label>
+                        <input type="number" 
+                               class="form-control" 
+                               id="session_timeout" 
+                               name="security[session_timeout]" 
+                               value="{{ $settings['session_timeout'] ?? 30 }}"
+                               min="5" 
+                               max="120">
+                    </div>
+
+                    <div class="toggle-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="two_factor_auth" name="security[two_factor_auth]" value="1" {{ ($settings['two_factor_auth'] ?? false) ? 'checked' : '' }}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <div class="toggle-label">
+                            <i class="fas fa-mobile-alt"></i>
+                            <div>
+                                <strong>Autenticación de dos factores (2FA)</strong>
+                                <p>Requerir código de verificación adicional al iniciar sesión</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="integration-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="fas fa-print"></i>
-                                    <strong>Impresoras de Tickets</strong>
-                                    <p class="text-muted small mb-0 mt-1">Configurar impresión de tickets</p>
-                                </div>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="configurePrinters()">
-                                    <i class="fas fa-cog"></i> Configurar
-                                </button>
-                            </div>
-                        </div>
-                        <div class="integration-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <strong>API Externa</strong>
-                                    <p class="text-muted small mb-0 mt-1">Integración con servicios externos</p>
-                                </div>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="configureAPI()">
-                                    <i class="fas fa-cog"></i> Configurar
-                                </button>
+
+                    <div class="toggle-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="session_timeout_enabled" name="security[session_timeout_enabled]" value="1" {{ ($settings['session_timeout_enabled'] ?? true) ? 'checked' : '' }}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <div class="toggle-label">
+                            <i class="fas fa-power-off"></i>
+                            <div>
+                                <strong>Cierre automático por inactividad</strong>
+                                <p>Finalizar sesión automáticamente después del tiempo especificado</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Botones de Acción -->
-    <div class="row">
-        <div class="col-12">
-            <div class="settings-actions">
-                <button class="btn btn-secondary me-2" onclick="resetSettings()">
-                    <i class="fas fa-undo"></i> Restablecer
-                </button>
-                <button class="btn btn-primary" onclick="saveSettings()">
-                    <i class="fas fa-save"></i> Guardar Cambios
-                </button>
+            <!-- Tarjeta: Notificaciones -->
+            <div class="settings-card card-notifications">
+                <div class="card-header">
+                    <div class="header-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="header-text">
+                        <h3>Notificaciones</h3>
+                        <p>Configura las alertas y comunicaciones del sistema</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="toggle-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="email_notifications" name="notifications[email_notifications]" value="1" {{ ($settings['email_notifications'] ?? true) ? 'checked' : '' }}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <div class="toggle-label">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <strong>Notificaciones por correo electrónico</strong>
+                                <p>Enviar alertas y reportes vía email</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="toggle-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="access_alerts" name="notifications[access_alerts]" value="1" {{ ($settings['access_alerts'] ?? false) ? 'checked' : '' }}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <div class="toggle-label">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Alertas de accesos sospechosos</strong>
+                                <p>Notificar cuando se detecten patrones inusuales de acceso</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-envelope-open-text"></i>
+                            Correos para notificaciones
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="notification_emails" 
+                               name="notifications[notification_emails]" 
+                               value="{{ $settings['notification_emails'] ?? '' }}"
+                               placeholder="correo1@empresa.com, correo2@empresa.com">
+                        <small class="form-hint">Separar múltiples correos con comas</small>
+                    </div>
+                </div>
             </div>
+
+            <!-- Tarjeta: Respaldos -->
+            <div class="settings-card card-backup">
+                <div class="card-header">
+                    <div class="header-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="header-text">
+                        <h3>Respaldos</h3>
+                        <p>Configura la copia de seguridad automática</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="toggle-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="auto_backup" name="backup[auto_backup]" value="1" {{ ($settings['auto_backup'] ?? true) ? 'checked' : '' }}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <div class="toggle-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <div>
+                                <strong>Respaldo automático</strong>
+                                <p>Realizar copias de seguridad programadas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-week"></i>
+                                Frecuencia
+                            </label>
+                            <select class="form-control" id="backup_frequency" name="backup[backup_frequency]">
+                                <option value="daily" {{ ($settings['backup_frequency'] ?? '') == 'daily' ? 'selected' : '' }}>Diario</option>
+                                <option value="weekly" {{ ($settings['backup_frequency'] ?? 'weekly') == 'weekly' ? 'selected' : '' }}>Semanal</option>
+                                <option value="monthly" {{ ($settings['backup_frequency'] ?? '') == 'monthly' ? 'selected' : '' }}>Mensual</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-clock"></i>
+                                Hora
+                            </label>
+                            <input type="time" 
+                                   class="form-control" 
+                                   id="backup_time" 
+                                   name="backup[backup_time]" 
+                                   value="{{ $settings['backup_time'] ?? '02:00' }}">
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-backup" id="manualBackupBtn">
+                        <i class="fas fa-database"></i>
+                        <span>Realizar Respaldo Ahora</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tarjeta: Integraciones -->
+            <div class="settings-card card-integrations">
+                <div class="card-header">
+                    <div class="header-icon">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <div class="header-text">
+                        <h3>Integraciones</h3>
+                        <p>Conecta el sistema con servicios externos</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="integration-item">
+                        <div class="integration-info">
+                            <i class="fab fa-whatsapp"></i>
+                            <div>
+                                <strong>WhatsApp Business API</strong>
+                                <p>Envío de notificaciones y alertas vía WhatsApp</p>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="whatsapp_integration" name="integrations[whatsapp]" value="1" {{ ($settings['whatsapp_integration'] ?? false) ? 'checked' : '' }}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="integration-item">
+                        <div class="integration-info">
+                            <i class="fas fa-id-card"></i>
+                            <div>
+                                <strong>Lectores NFC</strong>
+                                <p>Configuración de lectores de tarjetas y credenciales</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-config" data-integration="nfc">
+                            <i class="fas fa-cog"></i>
+                            <span>Configurar</span>
+                        </button>
+                    </div>
+
+                    <div class="integration-item">
+                        <div class="integration-info">
+                            <i class="fas fa-print"></i>
+                            <div>
+                                <strong>Impresoras de Tickets</strong>
+                                <p>Configuración de impresión de tickets y reportes</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-config" data-integration="printer">
+                            <i class="fas fa-cog"></i>
+                            <span>Configurar</span>
+                        </button>
+                    </div>
+
+                    <div class="integration-item">
+                        <div class="integration-info">
+                            <i class="fas fa-chart-line"></i>
+                            <div>
+                                <strong>API de Reportes</strong>
+                                <p>Integración con sistemas externos de reporting</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-config" data-integration="api">
+                            <i class="fas fa-cog"></i>
+                            <span>Configurar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="settings-footer">
+            <button type="button" class="btn-reset" id="resetBtn">
+                <i class="fas fa-undo-alt"></i>
+                Restablecer Valores
+            </button>
+            <button type="submit" class="btn-save" id="saveBtn">
+                <i class="fas fa-save"></i>
+                Guardar Cambios
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Modal de Configuración de Integración -->
+<div id="configModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Configuración</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- Contenido dinámico -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" id="modalCancel">Cancelar</button>
+            <button class="btn-primary" id="modalSave">Guardar</button>
         </div>
     </div>
 </div>
 @endsection
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/settings.css') }}">
-@endpush
-
 @push('scripts')
-<script>
-    function saveSettings() {
-        // Recopilar datos de todos los formularios
-        const generalData = {
-            system_name: document.querySelector('input[name="system_name"]').value,
-            timezone: document.querySelector('select[name="timezone"]').value,
-            date_format: document.querySelector('select[name="date_format"]').value,
-            language: document.querySelector('select[name="language"]').value
-        };
-        
-        const securityData = {
-            max_attempts: document.querySelector('input[name="max_attempts"]').value,
-            lockout_time: document.querySelector('input[name="lockout_time"]').value,
-            two_factor_auth: document.getElementById('twoFactorAuth').checked,
-            session_timeout: document.getElementById('sessionTimeout').checked,
-            session_timeout_minutes: document.querySelector('input[name="session_timeout"]').value
-        };
-        
-        const notificationsData = {
-            email_notifications: document.getElementById('emailNotifications').checked,
-            access_alerts: document.getElementById('accessAlerts').checked,
-            notification_emails: document.querySelector('#notificationsForm input[type="text"]').value
-        };
-        
-        const backupData = {
-            auto_backup: document.getElementById('autoBackup').checked,
-            backup_frequency: document.querySelector('select[name="backup_frequency"]').value,
-            backup_time: document.querySelector('input[name="backup_time"]').value
-        };
-        
-        const integrationsData = {
-            whatsapp: document.getElementById('whatsappIntegration').checked
-        };
-        
-        // Aquí iría la llamada AJAX para guardar
-        console.log('Guardando configuración:', {
-            general: generalData,
-            security: securityData,
-            notifications: notificationsData,
-            backup: backupData,
-            integrations: integrationsData
-        });
-        
-        // Mostrar mensaje de éxito
-        showNotification('Configuración guardada correctamente', 'success');
-    }
-    
-    function resetSettings() {
-        if (confirm('¿Restablecer toda la configuración a los valores predeterminados?')) {
-            // Restablecer formularios
-            document.getElementById('generalSettingsForm').reset();
-            document.getElementById('securitySettingsForm').reset();
-            document.getElementById('notificationsForm').reset();
-            document.getElementById('backupSettingsForm').reset();
-            
-            // Restablecer switches
-            document.getElementById('emailNotifications').checked = true;
-            document.getElementById('sessionTimeout').checked = true;
-            document.getElementById('autoBackup').checked = true;
-            document.getElementById('whatsappIntegration').checked = false;
-            document.getElementById('accessAlerts').checked = false;
-            document.getElementById('twoFactorAuth').checked = false;
-            
-            showNotification('Configuración restablecida', 'info');
-        }
-    }
-    
-    function manualBackup() {
-        showNotification('Iniciando respaldo manual...', 'info');
-        setTimeout(() => {
-            showNotification('Respaldo completado exitosamente', 'success');
-        }, 2000);
-    }
-    
-    function configureNFCReaders() {
-        showNotification('Configuración de lectores NFC', 'info');
-    }
-    
-    function configurePrinters() {
-        showNotification('Configuración de impresoras', 'info');
-    }
-    
-    function configureAPI() {
-        showNotification('Configuración de API externa', 'info');
-    }
-    
-    function showNotification(message, type) {
-        // Crear elemento de notificación
-        const notification = document.createElement('div');
-        notification.className = `alert alert-${type === 'success' ? 'success' : 'info'} alert-dismissible fade show`;
-        notification.style.position = 'fixed';
-        notification.style.top = '20px';
-        notification.style.right = '20px';
-        notification.style.zIndex = '9999';
-        notification.style.minWidth = '300px';
-        notification.style.borderRadius = '12px';
-        notification.innerHTML = `
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
-    }
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/settings.js') }}"></script>
 @endpush

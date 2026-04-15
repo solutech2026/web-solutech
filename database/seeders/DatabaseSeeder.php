@@ -9,9 +9,9 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            CompanySeeder::class,
-            PersonSeeder::class,
-            NFCCardSeeder::class,
+            //CompanySeeder::class,
+            //PersonSeeder::class,
+            //NFCCardSeeder::class,
             RolePermissionSeeder::class,
         ]);
     }

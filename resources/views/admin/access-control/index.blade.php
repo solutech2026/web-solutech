@@ -71,7 +71,7 @@
         <div class="tab-pane fade show active" id="persons" role="tabpanel">
             <div class="persons-grid" id="personsGrid">
                 @foreach($persons as $person)
-                <div class="person-card" data-category="{{ $person->category }}" data-company="{{ $person->company_id }}" data-name="{{ strtolower($person->full_name) }}" data-document="{{ strtolower($person->document_id ?? '') }}">
+                <div class="person-card" data-id="{{ $person->id }}" data-category="{{ $person->category }}" data-company="{{ $person->company_id }}" data-name="{{ strtolower($person->full_name) }}" data-document="{{ strtolower($person->document_id ?? '') }}">
                     <div class="person-card-header">
                         <div class="person-avatar">
                             <span>{{ strtoupper(substr($person->name, 0, 1)) }}{{ strtoupper(substr($person->lastname ?? $person->name, 0, 1)) }}</span>
@@ -140,11 +140,11 @@
                             <i class="fas fa-edit"></i>
                         </a>
                         @if(!$person->nfc_card_id && $availableCards->count() > 0)
-                            <button class="btn-icon btn-primary" onclick="openAssignNFCModal({{ $person->id }}, '{{ $person->full_name }}')" title="Asignar NFC">
+                            <button type="button" class="btn-icon btn-primary" onclick="openAssignNFCModal({{ $person->id }}, '{{ addslashes($person->full_name) }}')" title="Asignar NFC">
                                 <i class="fas fa-id-card"></i>
                             </button>
                         @endif
-                        <button class="btn-icon btn-danger" onclick="deletePerson({{ $person->id }})" title="Eliminar">
+                        <button type="button" class="btn-icon btn-danger" onclick="deletePerson({{ $person->id }})" title="Eliminar">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -169,7 +169,7 @@
                         <i class="fas fa-history"></i>
                         <h4>Registros de Acceso</h4>
                     </div>
-                    <button class="btn-export" onclick="exportLogs()">
+                    <button type="button" class="btn-export" onclick="exportLogs()">
                         <i class="fas fa-download"></i> Exportar
                     </button>
                 </div>
@@ -234,20 +234,20 @@
 </div>
 
 <!-- Modal Asignar Tarjeta NFC -->
-<div class="modal fade" id="assignNFCModal" tabindex="-1">
+<div class="modal fade" id="assignNFCModal" tabindex="-1" aria-labelledby="assignNFCModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content-modern">
             <div class="modal-header-modern">
-                <h5>
+                <h5 id="assignNFCModalLabel">
                     <i class="fas fa-id-card"></i> Asignar Tarjeta NFC
                 </h5>
-                <button type="button" class="modal-close" data-bs-dismiss="modal">
+                <button type="button" class="modal-close" data-bs-dismiss="modal" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <form id="assignNFCForm" method="POST">
                 @csrf
-                @method('PUT')
+                <input type="hidden" name="_method" value="PUT">
                 <div class="modal-body-modern">
                     <div class="info-person">
                         <div class="info-icon">
@@ -255,7 +255,7 @@
                         </div>
                         <div class="info-text">
                             <label>Persona seleccionada</label>
-                            <p id="assignPersonName"></p>
+                            <p id="assignPersonName">---</p>
                         </div>
                     </div>
                     
@@ -285,7 +285,7 @@
                 </div>
                 <div class="modal-footer-modern">
                     <button type="button" class="btn-secondary-modern" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn-primary-modern">
+                    <button type="submit" class="btn-primary-modern" id="submitAssignBtn">
                         <i class="fas fa-id-card"></i> Asignar Tarjeta
                     </button>
                 </div>
@@ -308,5 +308,6 @@
 @endpush
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/access-control.js') }}"></script>
 @endpush
