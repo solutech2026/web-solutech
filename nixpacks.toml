@@ -2,13 +2,17 @@
 nixPkgs = ["nodejs_20", "php83"]
 
 [phases.install]
-cmds = ["npm ci", "composer install"]
+cmds = ["composer install", "npm ci"]
 
 [phases.build]
 cmds = ["npm run build"]
 
 [phases.deploy]
-cmds = ["php artisan optimize:clear", "php artisan migrate --force", "php artisan optimize"]
+cmds = [
+  "php artisan optimize:clear",
+  "php artisan migrate --force",
+  "php artisan optimize"
+]
 
 [start]
 cmd = "php artisan serve --host=0.0.0.0 --port=$PORT"
