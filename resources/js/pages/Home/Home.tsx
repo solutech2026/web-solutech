@@ -44,23 +44,23 @@ const Home = () => {
   const stats = [
     { number: '99.9%', label: 'Tiempo de Actividad' },
     { number: '24/7', label: 'Soporte Disponible' },
-    { number: '15+', label: 'Clientes Satisfechos' },
-    { number: '15+', label: 'Años de Experiencia' }
+    { number: '+500', label: 'Clientes Satisfechos' },
+    { number: '+15', label: 'Años de Experiencia' }
   ];
 
   // Tecnologías
   const technologies = [
-    'AWS / Azure / GCP', 'Docker', 'React / Angular / Vue',
-    'Node.js / Python / .NET / PHP', 'Ubiquiti / Microtik / TP-Link', 'Linux / Windows Server',
-    'SQL Server / MySQL / PostgreSQL / MongoDB / Firebase', 'CI/CD Pipelines / Git / GitHub'
+    'AWS / Azure / GCP', 'Docker / Kubernetes', 'React / Angular / Vue',
+    'Node.js / Python / .NET / PHP', 'Ubiquiti / MikroTik / Cisco', 'Linux / Windows Server',
+    'SQL Server / MySQL / PostgreSQL', 'CI/CD / Git / GitHub Actions', 'Terraform / Ansible', 'Prometheus / Grafana'
   ];
 
   // Beneficios
   const benefits = [
     {
       icon: '⚡',
-      title: 'Rápida Implementación',
-      description: 'Despliegue rápido con mínima interrupción operativa.'
+      title: 'Implementación Rápida',
+      description: 'Despliegue ágil con mínima interrupción operativa.'
     },
     {
       icon: '🛡️',
@@ -69,17 +69,16 @@ const Home = () => {
     },
     {
       icon: '📈',
-      title: 'ROI Optimizado',
-      description: 'Soluciones que maximizan tu inversión en tecnología.'
+      title: 'Escalabilidad',
+      description: 'Soluciones que crecen con tu negocio.'
     },
     {
       icon: '🤝',
       title: 'Soporte Continuo',
-      description: 'Acompañamiento permanente en tu transformación digital.'
+      description: 'Acompañamiento 24/7 en tu transformación digital.'
     }
   ];
 
-  // Abrir WhatsApp
   const openWhatsApp = () => {
     const message = 'Hola SoluTech, me gustaría solicitar una consultoría gratuita';
     window.open(`https://wa.me/584124714588?text=${encodeURIComponent(message)}`, '_blank');
@@ -94,21 +93,18 @@ const Home = () => {
         <div className="hero-container">
           <div className="hero-content">
             <div className="hero-badge">
-              <span>🚀 Transformación Digital</span>
+              <span>🚀 Innovación Tecnológica</span>
             </div>
             <h1 className="hero-title">
               Tecnología que
-              <span className="hero-title-accent"> Impulsa Resultados</span>
+              <span className="hero-title-accent"> Impulsa tu Éxito</span>
             </h1>
             <p className="hero-description">
               Soluciones IT integrales en administración de sistemas, redes, desarrollo de software 
               y soporte técnico multinivel para empresas que buscan crecer.
             </p>
             <div className="hero-actions">
-              <button 
-                onClick={openWhatsApp}
-                className="btn-primary"
-              >
+              <button onClick={openWhatsApp} className="btn-primary">
                 Solicitar Consultoría Gratuita
                 <span className="btn-arrow">→</span>
               </button>
@@ -116,15 +112,6 @@ const Home = () => {
                 Ver Servicios ↓
               </a>
             </div>
-          </div>
-          
-          <div className="hero-stats">
-            {stats.slice(0, 2).map((stat, index) => (
-              <div key={index} className="hero-stat">
-                <div className="stat-number">{stat.number}</div>
-                <div className="stat-label">{stat.label}</div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -153,7 +140,7 @@ const Home = () => {
 
           <div className="services-grid">
             {services.map((service) => (
-              <div key={service.id} className={`service-card ${service.color}`}>
+              <div key={service.id} className={`service-card service-${service.color}`}>
                 <div className="service-header">
                   <div className="service-icon">{service.icon}</div>
                   <h3>{service.title}</h3>
@@ -167,10 +154,7 @@ const Home = () => {
                     </div>
                   ))}
                 </div>
-                <button 
-                  onClick={openWhatsApp}
-                  className="service-btn"
-                >
+                <button onClick={openWhatsApp} className="service-btn">
                   Solicitar Información
                   <span>→</span>
                 </button>
@@ -204,7 +188,7 @@ const Home = () => {
       <section className="technologies-section">
         <div className="container">
           <div className="section-header">
-            <h2>Tecnologías que Implementamos</h2>
+            <h2>Tecnologías de Vanguardia</h2>
             <p>Las mejores herramientas y plataformas del mercado</p>
           </div>
 
@@ -225,23 +209,17 @@ const Home = () => {
             <div className="cta-badge">
               <span>🌟 Oferta Especial</span>
             </div>
-            <h2>¿Listo para Transformar tu IT?</h2>
+            <h2>¿Listo para Transformar tu Empresa?</h2>
             <p>
               Agenda una auditoría gratuita de tus sistemas y descubre oportunidades 
-              de optimización y mejora para tu empresa.
+              de optimización y mejora para tu negocio.
             </p>
             
             <div className="cta-actions">
-              <button 
-                onClick={openWhatsApp}
-                className="cta-btn-primary"
-              >
+              <button onClick={openWhatsApp} className="cta-btn-primary">
                 💬 Solicitar Auditoría Gratuita
               </button>
-              <button 
-                onClick={() => window.location.href = '/contacto'}
-                className="cta-btn-secondary"
-              >
+              <button onClick={() => window.location.href = '/contacto'} className="cta-btn-secondary">
                 📧 Contactar por Email
               </button>
             </div>
@@ -249,11 +227,11 @@ const Home = () => {
             <div className="cta-footer">
               <div className="cta-feature">
                 <span>✅</span>
-                <span>Sin compromiso inicial</span>
+                <span>Sin compromiso</span>
               </div>
               <div className="cta-feature">
                 <span>✅</span>
-                <span>Respuesta en 24 horas</span>
+                <span>Respuesta 24h</span>
               </div>
               <div className="cta-feature">
                 <span>✅</span>

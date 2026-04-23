@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePage, Link } from '@inertiajs/react';
 import './Navbar.css';
+
 const brandIcon = '/img/logo_solutech1.png';
 
 const Navbar = () => {
@@ -9,224 +10,171 @@ const Navbar = () => {
   const { url, props } = usePage();
   const { auth } = props;
 
-  // Verificar si el usuario es administrador
   const isAdmin = auth?.user?.role === 'admin' || auth?.user?.is_admin === true;
 
-  // Maneja el scroll para cambiar el estilo
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Menú principal
   const menuItems = [
-    { id: 'inicio', label: 'Inicio', url: '/' },
-    { id: 'servicios', label: 'Servicios', url: '/servicio' },
-    { id: 'nosotros', label: 'Nosotros', url: '/about-us' },
-    { id: 'contacto', label: 'Contacto', url: '/contacto' },
+    { id: 'inicio', label: 'Inicio', url: '/', icon: '🏠' },
+    { id: 'servicios', label: 'Servicios', url: '/servicio', icon: '⚡' },
+    { id: 'nosotros', label: 'Nosotros', url: '/about-us', icon: '👥' },
+    { id: 'contacto', label: 'Contacto', url: '/contacto', icon: '✉️' },
   ];
 
-  const isActive = (path) => {
-    return url === path;
-  };
-
-  // Cerrar menú móvil al hacer clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isOpen && !event.target.closest('.navbar-container')) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, [isOpen]);
+  const isActive = (path) => url === path;
 
   return (
     <>
-      <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
-        <div className="navbar-container">
+      <nav className={`navbar-premium ${scrolled ? 'scrolled' : ''}`}>
+        <div className="navbar-premium-container">
 
-          {/* Logo Brand */}
-          <Link href="/" className="navbar-brand">
-            <div className="brand-icon">
-              <img
-                src={brandIcon}
-                alt="Icono de marca SoluTech"
-                className="brand-icon-img"
-              />
-            </div>
-            <div className="brand-text">
-              <span className="brand-primary">Solu</span>
-              <span className="brand-accent">Tech</span>
+          {/* Logo */}
+          <Link href="/" className="navbar-premium-logo">
+            <div className="logo-wrapper">
+              <img src={brandIcon} alt="SoluTech" className="logo-image" />
+              <div className="logo-badge">IT</div>
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="desktop-nav">
+          {/* Desktop Menu */}
+          <div className="nav-premium-menu">
             {menuItems.map((item) => (
               <Link
                 key={item.id}
                 href={item.url}
-                className={`nav-link ${isActive(item.url) ? 'active' : ''}`}
+                className={`nav-premium-link ${isActive(item.url) ? 'active' : ''}`}
               >
-                <span className="link-text">{item.label}</span>
-                <span className="link-dot"></span>
+                <span className="nav-link-icon">{item.icon}</span>
+                <span className="nav-link-text">{item.label}</span>
               </Link>
             ))}
+
+            {/* Admin Dropdown */}
+            {auth?.user && isAdmin && (
+              <div className="admin-premium-dropdown">
+                <button className="admin-premium-btn">
+                  <div className="admin-avatar">
+                    <span>AD</span>
+                  </div>
+                  <span className="admin-name">Admin</span>
+                  <svg className="dropdown-arrow" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                <div className="dropdown-premium-content">
+                  <Link href="/admin/dashboard" className="dropdown-premium-link">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                    </svg>
+                    Dashboard
+                  </Link>
+                  <Link href="/admin/access-control" className="dropdown-premium-link">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                    Control de Acceso
+                  </Link>
+                  <div className="dropdown-divider"></div>
+                  <Link href="/logout" method="post" as="button" className="dropdown-premium-link logout">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 11H7a1 1 0 000 2h7.586l-1.293 1.293z" clipRule="evenodd" />
+                    </svg>
+                    Cerrar Sesión
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Menú de Administrador - Solo visible cuando está autenticado */}
-          {auth?.user && isAdmin && (
-            <div className="admin-menu">
-              <button className="admin-menu-button">
-                <div className="admin-avatar">
-                  <span>AD</span>
-                </div>
-                <span className="admin-name">Admin</span>
-                <svg className="dropdown-icon" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </button>
-              <div className="admin-dropdown">
-                <Link href="/admin/dashboard" className="dropdown-item">
-                  <svg viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-                  </svg>
-                  <span>Dashboard Admin</span>
-                </Link>
-                <Link href="/admin/access-control" className="dropdown-item">
-                  <svg viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                  </svg>
-                  <span>Control de Acceso</span>
-                </Link>
-                <div className="dropdown-divider"></div>
-                <Link href="/logout" method="post" as="button" className="dropdown-item logout">
-                  <svg viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 11H7a1 1 0 000 2h7.586l-1.293 1.293z" clipRule="evenodd" />
-                  </svg>
-                  <span>Cerrar Sesión</span>
-                </Link>
-              </div>
-            </div>
-          )}
+          {/* Contact Button Desktop */}
+          <a href="https://wa.me/584124714588" target="_blank" rel="noopener noreferrer" className="contact-premium-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <span>Contactar</span>
+          </a>
 
-          {/* Mobile Menu Toggle */}
+          {/* Mobile Menu Button */}
           <button
-            className={`menu-toggle ${isOpen ? 'open' : ''}`}
+            className={`mobile-premium-btn ${isOpen ? 'open' : ''}`}
             onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
-            aria-expanded={isOpen}
+            aria-label="Menu"
           >
-            <span className="toggle-line"></span>
-            <span className="toggle-line"></span>
-            <span className="toggle-line"></span>
+            <span></span>
+            <span></span>
+            <span></span>
           </button>
         </div>
       </nav>
 
-      {/* Mobile Menu Overlay */}
-      <div className={`mobile-menu-overlay ${isOpen ? 'open' : ''}`}>
-        <div className="mobile-menu-container">
-          <div className="mobile-menu-header">
-            <Link href="/" className="mobile-brand" onClick={() => setIsOpen(false)}>
-              <div className="mobile-brand-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div className="mobile-brand-text">
-                <span className="mobile-brand-primary">Solu</span>
-                <span className="mobile-brand-accent">Tech</span>
-              </div>
-            </Link>
-            <button
-              className="mobile-close-btn"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close menu"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          <div className="mobile-menu-content">
-            {menuItems.map((item) => (
-              <Link
-                key={item.id}
-                href={item.url}
-                className={`mobile-nav-link ${isActive(item.url) ? 'active' : ''}`}
-                onClick={() => setIsOpen(false)}
-              >
-                <span className="mobile-link-text">{item.label}</span>
-                {isActive(item.url) && (
-                  <span className="mobile-link-indicator"></span>
-                )}
-              </Link>
-            ))}
-            
-            {/* Menú admin para móvil - Solo visible cuando está autenticado */}
-            {auth?.user && isAdmin && (
-              <>
-                <div className="mobile-admin-header">
-                  <div className="mobile-admin-avatar">AD</div>
-                  <div className="mobile-admin-info">
-                    <span className="mobile-admin-name">{auth.user.name || 'Administrador'}</span>
-                    <span className="mobile-admin-role">Administrador</span>
-                  </div>
-                </div>
-                <Link href="/admin/dashboard" className="mobile-nav-link" onClick={() => setIsOpen(false)}>
-                  <span>Dashboard Admin</span>
-                </Link>
-                <Link href="/admin/access-control" className="mobile-nav-link" onClick={() => setIsOpen(false)}>
-                  <span>Control de Acceso</span>
-                </Link>
-                <Link href="/logout" method="post" as="button" className="mobile-logout-btn" onClick={() => setIsOpen(false)}>
-                  <span>Cerrar Sesión</span>
-                </Link>
-              </>
-            )}
-          </div>
-
-          <div className="mobile-menu-footer">
-            <Link
-              href="/contacto"
-              className="mobile-nav-cta"
-              onClick={() => setIsOpen(false)}
-            >
-              <span>Contactar Ahora</span>
-              <svg viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </Link>
-
-            <div className="mobile-contact-info">
-              <div className="contact-item">
-                <svg viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                </svg>
-                <span>+58 412 471 45 88</span>
-              </div>
-              <div className="contact-item">
-                <svg viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                  <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                </svg>
-                <span>solutech24@outlook.com</span>
-              </div>
+      {/* Mobile Menu */}
+      <div className={`mobile-premium-nav ${isOpen ? 'open' : ''}`}>
+        <div className="mobile-premium-header">
+          <Link href="/" className="mobile-premium-logo" onClick={() => setIsOpen(false)}>
+            <div className="mobile-logo-icon">
+              <img src={brandIcon} alt="SoluTech" />
             </div>
-          </div>
+            <span>SoluTech</span>
+          </Link>
+          <button className="mobile-premium-close" onClick={() => setIsOpen(false)}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="mobile-premium-links">
+          {menuItems.map((item) => (
+            <Link
+              key={item.id}
+              href={item.url}
+              className={`mobile-premium-link ${isActive(item.url) ? 'active' : ''}`}
+              onClick={() => setIsOpen(false)}
+            >
+              <span className="mobile-link-icon">{item.icon}</span>
+              <span>{item.label}</span>
+            </Link>
+          ))}
+
+          {auth?.user && isAdmin && (
+            <>
+              <div className="mobile-premium-divider"></div>
+              <Link href="/admin/dashboard" className="mobile-premium-link" onClick={() => setIsOpen(false)}>
+                <span className="mobile-link-icon">📊</span>
+                Dashboard Admin
+              </Link>
+              <Link href="/admin/access-control" className="mobile-premium-link" onClick={() => setIsOpen(false)}>
+                <span className="mobile-link-icon">🔒</span>
+                Control de Acceso
+              </Link>
+              <Link href="/logout" method="post" as="button" className="mobile-premium-link logout" onClick={() => setIsOpen(false)}>
+                <span className="mobile-link-icon">🚪</span>
+                Cerrar Sesión
+              </Link>
+            </>
+          )}
+        </div>
+
+        <div className="mobile-premium-footer">
+          <a href="https://wa.me/584124714588" target="_blank" rel="noopener noreferrer" className="mobile-premium-whatsapp">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            Contactar por WhatsApp
+          </a>
         </div>
       </div>
 
-      {/* Blur overlay para menú móvil */}
-      <div className={`menu-backdrop ${isOpen ? 'open' : ''}`} onClick={() => setIsOpen(false)} />
+      {/* Overlay */}
+      <div className={`mobile-premium-overlay ${isOpen ? 'open' : ''}`} onClick={() => setIsOpen(false)} />
     </>
   );
 };

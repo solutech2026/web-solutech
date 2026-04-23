@@ -7,13 +7,12 @@ const Footer = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [subscriptionMessage, setSubscriptionMessage] = useState('');
   const [subscriptionStatus, setSubscriptionStatus] = useState('');
-  const [logoError, setLogoError] = useState(false); // Estado para manejar error de imagen
 
   const services = [
-    { name: 'Admin. de Sistemas', short: 'Sistemas' },
-    { name: 'Admin. de Redes', short: 'Redes' },
-    { name: 'Soporte Multi-Nivel', short: 'Soporte' },
-    { name: 'Desarrollo de Software', short: 'Desarrollo' },
+    { name: 'Administración de Sistemas', icon: '🖥️', url: '/servicio#sistemas' },
+    { name: 'Administración de Redes', icon: '🌐', url: '/servicio#redes' },
+    { name: 'Desarrollo de Software', icon: '💻', url: '/servicio#software' },
+    { name: 'Soporte Multi-Nivel', icon: '👨‍💼', url: '/servicio#soporte' },
   ];
 
   const quickLinks = [
@@ -27,12 +26,14 @@ const Footer = () => {
     address: 'Multi Centro Empresarial Del Este, Caracas/Venezuela',
     phone: '+58 412 471 45 88',
     email: 'solutech24@outlook.com',
-    hours: 'Lun-Vie: 8:00 AM - 6:00 PM'
+    whatsapp: 'https://wa.me/584124714588'
   };
 
   const socialMedia = [
-    { name: 'Facebook', icon: '↗', url: 'https://www.facebook.com/Solutech.ve' },
-    { name: 'Instagram', icon: '↗', url: 'https://www.instagram.com/solutechoficial.ve/' },
+    { name: 'Facebook', icon: '📘', url: 'https://www.facebook.com/Solutech.ve' },
+    { name: 'Instagram', icon: '📸', url: 'https://www.instagram.com/solutechoficial.ve/' },
+    { name: 'LinkedIn', icon: '🔗', url: 'https://linkedin.com/company/solutech' },
+    { name: 'Twitter', icon: '🐦', url: 'https://twitter.com/solutech' },
   ];
 
   const newsletterSubscribe = async (e) => {
@@ -72,7 +73,6 @@ const Footer = () => {
         setSubscriptionStatus('success');
         setSubscriptionMessage(data.message || '¡Te has suscrito exitosamente!');
         setEmail('');
-
         setTimeout(() => {
           setSubscriptionMessage('');
           setSubscriptionStatus('');
@@ -82,7 +82,6 @@ const Footer = () => {
         setSubscriptionMessage(data.message || 'Error al procesar la suscripción');
       }
     } catch (error) {
-      console.error('Error en suscripción:', error);
       setSubscriptionStatus('error');
       setSubscriptionMessage('Error de conexión. Por favor intenta nuevamente.');
     } finally {
@@ -94,192 +93,184 @@ const Footer = () => {
     const handleScroll = () => {
       setShowBackToTop(window.pageYOffset > 300);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <footer className="footer-modern-minimal">
-      <div className="footer-container">
+    <footer className="footer-premium">
+      {/* Waves Effect */}
+      <div className="footer-waves">
+        <svg className="waves-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+          <path fill="#4f46e5" fillOpacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+        </svg>
+      </div>
 
-        {/* Main Content Grid */}
-        <div className="footer-main-grid">
+      <div className="footer-premium-container">
+        {/* Main Grid */}
+        <div className="footer-premium-grid">
 
           {/* Brand Column */}
-          <div className="footer-brand-column">
+          <div className="footer-brand">
             <div className="brand-logo">
-              {/* Logo como imagen con fallback */}
-              {!logoError ? (
+              <div className="logo-wrapper">
                 <img
-                  src="./img/logo_solutech.jpeg"
-                  alt="SoluTech Logo"
-                  className="logo-image"
-                  onError={() => setLogoError(true)}
-                  onLoad={() => setLogoError(false)}
+                  src="/img/logo_solutech1.png"
+                  alt="SoluTech"
+                  className="footer-logo-image"
                 />
-              ) : (
-                // Fallback que se muestra si la imagen no carga
-                <div className="logo-fallback">
-                  <div className="logo-mark">ST</div>
-                  <div className="brand-name">
-                    <span className="brand-primary">Solu</span>
-                    <span className="brand-accent">Tech</span>
-                  </div>
-                </div>
-              )}
+                <div className="logo-badge">IT</div>
+              </div>
+              <div className="logo-text">
+                <span className="logo-solu">Solu</span>
+                <span className="logo-tech">Tech</span>
+              </div>
             </div>
-
-            <p className="brand-tagline">
-              Soluciones Tecnológicas Integrales
+            <p className="brand-description">
+              Transformamos negocios a través de soluciones tecnológicas innovadoras,
+              ofreciendo servicios de alta calidad y soporte especializado.
             </p>
-
-            {/* Newsletter */}
-            <div className="newsletter-section">
-              <p className="newsletter-label">Mantente informado</p>
-              <form onSubmit={newsletterSubscribe} className="newsletter-form" noValidate>
-                <div className="input-group">
-                  <input
-                    type="email"
-                    placeholder="tu@email.com"
-                    className="newsletter-input"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    disabled={isSubmitting}
-                  />
-                  <button
-                    type="submit"
-                    className="newsletter-submit"
-                    aria-label="Suscribirse"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <span className="submit-spinner"></span>
-                    ) : (
-                      <svg className="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M5 12h14M12 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-
-                {/* Mensaje de estado */}
-                {subscriptionMessage && (
-                  <div className={`subscription-message ${subscriptionStatus}`}>
-                    {subscriptionMessage}
-                  </div>
-                )}
-              </form>
-            </div>
           </div>
 
           {/* Services Column */}
           <div className="footer-column">
-            <h4 className="column-title">Servicios</h4>
-            <div className="services-list">
+            <h4 className="column-title">
+              <span className="title-icon">⚡</span>
+              Servicios
+            </h4>
+            <ul className="footer-links">
               {services.map((service, index) => (
-                <span key={index} className="service-item">
-                  {service.short}
-                </span>
+                <li key={index}>
+                  <a href={service.url} className="footer-link">
+                    <span className="link-icon">{service.icon}</span>
+                    {service.name}
+                  </a>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
-          {/* Navigation Column */}
+          {/* Quick Links Column */}
           <div className="footer-column">
-            <h4 className="column-title">Enlaces</h4>
-            <nav className="nav-links">
+            <h4 className="column-title">
+              <span className="title-icon">🔗</span>
+              Enlaces Rápidos
+            </h4>
+            <ul className="footer-links">
               {quickLinks.map((link, index) => (
-                <a key={index} href={link.url} className="nav-link">
-                  {link.name}
-                </a>
+                <li key={index}>
+                  <a href={link.url} className="footer-link">
+                    {link.name}
+                  </a>
+                </li>
               ))}
-            </nav>
+            </ul>
           </div>
 
           {/* Contact Column */}
           <div className="footer-column">
-            <h4 className="column-title">Contacto</h4>
-            <div className="contact-info">
-              <div className="contact-item">
-                <div className="contact-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
-                </div>
-                <span className="contact-text">{contactInfo.address}</span>
-              </div>
-              <div className="contact-item">
-                <div className="contact-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                  </svg>
-                </div>
-                <span className="contact-text">{contactInfo.phone}</span>
-              </div>
-              <div className="contact-item">
-                <div className="contact-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                    <polyline points="22,6 12,13 2,6" />
-                  </svg>
-                </div>
-                <span className="contact-text">{contactInfo.email}</span>
-              </div>
-            </div>
+            <h4 className="column-title">
+              <span className="title-icon">📞</span>
+              Contacto
+            </h4>
+            <ul className="footer-contact">
+              <li>
+                <div className="contact-icon">📍</div>
+                <span>{contactInfo.address}</span>
+              </li>
+              <li>
+                <div className="contact-icon">📱</div>
+                <a href={`tel:${contactInfo.phone}`}>{contactInfo.phone}</a>
+              </li>
+              <li>
+                <div className="contact-icon">✉️</div>
+                <a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a>
+              </li>
+              <li>
+                <div className="contact-icon">💬</div>
+                <a href={contactInfo.whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+              </li>
+            </ul>
           </div>
+        </div>
 
-          {/* Social Media */}
-          <div className="footer-social">
-            <div className="social-links">
-              {socialMedia.map((social, index) => (
-                <a
-                  key={index}
-                  href={social.url}
-                  className="social-link"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.name}
-                >
-                  <span className="social-text">{social.name}</span>
-                  <svg className="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" strokeWidth="2" strokeLinecap="round" />
-                    <polyline points="15 3 21 3 21 9" strokeWidth="2" strokeLinecap="round" />
-                    <line x1="10" y1="14" x2="21" y2="3" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
-                </a>
-              ))}
+        {/* Newsletter Section */}
+        <div className="newsletter-section">
+          <div className="newsletter-content">
+            <div className="newsletter-text">
+              <h3 className="newsletter-title">Suscríbete a nuestro newsletter</h3>
+              <p className="newsletter-description">Recibe las últimas novedades y promociones exclusivas</p>
             </div>
+            <form onSubmit={newsletterSubscribe} className="newsletter-form" noValidate>
+              <div className="input-wrapper">
+                <input
+                  type="email"
+                  placeholder="tu@email.com"
+                  className="newsletter-input"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isSubmitting}
+                />
+                <button type="submit" className="newsletter-button" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <span className="spinner"></span>
+                  ) : (
+                    <>
+                      Suscribirse
+                      <svg className="button-icon" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </>
+                  )}
+                </button>
+              </div>
+              {subscriptionMessage && (
+                <div className={`subscription-message ${subscriptionStatus}`}>
+                  {subscriptionMessage}
+                </div>
+              )}
+            </form>
           </div>
+        </div>
 
+        {/* Social Links */}
+        <div className="social-section">
+          <div className="social-links">
+            {socialMedia.map((social, index) => (
+              <a
+                key={index}
+                href={social.url}
+                className="social-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={social.name}
+              >
+                <span className="social-icon">{social.icon}</span>
+                <span className="social-name">{social.name}</span>
+              </a>
+            ))}
+          </div>
         </div>
 
         {/* Footer Bottom */}
         <div className="footer-bottom">
           <div className="footer-bottom-content">
-            <div className="copyright">
-              <p className="copyright-text">
-                © {new Date().getFullYear()} SoluTech. Todos los derechos reservados.
-              </p>
-              <p className="copyright-subtext">
-                Innovación tecnológica para el éxito empresarial.
-              </p>
-            </div>
-
+            <p className="copyright">
+              © {new Date().getFullYear()} SoluTech. Todos los derechos reservados.
+            </p>
             <div className="legal-links">
-              <div className="legal-links-container">
-                <a href="/politica-de-privacidad" className="legal-link">Politicas de Privacidad</a>
-                <span className="legal-separator">•</span>
-                <a href="/terminos-y-condiciones" className="legal-link">Términos y Condiciones</a>
-                <span className="legal-separator">•</span>
-                <a href="/aviso-legal" className="legal-link">Aviso Legal</a>
-              </div>
+              <a href="/privacy" className="legal-link">Política de Privacidad</a>
+              <span className="separator">•</span>
+              <a href="/terms" className="legal-link">Términos y Condiciones</a>
+              <span className="separator">•</span>
+              <a href="/legal" className="legal-link">Aviso Legal</a>
+              <span className="separator">•</span>
+              <a href="/bio/proxicard" className="legal-link" target="_blank" rel="noopener noreferrer">
+                🔐 PROXICARD
+              </a>
             </div>
           </div>
         </div>
-
       </div>
 
       {/* Back to Top Button */}
@@ -288,8 +279,8 @@ const Footer = () => {
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         aria-label="Volver arriba"
       >
-        <svg className="arrow-up-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path d="M12 19V5M5 12l7-7 7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 19V5M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
     </footer>

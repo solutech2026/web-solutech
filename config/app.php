@@ -123,4 +123,17 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Email Configuration
+    |--------------------------------------------------------------------------
+    |
+    | This value is the email address of the system administrator who will
+    | receive password reset requests from users in the access control system.
+    |
+    */
+
+    'admin_email' => env('ADMIN_EMAIL', 'soporteitsolutech@gmail.com'),
+    'admin_name' => env('ADMIN_NAME', 'Administrador del Sistema'),
+
 ];

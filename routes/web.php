@@ -33,11 +33,12 @@ Route::get('/servicio', fn() => Inertia::render('Service/Service'))->name('servi
 Route::get('/about-us', fn() => Inertia::render('About/About'))->name('about');
 Route::get('/contacto', [ContactController::class, 'index'])->name('contacto');
 
-// Rutas públicas de Bio
+// Rutas públicas de Bio (perfiles públicos)
 Route::prefix('bio')->name('bio.')->group(function () {
     Route::get('/{url}', [PublicBioController::class, 'show'])->name('public');
     Route::get('/{url}/data', [PublicBioController::class, 'getData'])->name('public.data');
     Route::get('/{url}/vcard', [PublicBioController::class, 'downloadVCard'])->name('public.vcard');
+    Route::get('/{url}/redirect', [PublicBioController::class, 'redirectToProfile'])->name('redirect');
 });
 
 // ============================================================================
@@ -79,10 +80,12 @@ Route::prefix('api')->name('api.')->group(function () {
 
 require __DIR__ . '/auth.php';
 
+// Rutas protegidas con autenticación y verificación de email
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
+// Rutas de perfil de usuario
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -101,7 +104,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/logout', 'logout')->name('logout');
     });
 
-    // Rutas protegidas
+    // Rutas protegidas del admin
     Route::middleware(['auth'])->group(function () {
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -205,36 +208,39 @@ Route::prefix('admin')->name('admin.')->group(function () {
 // 5. RUTAS PARA LECTORES NFC
 // ============================================================================
 
-Route::get('/lectores', [App\Http\Controllers\Admin\NFCReaderController::class, 'index'])->name('lectores.index');
-Route::get('/lectores/nuevo', [App\Http\Controllers\Admin\NFCReaderController::class, 'config'])->name('lectores.nuevo');
-Route::get('/lectores/{id}/editar', [App\Http\Controllers\Admin\NFCReaderController::class, 'config'])->name('lectores.editar');
-Route::post('/lectores/guardar/{id?}', [App\Http\Controllers\Admin\NFCReaderController::class, 'save'])->name('lectores.guardar');
-Route::delete('/lectores/{id}', [App\Http\Controllers\Admin\NFCReaderController::class, 'delete'])->name('lectores.eliminar');
-Route::post('/lectores/{id}/test', [App\Http\Controllers\Admin\NFCReaderController::class, 'test'])->name('lectores.test');
-
-// ============================================================================
-// 6. RUTAS DE PRUEBA (DEBUG)
-// ============================================================================
-
-Route::get('/prueba', function () {
-    return response()->json([
-        'status' => 'success',
-        'message' => 'OK - Ruta funciona correctamente',
-        'timestamp' => now()->toDateTimeString()
-    ]);
+Route::prefix('lectores')->name('lectores.')->group(function () {
+    Route::get('/', [NFCReaderController::class, 'index'])->name('index');
+    Route::get('/nuevo', [NFCReaderController::class, 'config'])->name('nuevo');
+    Route::get('/{id}/editar', [NFCReaderController::class, 'config'])->name('editar');
+    Route::post('/guardar/{id?}', [NFCReaderController::class, 'save'])->name('guardar');
+    Route::delete('/{id}', [NFCReaderController::class, 'delete'])->name('eliminar');
+    Route::post('/{id}/test', [NFCReaderController::class, 'test'])->name('test');
 });
 
-Route::get('/prueba-vista', function () {
-    return '<h1>✅ Ruta de prueba funcionando!</h1><p>Si ves esto, las rutas están correctamente configuradas.</p>';
-});
+// ============================================================================
+// 6. RUTAS DE PRUEBA Y DEBUG (SOLO PARA DESARROLLO)
+// ============================================================================
 
-// RUTA DE PRUEBA - AL PRINCIPIO DEL ARCHIVO
-Route::get('/test-nuevo', function () {
-    return 'Ruta de prueba funcionando';
-})->name('test.nuevo');
+if (app()->environment('local')) {
+    Route::get('/prueba', function () {
+        return response()->json([
+            'status' => 'success',
+            'message' => 'OK - Ruta funciona correctamente',
+            'timestamp' => now()->toDateTimeString()
+        ]);
+    });
+
+    Route::get('/prueba-vista', function () {
+        return '<h1>✅ Ruta de prueba funcionando!</h1><p>Si ves esto, las rutas están correctamente configuradas.</p>';
+    });
+
+    Route::get('/test-nuevo', function () {
+        return 'Ruta de prueba funcionando';
+    })->name('test.nuevo');
+}
 
 // ============================================================================
-// 7. RUTAS DE DEBUG (Ignorar - No eliminar)
+// 7. RUTA CATCH-ALL PARA DEBUG (Mantener al final)
 // ============================================================================
 
 Route::any('/_boost/{any}', fn() => response()->json(['message' => 'Not found'], 404))

@@ -1,4 +1,6 @@
-/* ProfileShow.css - Versión Moderna V3 */
+/* ============================================
+   PROXICARD PROFILE STYLE - Glassmorphism + Neon
+   ============================================ */
 
 * {
     margin: 0;
@@ -6,550 +8,658 @@
     box-sizing: border-box;
 }
 
-/* ========== PAGE CONTAINER ========== */
-.profile-page {
-    min-height: 100vh;
+/* Page Wrapper */
+.profile-page-proxicard {
     position: relative;
-    background: #0a0c10;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a0c15 0%, #05070f 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    padding: 40px 20px;
+    overflow-x: hidden;
 }
 
-/* ========== BACKGROUND GRADIENT ========== */
-.bg-gradient {
-    position: fixed;
+/* Background Gradient */
+.bg-gradient-proxicard {
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(ellipse at 30% 40%, rgba(99, 102, 241, 0.15), transparent 50%),
-                radial-gradient(ellipse at 70% 60%, rgba(139, 92, 246, 0.1), transparent 50%);
+    background: radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.08), transparent 50%);
     pointer-events: none;
 }
 
-/* ========== FLOATING ELEMENTS ========== */
-.floating-elements {
-    position: fixed;
-    top: 0;
-    left: 0;
+/* Grid Background */
+.grid-bg-proxicard {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+}
+
+/* Floating Orbs */
+.floating-orbs-proxicard {
+    position: absolute;
     width: 100%;
     height: 100%;
     overflow: hidden;
     pointer-events: none;
-    z-index: 0;
 }
 
-.float-1, .float-2, .float-3, .float-4 {
+.orb-cyan-proxicard {
     position: absolute;
+    width: 400px;
+    height: 400px;
+    background: #00d4ff;
     border-radius: 50%;
-    filter: blur(60px);
-    opacity: 0.4;
+    filter: blur(100px);
+    top: -150px;
+    left: -150px;
+    opacity: 0.2;
+    animation: floatOrb 12s infinite ease-in-out;
 }
 
-.float-1 {
-    top: -100px;
-    right: -100px;
+.orb-magenta-proxicard {
+    position: absolute;
+    width: 450px;
+    height: 450px;
+    background: #d500f9;
+    border-radius: 50%;
+    filter: blur(100px);
+    bottom: -200px;
+    right: -150px;
+    opacity: 0.15;
+    animation: floatOrb 15s infinite ease-in-out reverse;
+}
+
+.orb-blue-proxicard {
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: #1e88e5;
+    border-radius: 50%;
+    filter: blur(90px);
+    top: 40%;
+    left: 60%;
+    opacity: 0.12;
+    animation: floatOrb 18s infinite ease-in-out;
+}
+
+.orb-purple-proxicard {
+    position: absolute;
     width: 300px;
     height: 300px;
-    background: #6366f1;
-    animation: float1 20s infinite ease-in-out;
-}
-
-.float-2 {
-    bottom: -80px;
-    left: -80px;
-    width: 250px;
-    height: 250px;
-    background: #8b5cf6;
-    animation: float2 25s infinite ease-in-out reverse;
-}
-
-.float-3 {
-    top: 40%;
-    left: 20%;
-    width: 150px;
-    height: 150px;
-    background: #06b6d4;
-    animation: float3 18s infinite ease-in-out;
-}
-
-.float-4 {
+    background: #7c3aed;
+    border-radius: 50%;
+    filter: blur(80px);
     bottom: 30%;
-    right: 15%;
-    width: 120px;
-    height: 120px;
-    background: #f59e0b;
-    animation: float4 22s infinite ease-in-out reverse;
+    left: 20%;
+    opacity: 0.1;
+    animation: floatOrb 14s infinite ease-in-out;
 }
 
-@keyframes float1 {
+@keyframes floatOrb {
     0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(30px, -20px) scale(1.1); }
-    66% { transform: translate(-20px, 15px) scale(0.9); }
+    50% { transform: translate(30px, -30px) scale(1.05); }
 }
 
-@keyframes float2 {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(-30px, 20px); }
-}
-
-@keyframes float3 {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(20px, -30px); }
-}
-
-@keyframes float4 {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(-20px, -20px); }
-}
-
-/* ========== CONTAINER ========== */
-.container {
-    max-width: 1200px;
-    width: 90%;
-    margin: 0 auto;
+/* Container */
+.container-proxicard {
     position: relative;
+    width: 100%;
+    max-width: 1200px;
     z-index: 1;
-    padding: 40px 0;
 }
 
-.profile-wrapper {
+/* Wrapper Animation */
+.profile-wrapper-proxicard {
     opacity: 0;
     transform: translateY(30px);
     transition: all 0.6s ease;
 }
 
-.profile-wrapper.visible {
+.profile-wrapper-proxicard.visible {
     opacity: 1;
     transform: translateY(0);
 }
 
-/* ========== PROFILE CARD ========== */
-.profile-card {
+/* Main Card */
+.profile-card-proxicard {
     display: grid;
-    grid-template-columns: 1fr 1.5fr;
-    background: rgba(18, 22, 35, 0.8);
-    backdrop-filter: blur(20px);
+    grid-template-columns: 380px 1fr;
+    background: rgba(15, 20, 35, 0.6);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border-radius: 32px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(0, 212, 255, 0.2);
     overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     transition: all 0.3s ease;
 }
 
-.profile-card:hover {
-    border-color: rgba(99, 102, 241, 0.3);
-    box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.3);
+.profile-card-proxicard:hover {
+    border-color: rgba(0, 212, 255, 0.4);
+    box-shadow: 0 30px 55px -12px rgba(0, 0, 0, 0.6);
 }
 
-/* ========== LEFT COLUMN ========== */
-.profile-left {
-    padding: 40px;
-    background: rgba(10, 12, 16, 0.5);
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+/* Left Column */
+.profile-left-proxicard {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(168, 85, 247, 0.05));
+    padding: 40px 30px;
+    text-align: center;
+    border-right: 1px solid rgba(0, 212, 255, 0.1);
 }
 
 /* Avatar */
-.avatar-frame {
+.avatar-frame-proxicard {
     position: relative;
-    width: 140px;
-    height: 140px;
-    margin: 0 auto 24px;
+    display: inline-block;
+    margin-bottom: 24px;
 }
 
-.avatar-border {
+.avatar-border-proxicard {
     position: absolute;
     inset: -3px;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4);
     border-radius: 50%;
+    background: linear-gradient(135deg, #00d4ff, #a855f7);
     opacity: 0.6;
-    transition: opacity 0.3s;
 }
 
-.avatar-frame:hover .avatar-border {
-    opacity: 1;
-}
-
-.avatar {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background: #1e293b;
+.avatar-proxicard {
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     overflow: hidden;
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: #1a1f2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
 }
 
-.avatar img {
+.avatar-proxicard img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.status-dot {
+.status-dot-proxicard {
     position: absolute;
     bottom: 8px;
     right: 8px;
     width: 16px;
     height: 16px;
-    background: #10b981;
+    background: #00ff88;
     border-radius: 50%;
-    border: 2px solid #0a0c10;
+    border: 2px solid #0a0c15;
     z-index: 2;
+    animation: pulse 2s infinite;
 }
 
-/* Typography */
-.profile-name {
-    font-size: 28px;
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+/* Name */
+.profile-name-proxicard {
+    font-size: 32px;
     font-weight: 700;
-    color: white;
-    text-align: center;
+    letter-spacing: -0.5px;
     margin-bottom: 8px;
 }
 
-.profile-role {
+.name-cyan {
+    background: linear-gradient(135deg, #00d4ff, #0099cc);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.name-purple {
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+/* Role */
+.profile-role-proxicard {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #b0c4ff;
     font-size: 14px;
-    color: #818cf8;
-    text-align: center;
     margin-bottom: 12px;
 }
 
-.profile-location {
+.role-icon {
+    color: #00d4ff;
+}
+
+/* Location */
+.profile-location-proxicard {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    font-size: 12px;
-    color: #6b7280;
+    color: #8a93b0;
+    font-size: 13px;
     margin-bottom: 16px;
 }
 
-.availability-badge {
+/* Availability Badge */
+.availability-badge-proxicard {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(16, 185, 129, 0.1);
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.3);
     padding: 6px 14px;
     border-radius: 40px;
     font-size: 11px;
-    color: #34d399;
-    width: fit-content;
-    margin: 0 auto 24px;
+    color: #00d4ff;
+    margin-bottom: 28px;
 }
 
 /* Stats */
-.stats-container {
+.stats-container-proxicard {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     gap: 16px;
     margin-bottom: 32px;
     padding: 16px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(0, 212, 255, 0.1);
+    border-bottom: 1px solid rgba(0, 212, 255, 0.1);
 }
 
-.stat-block {
+.stat-block-proxicard {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.stat-icon {
+.stat-icon-proxicard {
     width: 36px;
     height: 36px;
+    background: rgba(0, 212, 255, 0.1);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(99, 102, 241, 0.1);
-    border-radius: 50%;
-    color: #818cf8;
+    color: #00d4ff;
 }
 
-.stat-info {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 2px;
+.stat-info-proxicard {
+    text-align: left;
 }
 
-.stat-value {
-    font-size: 18px;
+.stat-value-proxicard {
+    font-size: 20px;
     font-weight: 700;
     color: white;
 }
 
-.stat-suffix {
-    font-size: 11px;
-    color: #6b7280;
+.stat-suffix-proxicard {
+    font-size: 12px;
+    color: #8a93b0;
+    margin-left: 2px;
 }
 
-.stat-label {
-    width: 100%;
+.stat-label-proxicard {
+    display: block;
     font-size: 10px;
     color: #6b7280;
+    text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 /* Contact Buttons */
-.contact-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 24px;
-}
-
-.btn-wa, .btn-email, .btn-call {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 12px 16px;
-    border-radius: 60px;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.btn-wa {
-    background: linear-gradient(135deg, #075e54, #128c7e);
-    color: white;
-}
-
-.btn-wa:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px -6px #128c7e;
-}
-
-.btn-email {
-    background: rgba(59, 130, 246, 0.15);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    color: #60a5fa;
-}
-
-.btn-email:hover {
-    background: rgba(59, 130, 246, 0.25);
-    transform: translateY(-2px);
-}
-
-.btn-call {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #cbd5e1;
-}
-
-.btn-call:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
-}
-
-/* Social */
-.social-container {
-    margin-top: 16px;
-}
-
-.social-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    margin-bottom: 20px;
-}
-
-.social-links {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-.social-link {
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 50%;
-    color: #94a3b8;
-    transition: all 0.3s ease;
-}
-
-.social-link:hover {
-    transform: translateY(-3px);
-    color: white;
-    background: rgba(99, 102, 241, 0.2);
-}
-
-/* ========== RIGHT COLUMN ========== */
-.profile-right {
-    padding: 40px;
-}
-
-.bio-container {
-    margin-bottom: 32px;
-}
-
-.bio-container h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #818cf8;
-    margin-bottom: 16px;
-    letter-spacing: 0.5px;
-}
-
-.bio-container p {
-    font-size: 14px;
-    line-height: 1.7;
-    color: #cbd5e1;
-}
-
-/* Services */
-.services-container h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #818cf8;
-    margin-bottom: 16px;
-    letter-spacing: 0.5px;
-}
-
-.services-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 32px;
-}
-
-.service-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    transition: all 0.3s ease;
-}
-
-.service-item:hover {
-    background: rgba(99, 102, 241, 0.1);
-    border-color: rgba(99, 102, 241, 0.3);
-    transform: translateX(4px);
-}
-
-.service-icon {
-    color: #818cf8;
-}
-
-.service-item span {
-    font-size: 13px;
-    color: #e2e8f0;
-}
-
-/* Actions */
-.actions-container {
+.contact-buttons-proxicard {
     display: flex;
     gap: 12px;
+    margin-bottom: 28px;
 }
 
-.action-btn {
+.btn-wa-proxicard, .btn-email-proxicard, .btn-call-proxicard {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 16px;
-    border-radius: 60px;
-    text-decoration: none;
-    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 40px;
+    font-size: 12px;
     font-weight: 500;
+    text-decoration: none;
     transition: all 0.3s ease;
 }
 
-.action-btn.primary {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+.btn-wa-proxicard {
+    background: rgba(37, 211, 102, 0.15);
+    border: 1px solid rgba(37, 211, 102, 0.3);
+    color: #25d366;
+}
+
+.btn-wa-proxicard:hover {
+    background: rgba(37, 211, 102, 0.25);
+    transform: translateY(-2px);
+}
+
+.btn-email-proxicard {
+    background: rgba(0, 212, 255, 0.15);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    color: #00d4ff;
+}
+
+.btn-email-proxicard:hover {
+    background: rgba(0, 212, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.btn-call-proxicard {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+}
+
+.btn-call-proxicard:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Social */
+.social-container-proxicard {
+    margin-top: 20px;
+}
+
+.social-divider-proxicard {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.3), transparent);
+    margin-bottom: 20px;
+}
+
+.social-links-proxicard {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.social-link-proxicard {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8a93b0;
+    transition: all 0.3s ease;
+}
+
+.social-link-proxicard:hover {
+    background: #00d4ff;
+    color: #0a0c15;
+    transform: translateY(-3px);
+}
+
+/* Right Column */
+.profile-right-proxicard {
+    padding: 40px 35px;
+}
+
+/* Bio */
+.bio-container-proxicard {
+    margin-bottom: 32px;
+}
+
+.bio-container-proxicard h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #00d4ff;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.bio-container-proxicard p {
+    color: #cbd5e1;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+/* Services */
+.services-container-proxicard {
+    margin-bottom: 32px;
+}
+
+.services-container-proxicard h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #00d4ff;
+    margin-bottom: 16px;
+}
+
+.services-grid-proxicard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.service-item-proxicard {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.service-item-proxicard:hover {
+    background: rgba(0, 212, 255, 0.08);
+    border-color: rgba(0, 212, 255, 0.2);
+    transform: translateX(4px);
+}
+
+.service-icon-proxicard {
+    width: 28px;
+    height: 28px;
+    background: rgba(0, 212, 255, 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00d4ff;
+}
+
+.service-item-proxicard span {
+    font-size: 12px;
+    color: #e2e8f0;
+    font-weight: 500;
+}
+
+/* Features */
+.features-container-proxicard {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 32px;
+    padding: 16px 0;
+}
+
+.feature-item-proxicard {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #cbd5e1;
+}
+
+.feature-check {
+    color: #00ff88;
+}
+
+/* Actions */
+.actions-container-proxicard {
+    display: flex;
+    gap: 16px;
+}
+
+.action-btn-proxicard {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.action-btn-proxicard.primary {
+    background: linear-gradient(90deg, #00b4db, #0083b0);
     color: white;
 }
 
-.action-btn.primary:hover {
+.action-btn-proxicard.primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px -6px #6366f1;
+    box-shadow: 0 8px 25px rgba(0, 180, 219, 0.3);
 }
 
-.action-btn.secondary {
+.action-btn-proxicard.secondary {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #cbd5e1;
 }
 
-.action-btn.secondary:hover {
+.action-btn-proxicard.secondary:hover {
     background: rgba(255, 255, 255, 0.1);
     transform: translateY(-2px);
 }
 
-/* ========== FOOTER ========== */
-.profile-footer {
+/* Footer */
+.profile-footer-proxicard {
     text-align: center;
     margin-top: 24px;
-    font-size: 11px;
-    color: #475569;
+    padding: 20px;
+    color: #6b7280;
+    font-size: 12px;
 }
 
-.profile-footer .separator {
-    margin: 0 8px;
+.separator-proxicard {
+    margin: 0 12px;
 }
 
-/* ========== RESPONSIVE ========== */
+/* Responsive */
 @media (max-width: 900px) {
-    .profile-card {
+    .profile-card-proxicard {
         grid-template-columns: 1fr;
     }
     
-    .profile-left {
+    .profile-left-proxicard {
         border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(0, 212, 255, 0.1);
     }
     
-    .profile-left, .profile-right {
-        padding: 32px;
-    }
-}
-
-@media (max-width: 600px) {
-    .container {
-        width: 95%;
-        padding: 20px 0;
+    .services-grid-proxicard {
+        grid-template-columns: repeat(2, 1fr);
     }
     
-    .profile-left, .profile-right {
-        padding: 24px;
-    }
-    
-    .avatar-frame {
-        width: 100px;
-        height: 100px;
-    }
-    
-    .profile-name {
-        font-size: 22px;
-    }
-    
-    .stats-container {
+    .features-container-proxicard {
         flex-direction: column;
         gap: 12px;
     }
     
-    .stat-block {
-        justify-content: space-between;
+    .contact-buttons-proxicard {
+        flex-wrap: wrap;
     }
     
-    .services-grid {
+    .btn-wa-proxicard, .btn-email-proxicard, .btn-call-proxicard {
+        flex: auto;
+        min-width: calc(33.33% - 8px);
+    }
+}
+
+@media (max-width: 550px) {
+    .services-grid-proxicard {
         grid-template-columns: 1fr;
     }
     
-    .actions-container {
+    .stats-container-proxicard {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .stat-block-proxicard {
+        justify-content: center;
+    }
+    
+    .contact-buttons-proxicard {
         flex-direction: column;
     }
     
-    .contact-buttons {
-        gap: 8px;
+    .btn-wa-proxicard, .btn-email-proxicard, .btn-call-proxicard {
+        width: 100%;
     }
+}
+
+/* Emergency Contact */
+.emergency-contact-proxicard {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 12px;
+  border-left: 3px solid #ef4444;
+}
+
+.emergency-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ef4444;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.emergency-contact-proxicard p {
+  font-size: 0.875rem;
+  color: #e5e7eb;
+  margin: 0;
+}
+
+/* Category Info */
+.category-info-proxicard {
+  margin-top: 1rem;
+}
+
+.category-badge {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  background: rgba(99, 102, 241, 0.2);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: #a78bfa;
+}
+
+.badge.sub {
+  background: rgba(139, 92, 246, 0.2);
+  color: #c084fc;
 }

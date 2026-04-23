@@ -1,12 +1,11 @@
 /* ============================================
-   NEON REGISTER STYLE - Glassmorphism + Dark Tech
+   NEON RESET PASSWORD STYLE - Glassmorphism + Dark Tech
    COMPATIBLE CON SAFARI (iOS + macOS)
    ============================================ */
 
 /* Importar fuentes modernas */
 @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
 
-/* Reset y base */
 * {
     margin: 0;
     padding: 0;
@@ -20,7 +19,7 @@ body {
 }
 
 /* === WRAPPER PRINCIPAL === */
-.neon-register-wrapper {
+.neon-reset-wrapper {
     position: relative;
     width: 100%;
     min-height: 100vh;
@@ -33,7 +32,7 @@ body {
 }
 
 /* === FONDO CON EFECTO GRID === */
-.neon-grid-bg-register {
+.neon-grid-bg-reset {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -44,64 +43,64 @@ body {
     pointer-events: none;
 }
 
-/* === ORBES FLOTANTES (neón) === */
-.neon-orb-register {
+/* === ORBES FLOTANTES === */
+.neon-orb-reset {
     position: absolute;
     border-radius: 50%;
     filter: blur(90px);
     pointer-events: none;
-    animation: floatNeonRegister 15s infinite ease-in-out;
+    animation: floatNeonReset 15s infinite ease-in-out;
 }
 
-.orb-cyan-register {
+.orb-cyan-reset {
     width: 450px;
     height: 450px;
     background: #00d4ff;
     top: -200px;
-    right: -150px;
+    left: -150px;
     opacity: 0.25;
 }
 
-.orb-magenta-register {
+.orb-magenta-reset {
     width: 500px;
     height: 500px;
     background: #d500f9;
     bottom: -250px;
-    left: -200px;
+    right: -200px;
     opacity: 0.2;
     animation-delay: -5s;
 }
 
-.orb-purple-register {
+.orb-purple-reset {
     width: 380px;
     height: 380px;
     background: #7c3aed;
-    top: 30%;
-    right: 20%;
+    top: 50%;
+    left: 50%;
     opacity: 0.15;
     animation-delay: -10s;
     filter: blur(100px);
+    transform: translate(-50%, -50%);
 }
 
-@keyframes floatNeonRegister {
+@keyframes floatNeonReset {
     0% {
         transform: translate(0, 0) scale(1);
     }
     50% {
-        transform: translate(-30px, 40px) scale(1.08);
+        transform: translate(30px, -30px) scale(1.08);
     }
     100% {
         transform: translate(0, 0) scale(1);
     }
 }
 
-/* === TARJETA PRINCIPAL (glassmorphism con soporte Safari) === */
-.neon-register-card {
+/* === TARJETA PRINCIPAL === */
+.neon-reset-card {
     position: relative;
     width: 520px;
     max-width: 100%;
     background: rgba(15, 20, 35, 0.55);
-    /* Soporte Safari y navegadores modernos */
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
     border-radius: 32px;
@@ -111,29 +110,35 @@ body {
     transition: all 0.3s ease;
 }
 
-.neon-register-card:hover {
+.neon-reset-card:hover {
     border-color: rgba(0, 255, 255, 0.4);
     box-shadow: 0 30px 55px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 212, 255, 0.2);
 }
 
-/* === HEADER DEL FORMULARIO === */
-.register-header-neon {
+/* === HEADER === */
+.reset-header-neon {
     text-align: center;
     margin-bottom: 32px;
 }
 
-.logo-icon-neon {
-    display: inline-flex;
+.brand-icon-reset {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(168, 85, 247, 0.15));
+    border-radius: 25px;
+    display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 16px;
+    margin: 0 auto 16px;
+    border: 1px solid rgba(0, 212, 255, 0.3);
 }
 
-.logo-icon-neon svg {
-    filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
+.brand-icon-reset i {
+    font-size: 32px;
+    color: #00d4ff;
 }
 
-.badge-register-neon {
+.badge-reset-neon {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -144,47 +149,42 @@ body {
     font-size: 0.7rem;
     font-weight: 500;
     color: #00d4ff;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     letter-spacing: 0.5px;
 }
 
-.badge-register-neon i {
-    font-size: 0.7rem;
-}
-
-.register-header-neon h1 {
-    font-size: 2rem;
+.reset-title-neon {
+    font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 8px;
     letter-spacing: -0.5px;
 }
 
-.register-header-neon h1 span:first-child {
+.reset-title-neon .primary-text-neon {
     background: linear-gradient(135deg, #00d4ff, #0099cc);
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
 }
 
-.register-header-neon h1 span:last-child {
+.reset-title-neon .accent-text-neon {
     background: linear-gradient(135deg, #a855f7, #7c3aed);
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
 }
 
-.register-subtitle-neon {
+.reset-subtitle-neon {
     color: #8a93b0;
     font-size: 0.85rem;
     font-weight: 400;
-    margin-top: 8px;
 }
 
 /* === ALERTAS === */
-.alert-neon-register {
+.alert-neon-reset {
     display: flex;
-    flex-direction: column;
-    gap: 6px;
+    align-items: center;
+    gap: 12px;
     background: rgba(255, 65, 65, 0.1);
     border-left: 3px solid #ff4444;
     border-radius: 12px;
@@ -192,28 +192,45 @@ body {
     margin-bottom: 24px;
     font-size: 0.8rem;
     color: #ff9999;
-    /* Soporte Safari */
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
 }
 
-.alert-neon-register div {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.alert-neon-register i {
-    font-size: 0.85rem;
+.alert-error-reset i {
     color: #ff4444;
 }
 
-/* === CAMPOS DE ENTRADA === */
-.input-group-neon {
-    margin-bottom: 20px;
+.alert-content-reset {
+    flex: 1;
 }
 
-.input-label-neon {
+.alert-content-reset div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 2px 0;
+}
+
+.close-btn-reset {
+    background: transparent;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: color 0.2s;
+    padding: 4px;
+}
+
+.close-btn-reset:hover {
+    color: #ff4444;
+}
+
+/* === FORMULARIO === */
+.form-group-neon {
+    margin-bottom: 24px;
+}
+
+.form-label-neon {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -224,7 +241,7 @@ body {
     letter-spacing: 0.3px;
 }
 
-.input-label-neon i {
+.form-label-neon i {
     font-size: 0.85rem;
     color: #00d4ff;
 }
@@ -233,35 +250,49 @@ body {
     position: relative;
 }
 
-.input-field-neon {
+.form-input-neon {
     width: 100%;
     background: rgba(10, 14, 23, 0.7);
     border: 1px solid rgba(0, 212, 255, 0.2);
     border-radius: 16px;
-    padding: 14px 18px;
+    padding: 14px 45px 14px 18px;
     font-size: 0.9rem;
     color: #ffffff;
     font-family: 'Inter', sans-serif;
     transition: all 0.2s ease;
     outline: none;
-    /* Mejora para iOS */
     -webkit-appearance: none;
     appearance: none;
 }
 
-.input-field-neon:focus {
+.form-input-neon:focus {
     border-color: #00d4ff;
     box-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
     background: rgba(10, 14, 23, 0.9);
 }
 
-.input-field-neon::placeholder {
+.form-input-neon::placeholder {
     color: #4a5578;
     font-weight: 400;
 }
 
-/* Botón toggle de contraseña */
-.password-toggle-neon {
+.input-border-neon {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #00d4ff, #a855f7);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.form-input-neon:focus ~ .input-border-neon {
+    width: 100%;
+}
+
+/* Botón toggle */
+.password-toggle-reset {
     position: absolute;
     right: 14px;
     top: 50%;
@@ -275,16 +306,16 @@ body {
     padding: 8px;
 }
 
-.password-toggle-neon:hover {
+.password-toggle-reset:hover {
     color: #00d4ff;
 }
 
-/* Hint de ayuda */
+/* Hint */
 .input-hint-neon {
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-top: 6px;
+    margin-top: 8px;
     font-size: 0.7rem;
     color: #6b7280;
 }
@@ -294,8 +325,33 @@ body {
     color: #00d4ff;
 }
 
-/* === BOTÓN PRINCIPAL === */
-.btn-register-neon {
+/* Medidor de fortaleza */
+.password-strength-neon {
+    margin-top: -8px;
+    margin-bottom: 20px;
+}
+
+.strength-bar {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.strength-text {
+    font-size: 0.7rem;
+}
+
+/* === BOTÓN === */
+.submit-btn-reset {
     width: 100%;
     background: linear-gradient(90deg, #00b4db, #0083b0);
     border: none;
@@ -310,44 +366,48 @@ body {
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     font-family: 'Inter', sans-serif;
     position: relative;
     overflow: hidden;
 }
 
-.btn-register-neon i {
+.submit-btn-reset i {
     font-size: 0.9rem;
     transition: transform 0.2s;
 }
 
-.btn-register-neon:hover {
+.submit-btn-reset:hover {
     background: linear-gradient(90deg, #00c9ff, #0099cc);
     box-shadow: 0 0 18px rgba(0, 180, 219, 0.4);
     transform: scale(1.01);
 }
 
-.btn-register-neon:hover i {
+.submit-btn-reset:hover i {
     transform: translateX(4px);
 }
 
-/* Efecto shine */
-.btn-shine-neon {
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
+.btn-loader-reset {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.btn-register-neon:hover .btn-shine-neon {
-    left: 100%;
+.spinner-reset {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spinReset 0.6s linear infinite;
+}
+
+@keyframes spinReset {
+    to { transform: rotate(360deg); }
 }
 
 /* === ENLACES === */
-.register-links-neon {
+.links-container-reset {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -355,7 +415,7 @@ body {
     flex-wrap: wrap;
 }
 
-.login-link-neon, .home-link-neon {
+.link-item-reset {
     color: #8a93b0;
     text-decoration: none;
     font-size: 0.8rem;
@@ -365,83 +425,54 @@ body {
     transition: color 0.2s;
 }
 
-.login-link-neon:hover, .home-link-neon:hover {
+.link-item-reset:hover {
     color: #00d4ff;
 }
 
-.login-link-neon i, .home-link-neon i {
+.link-item-reset i {
     font-size: 0.75rem;
 }
 
-/* === TÉRMINOS Y CONDICIONES === */
-.register-terms-neon {
-    text-align: center;
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(0, 212, 255, 0.15);
-}
-
-.register-terms-neon p {
-    font-size: 0.7rem;
-    color: #6b7280;
-}
-
-.register-terms-neon a {
-    color: #00d4ff;
-    text-decoration: none;
-    transition: color 0.2s;
-}
-
-.register-terms-neon a:hover {
-    color: #a855f7;
-    text-decoration: underline;
-}
-
-/* === FALLBACK para navegadores sin backdrop-filter === */
+/* === FALLBACK === */
 @supports not ((backdrop-filter: blur(14px)) or (-webkit-backdrop-filter: blur(14px))) {
-    .neon-register-card {
+    .neon-reset-card {
         background: rgba(15, 20, 35, 0.95);
-    }
-    
-    .alert-neon-register {
-        background: rgba(255, 65, 65, 0.2);
     }
 }
 
 /* === RESPONSIVE === */
-@media (max-width: 600px) {
-    .neon-register-card {
+@media (max-width: 550px) {
+    .neon-reset-card {
         padding: 30px 22px;
     }
     
-    .register-header-neon h1 {
-        font-size: 1.7rem;
+    .reset-title-neon {
+        font-size: 1.5rem;
     }
     
-    .input-field-neon {
-        padding: 12px 16px;
+    .form-input-neon {
+        padding: 12px 45px 12px 16px;
     }
     
-    .register-links-neon {
+    .links-container-reset {
         flex-direction: column;
         align-items: stretch;
         text-align: center;
     }
     
-    .login-link-neon, .home-link-neon {
+    .link-item-reset {
         justify-content: center;
     }
 }
 
-/* === MEJORAS PARA TOUCH (iOS) === */
 @media (hover: hover) {
-    .btn-register-neon:hover {
+    .submit-btn-reset:hover {
         transform: scale(1.01);
     }
 }
 
 @media (hover: none) {
-    .btn-register-neon:active {
+    .submit-btn-reset:active {
         transform: scale(0.98);
     }
 }
