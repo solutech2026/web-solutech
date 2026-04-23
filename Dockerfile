@@ -35,8 +35,11 @@ RUN composer run-script post-autoload-dump
 # Instalar dependencias de Node.js
 RUN npm ci --production || npm install --production
 
-# Compilar assets de React/Vite
-RUN npm run build
+# Ver qué script de build existe
+RUN cat package.json | grep build
+
+# Compilar assets de React/Vite con verbose
+RUN npm run build -- --verbose || (echo "Build failed. Checking for errors..." && exit 1)
 
 # Optimizar Laravel
 RUN php artisan optimize
@@ -46,5 +49,4 @@ RUN chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8000
 
-# Comando para iniciar la aplicación
 CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000
