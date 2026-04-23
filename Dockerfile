@@ -35,25 +35,42 @@ RUN composer run-script post-autoload-dump
 # Instalar dependencias de Node.js
 RUN npm install
 
-# Compilar assets
-RUN npm run build
+# Compilar assets FORZADAMENTE
+RUN npm run build || npx vite build
 
-# Optimizar Laravel (sin base de datos)
+# Verificar que los assets se crearon
+RUN ls -la public/build/ || echo "ERROR: Assets no compilados"
+
+# Optimizar Laravel
 RUN php artisan optimize
 
-# Establecer permisos
+# Establecer permisos correctos
 RUN chmod -R 775 storage bootstrap/cache public/build
+RUN chmod -R 755 public/build
 
 EXPOSE 8000
 
-# Script de inicio CORREGIDO - NO crear .env manualmente
+# Script de inicio CORREGIDO
 RUN echo '#!/bin/bash\n\
-# NO crear .env - Railway inyecta las variables automáticamente\n\
-\n\
-# Mostrar variables de Railway (debug)\n\
-echo "=== DATABASE_URL de Railway ==="\n\
+# Variables de Railway\n\
+echo "=== Configuración de Railway ==="\n\
 echo "DATABASE_URL: ${DATABASE_URL}"\n\
 echo "RAILWAY_PUBLIC_DOMAIN: ${RAILWAY_PUBLIC_DOMAIN}"\n\
+\n\
+# Crear .env solo con lo necesario\n\
+cat > .env << EOF\n\
+APP_ENV=production\n\
+APP_DEBUG=false\n\
+APP_KEY=base64:dxo01MmyF5p05aU4XHZByHPD1PVr/Rn5jUw8sGSY=\n\
+APP_URL=https://${RAILWAY_PUBLIC_DOMAIN}\n\
+ASSET_URL=https://${RAILWAY_PUBLIC_DOMAIN}\n\
+DB_CONNECTION=pgsql\n\
+DATABASE_URL=${DATABASE_URL}\n\
+EOF\n\
+\n\
+# Verificar .env\n\
+echo "=== Archivo .env ==="\n\
+cat .env\n\
 \n\
 # Limpiar caché\n\
 php artisan config:clear\n\
@@ -65,8 +82,12 @@ php artisan config:cache\n\
 php artisan route:cache\n\
 php artisan view:cache\n\
 \n\
-# Crear enlace simbólico para storage\n\
+# Enlace simbólico para storage\n\
 php artisan storage:link || true\n\
+\n\
+# Verificar que los assets existen\n\
+echo "=== Verificando assets ==="\n\
+ls -la public/build/ || echo "⚠️ Assets no encontrados"\n\
 \n\
 # Ejecutar migraciones\n\
 php artisan migrate --force\n\
