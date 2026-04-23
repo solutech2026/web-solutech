@@ -23,19 +23,19 @@ WORKDIR /app
 COPY composer.json composer.lock ./
 COPY package.json package-lock.json ./
 
-# Instalar dependencias de PHP - LÍNEA CORREGIDA
+# Instalar dependencias de PHP
 RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-platform-reqs
 
 # Instalar dependencias de Node.js
 RUN npm ci --production || npm install --production
 
-# Copiar el resto del código
+# Copiar el resto del código (incluyendo artisan)
 COPY . .
 
 # Compilar assets
 RUN npm run build
 
-# Optimizar Laravel
+# Optimizar Laravel (ahora artisan ya existe)
 RUN php artisan optimize
 
 # Establecer permisos
