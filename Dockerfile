@@ -1,12 +1,12 @@
 FROM php:8.3-cli
 
-# Instalar Node.js 20 y extensiones necesarias
+# Instalar Node.js, npm y extensiones necesarias desde los repositorios oficiales
 RUN apt-get update && apt-get install -y \
     curl \
     git \
     unzip \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
+    nodejs \
+    npm \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
