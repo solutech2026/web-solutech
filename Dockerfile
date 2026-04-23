@@ -32,6 +32,33 @@ COPY . .
 # Ejecutar scripts de composer
 RUN composer run-script post-autoload-dump
 
+# ============================================
+# LOGS PARA DEBUG - Verificar conexión a BD
+# ============================================
+
+# Crear archivo .env temporal con DATABASE_URL
+RUN echo "APP_ENV=production" > .env
+RUN echo "APP_KEY=base64:dxo01MmyF5p05aU4XHZByHPD1PVr/Rn5jUw8sGSY=" >> .env
+RUN echo "DB_CONNECTION=pgsql" >> .env
+RUN echo "DATABASE_URL=${DATABASE_URL}" >> .env
+
+# Mostrar qué DATABASE_URL está usando
+RUN echo "=== DATABASE_URL ===" && cat .env | grep DATABASE_URL
+
+# Verificar conexión a PostgreSQL
+RUN php -r "\$pdo = new PDO(getenv('DATABASE_URL')); echo '✅ Conexión exitosa a PostgreSQL\n';" || echo "❌ Error de conexión"
+
+# Verificar qué driver está usando Laravel
+RUN php artisan tinker --execute="echo 'Driver: ' . DB::connection()->getDriverName() . '\n';"
+
+# Verificar nombre de la base de datos
+RUN php artisan tinker --execute="echo 'Database: ' . DB::connection()->getDatabaseName() . '\n';"
+
+# Verificar si hay tablas existentes
+RUN php artisan tinker --execute="\$tables = DB::select('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\''); echo 'Tablas encontradas: ' . count(\$tables) . '\n';"
+
+# ============================================
+
 # Ver contenido de package.json
 RUN cat package.json
 
@@ -49,4 +76,7 @@ RUN chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8000
 
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000
+# Ejecutar migraciones con verbose y mostrar logs
+CMD php artisan migrate:status && \
+    php artisan migrate --force --verbose && \
+    php artisan serve --host=0.0.0.0 --port=8000
