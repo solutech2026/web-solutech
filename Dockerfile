@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y \
     nodejs \
     npm \
     libpq-dev \
-    nginx \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -47,26 +46,14 @@ RUN chmod -R 775 storage bootstrap/cache public/build
 
 EXPOSE 8000
 
-# Script de inicio CORREGIDO
+# Script de inicio CORREGIDO - NO crear .env manualmente
 RUN echo '#!/bin/bash\n\
-# Usar variables de Railway (NO hardcodear)\n\
-cat > .env << EOF\n\
-APP_ENV=production\n\
-APP_DEBUG=false\n\
-APP_KEY=base64:dxo01MmyF5p05aU4XHZByHPD1PVr/Rn5jUw8sGSY=\n\
-APP_URL=https://${RAILWAY_PUBLIC_DOMAIN}\n\
+# NO crear .env - Railway inyecta las variables automáticamente\n\
 \n\
-# Base de datos - Usar DATABASE_URL de Railway\n\
-DATABASE_URL=${DATABASE_URL}\n\
-DB_CONNECTION=pgsql\n\
-\n\
-# Assets\n\
-ASSET_URL=${APP_URL}\n\
-EOF\n\
-\n\
-# Mostrar configuración (debug)\n\
-echo "=== CONFIGURACIÓN ==="\n\
-cat .env\n\
+# Mostrar variables de Railway (debug)\n\
+echo "=== DATABASE_URL de Railway ==="\n\
+echo "DATABASE_URL: ${DATABASE_URL}"\n\
+echo "RAILWAY_PUBLIC_DOMAIN: ${RAILWAY_PUBLIC_DOMAIN}"\n\
 \n\
 # Limpiar caché\n\
 php artisan config:clear\n\
