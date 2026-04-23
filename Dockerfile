@@ -32,7 +32,7 @@ COPY . .
 # Crear archivo .env temporal si no existe
 RUN if [ ! -f .env ]; then echo "APP_ENV=production" > .env; fi
 
-# Ahora ejecutar los scripts de composer
+# Ejecutar los scripts de composer
 RUN composer run-script post-autoload-dump
 
 # Instalar dependencias de Node.js
