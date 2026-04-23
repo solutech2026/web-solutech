@@ -1,6 +1,6 @@
 FROM php:8.3-cli
 
-# Instalar Node.js, npm y extensiones necesarias (incluyendo libpq-dev para PostgreSQL)
+# Instalar Node.js, npm y extensiones necesarias
 RUN apt-get update && apt-get install -y \
     curl \
     git \
@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar extensiones de PHP para PostgreSQL (NO MySQL)
+# Instalar extensiones de PHP para PostgreSQL
 RUN docker-php-ext-install pdo_pgsql pgsql
 
 # Instalar Composer
@@ -33,34 +33,38 @@ COPY . .
 RUN composer run-script post-autoload-dump
 
 # ============================================
-# LOGS PARA DEBUG - Verificar conexión a BD
+# CONFIGURACIÓN FORZADA DE POSTGRESQL
 # ============================================
 
-# Crear archivo .env temporal con DATABASE_URL
+# Crear .env con la configuración CORRECTA
 RUN echo "APP_ENV=production" > .env
+RUN echo "APP_DEBUG=false" >> .env
 RUN echo "APP_KEY=base64:dxo01MmyF5p05aU4XHZByHPD1PVr/Rn5jUw8sGSY=" >> .env
+RUN echo "APP_URL=https://web-solutech-production.up.railway.app" >> .env
+
+# Configuración MANUAL de PostgreSQL (usando valores fijos)
 RUN echo "DB_CONNECTION=pgsql" >> .env
-RUN echo "DATABASE_URL=${DATABASE_URL}" >> .env
+RUN echo "DB_HOST=postgres.railway.internal" >> .env
+RUN echo "DB_PORT=5432" >> .env
+RUN echo "DB_DATABASE=railway" >> .env
+RUN echo "DB_USERNAME=postgres" >> .env
+RUN echo "DB_PASSWORD=dhxHXcZXJgRxQYbgrNoiyXqbnlKMPBvu" >> .env
+RUN echo "DB_SSLMODE=require" >> .env
 
-# Mostrar qué DATABASE_URL está usando
-RUN echo "=== DATABASE_URL ===" && cat .env | grep DATABASE_URL
+# Mostrar configuración para debug
+RUN echo "=== CONFIGURACIÓN FINAL ===" && cat .env
 
-# Verificar conexión a PostgreSQL
-RUN php -r "\$pdo = new PDO(getenv('DATABASE_URL')); echo '✅ Conexión exitosa a PostgreSQL\n';" || echo "❌ Error de conexión"
+# Probar conexión manualmente
+RUN php -r "\$pdo = new PDO('pgsql:host=postgres.railway.internal;port=5432;dbname=railway', 'postgres', 'dhxHXcZXJgRxQYbgrNoiyXqbnlKMPBvu', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]); echo '✅ CONEXIÓN EXITOSA A POSTGRESQL\n'; \$stmt = \$pdo->query('SELECT current_database()'); echo 'Base de datos: ' . \$stmt->fetchColumn() . '\n';"
 
-# Verificar qué driver está usando Laravel
-RUN php artisan tinker --execute="echo 'Driver: ' . DB::connection()->getDriverName() . '\n';"
+# Limpiar caché de Laravel
+RUN php artisan config:clear
+RUN php artisan config:cache
 
-# Verificar nombre de la base de datos
-RUN php artisan tinker --execute="echo 'Database: ' . DB::connection()->getDatabaseName() . '\n';"
-
-# Verificar si hay tablas existentes
-RUN php artisan tinker --execute="\$tables = DB::select('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\''); echo 'Tablas encontradas: ' . count(\$tables) . '\n';"
+# Ejecutar migraciones
+RUN php artisan migrate --force --verbose
 
 # ============================================
-
-# Ver contenido de package.json
-RUN cat package.json
 
 # Instalar dependencias de Node.js
 RUN npm install
@@ -76,7 +80,4 @@ RUN chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8000
 
-# Ejecutar migraciones con verbose y mostrar logs
-CMD php artisan migrate:status && \
-    php artisan migrate --force --verbose && \
-    php artisan serve --host=0.0.0.0 --port=8000
+CMD php artisan serve --host=0.0.0.0 --port=8000
