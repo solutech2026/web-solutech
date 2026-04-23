@@ -1,6 +1,6 @@
 FROM php:8.3-cli
 
-# Instalar Node.js, npm y extensiones necesarias desde los repositorios oficiales
+# Instalar Node.js, npm y extensiones necesarias
 RUN apt-get update && apt-get install -y \
     curl \
     git \
@@ -23,19 +23,25 @@ WORKDIR /app
 COPY composer.json composer.lock ./
 COPY package.json package-lock.json ./
 
-# Instalar dependencias de PHP
-RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-platform-reqs
+# Instalar dependencias de PHP (sin scripts automáticos)
+RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-platform-reqs --no-scripts
+
+# Copiar el resto del código
+COPY . .
+
+# Crear archivo .env temporal si no existe
+RUN if [ ! -f .env ]; then echo "APP_ENV=production" > .env; fi
+
+# Ahora ejecutar los scripts de composer
+RUN composer run-script post-autoload-dump
 
 # Instalar dependencias de Node.js
 RUN npm ci --production || npm install --production
 
-# Copiar el resto del código (incluyendo artisan)
-COPY . .
-
 # Compilar assets
 RUN npm run build
 
-# Optimizar Laravel (ahora artisan ya existe)
+# Optimizar Laravel
 RUN php artisan optimize
 
 # Establecer permisos
