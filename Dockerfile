@@ -1,17 +1,18 @@
 FROM php:8.3-cli
 
-# Instalar Node.js, npm y extensiones necesarias
+# Instalar Node.js, npm y extensiones necesarias (incluyendo libpq-dev para PostgreSQL)
 RUN apt-get update && apt-get install -y \
     curl \
     git \
     unzip \
     nodejs \
     npm \
+    libpq-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar extensiones de PHP
-RUN docker-php-ext-install pdo_mysql mysqli
+# Instalar extensiones de PHP para PostgreSQL (NO MySQL)
+RUN docker-php-ext-install pdo_pgsql pgsql
 
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -37,7 +38,7 @@ RUN cat package.json
 # Instalar dependencias de Node.js
 RUN npm install
 
-# Compilar assets (sin --verbose)
+# Compilar assets
 RUN npm run build
 
 # Optimizar Laravel
