@@ -32,47 +32,13 @@ COPY . .
 # Ejecutar scripts de composer
 RUN composer run-script post-autoload-dump
 
-# ============================================
-# CONFIGURACIÓN FORZADA DE POSTGRESQL
-# ============================================
-
-# Crear .env con la configuración CORRECTA
-RUN echo "APP_ENV=production" > .env
-RUN echo "APP_DEBUG=false" >> .env
-RUN echo "APP_KEY=base64:dxo01MmyF5p05aU4XHZByHPD1PVr/Rn5jUw8sGSY=" >> .env
-RUN echo "APP_URL=https://web-solutech-production.up.railway.app" >> .env
-
-# Configuración MANUAL de PostgreSQL (usando valores fijos)
-RUN echo "DB_CONNECTION=pgsql" >> .env
-RUN echo "DB_HOST=postgres.railway.internal" >> .env
-RUN echo "DB_PORT=5432" >> .env
-RUN echo "DB_DATABASE=railway" >> .env
-RUN echo "DB_USERNAME=postgres" >> .env
-RUN echo "DB_PASSWORD=dhxHXcZXJgRxQYbgrNoiyXqbnlKMPBvu" >> .env
-RUN echo "DB_SSLMODE=require" >> .env
-
-# Mostrar configuración para debug
-RUN echo "=== CONFIGURACIÓN FINAL ===" && cat .env
-
-# Probar conexión manualmente
-RUN php -r "\$pdo = new PDO('pgsql:host=postgres.railway.internal;port=5432;dbname=railway', 'postgres', 'dhxHXcZXJgRxQYbgrNoiyXqbnlKMPBvu', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]); echo '✅ CONEXIÓN EXITOSA A POSTGRESQL\n'; \$stmt = \$pdo->query('SELECT current_database()'); echo 'Base de datos: ' . \$stmt->fetchColumn() . '\n';"
-
-# Limpiar caché de Laravel
-RUN php artisan config:clear
-RUN php artisan config:cache
-
-# Ejecutar migraciones
-RUN php artisan migrate --force --verbose
-
-# ============================================
-
 # Instalar dependencias de Node.js
 RUN npm install
 
 # Compilar assets
 RUN npm run build
 
-# Optimizar Laravel
+# Optimizar Laravel (sin base de datos)
 RUN php artisan optimize
 
 # Establecer permisos
@@ -80,4 +46,34 @@ RUN chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8000
 
-CMD php artisan serve --host=0.0.0.0 --port=8000
+# ============================================
+# TODO ESTO SE EJECUTA AL INICIAR EL CONTENEDOR
+# ============================================
+
+# Crear script de inicio
+RUN echo '#!/bin/bash\n\
+# Crear .env con variables de Railway\n\
+echo "APP_ENV=production" > .env\n\
+echo "APP_DEBUG=false" >> .env\n\
+echo "APP_KEY=base64:dxo01MmyF5p05aU4XHZByHPD1PVr/Rn5jUw8sGSY=" >> .env\n\
+echo "APP_URL=${RAILWAY_PUBLIC_DOMAIN}" >> .env\n\
+echo "DB_CONNECTION=pgsql" >> .env\n\
+echo "DB_HOST=postgres.railway.internal" >> .env\n\
+echo "DB_PORT=5432" >> .env\n\
+echo "DB_DATABASE=railway" >> .env\n\
+echo "DB_USERNAME=postgres" >> .env\n\
+echo "DB_PASSWORD=dhxHXcZXJgRxQYbgrNoiyXqbnlKMPBvu" >> .env\n\
+echo "DB_SSLMODE=require" >> .env\n\
+\n\
+# Limpiar y cachear configuración\n\
+php artisan config:clear\n\
+php artisan config:cache\n\
+\n\
+# Ejecutar migraciones\n\
+php artisan migrate --force\n\
+\n\
+# Iniciar servidor\n\
+php artisan serve --host=0.0.0.0 --port=8000\n\
+' > /start.sh && chmod +x /start.sh
+
+CMD ["/start.sh"]
