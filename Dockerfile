@@ -62,7 +62,7 @@ echo "DB_HOST=postgres.railway.internal" >> .env\n\
 echo "DB_PORT=5432" >> .env\n\
 echo "DB_DATABASE=railway" >> .env\n\
 echo "DB_USERNAME=postgres" >> .env\n\
-echo "DB_PASSWORD=dhxHXcZXJgRxQYbgrNoiyXqbnlKMPBvu" >> .env\n\
+echo "DB_PASSWORD=dhxHXcZXJgRxQYbgrNoiyXqbnlKMPBVu" >> .env\n\
 echo "DB_SSLMODE=require" >> .env\n\
 \n\
 # Limpiar y cachear configuración\n\
