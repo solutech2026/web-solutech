@@ -23,22 +23,19 @@ WORKDIR /app
 COPY composer.json composer.lock ./
 COPY package.json package-lock.json ./
 
-# Instalar dependencias de PHP (sin scripts automáticos)
+# Instalar dependencias de PHP
 RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-platform-reqs --no-scripts
 
 # Copiar el resto del código
 COPY . .
 
-# Crear archivo .env temporal si no existe
-RUN if [ ! -f .env ]; then echo "APP_ENV=production" > .env; fi
-
-# Ejecutar los scripts de composer
+# Ejecutar scripts de composer
 RUN composer run-script post-autoload-dump
 
 # Instalar dependencias de Node.js
 RUN npm ci --production || npm install --production
 
-# Compilar assets
+# Compilar assets de React/Vite
 RUN npm run build
 
 # Optimizar Laravel
@@ -49,4 +46,5 @@ RUN chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8000
 
+# Comando para iniciar la aplicación
 CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000
