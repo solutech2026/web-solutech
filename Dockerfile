@@ -24,47 +24,53 @@ RUN chown -R www-data:www-data /var/www/html \
 # Instalar dependencias
 RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-platform-reqs
 
-# Crear .env
-RUN echo "APP_NAME=Solutech" > .env && \
-    echo "APP_ENV=production" >> .env && \
-    echo "APP_DEBUG=true" >> .env && \
-    echo "APP_KEY=${APP_KEY}" >> .env && \
-    echo "APP_URL=${APP_URL}" >> .env && \
-    echo "" >> .env && \
-    echo "DB_CONNECTION=pgsql" >> .env && \
-    echo "DB_HOST=dpg-d7ld2h77f7vs73b0or4g-a.oregon-postgres.render.com" >> .env && \
-    echo "DB_PORT=5432" >> .env && \
-    echo "DB_DATABASE=solutech" >> .env && \
-    echo "DB_USERNAME=solutech_user" >> .env && \
-    echo "DB_PASSWORD=${DB_PASSWORD}" >> .env && \
-    echo "DB_SSLMODE=require" >> .env && \
-    echo "" >> .env && \
-    echo "LOG_CHANNEL=stderr" >> .env && \
-    echo "SESSION_DRIVER=database" >> .env && \
-    echo "CACHE_DRIVER=database" >> .env
-
-# Cachear configuración
-RUN php artisan config:cache
-
 EXPOSE 80
 
-# Script que crea las tablas necesarias
+# Script de inicio que crea .env al arrancar
 RUN echo '#!/bin/bash\n\
-echo "=== INICIANDO APLICACION ===\n\
+set -e\n\
 \n\
-echo "=== CORRIENDO MIGRACIONES ==="\n\
+echo "=== CREANDO .env ===\n\
+\n\
+# Crear archivo .env desde cero\n\
+cat > .env << EOF\n\
+APP_NAME=Solutech\n\
+APP_ENV=production\n\
+APP_DEBUG=true\n\
+php artisan key:generate --force\n\
+APP_URL=https://web-solutech.onrender.com\n\
+\n\
+DB_CONNECTION=pgsql\n\
+DB_HOST=dpg-d7ld2h77f7vs73b0or4g-a.oregon-postgres.render.com\n\
+DB_PORT=5432\n\
+DB_DATABASE=solutech\n\
+DB_USERNAME=solutech_user\n\
+DB_PASSWORD=vt21B1imfNpBSuIqIrZ00iPLzf9snF0UZ\n\
+DB_SSLMODE=require\n\
+\n\
+LOG_CHANNEL=stderr\n\
+SESSION_DRIVER=database\n\
+CACHE_DRIVER=database\n\
+EOF\n\
+\n\
+# Mostrar que APP_KEY está presente\n\
+echo "=== VERIFICANDO .env ===\n\
+cat .env | grep APP_KEY\n\
+\n\
+# Forzar que Laravel use el .env\n\
+rm -rf bootstrap/cache/*.php\n\
+\n\
+# Limpiar y recachear configuración\n\
+php artisan config:clear\n\
+php artisan config:cache\n\
+\n\
+# Verificar que Laravel lee la APP_KEY\n\
+echo "=== VERIFICANDO APP_KEY ===\n\
+php artisan tinker --execute="echo \\"APP_KEY: \\" . env(\\"APP_KEY\\");"\n\
+\n\
+# Ejecutar migraciones\n\
+echo "=== EJECUTANDO MIGRACIONES ===\n\
 php artisan migrate --force\n\
-\n\
-echo "=== CREANDO TABLA DE CACHE ==="\n\
-php artisan cache:table\n\
-php artisan migrate --force\n\
-\n\
-echo "=== CREANDO TABLA DE SESIONES ==="\n\
-php artisan session:table\n\
-php artisan migrate --force\n\
-\n\
-echo "=== VERIFICANDO TABLAS ==="\n\
-php artisan migrate:status\n\
 \n\
 echo "=== INICIANDO APACHE ===\n\
 apache2-foreground\n\
