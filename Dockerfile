@@ -33,7 +33,7 @@ RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-pl
 ENV APP_ENV=production
 ENV APP_URL=https://web-solutech.onrender.com
 
-# Instalar dependencias Node.js y compilar Vite con la URL correcta
+# Instalar dependencias Node.js y compilar Vite
 RUN npm install && NODE_ENV=production npm run build
 
 # Limpiar cache de configuración inicial
@@ -41,60 +41,55 @@ RUN php artisan config:clear
 
 EXPOSE 80
 
-# Script de inicio con SEEDERS
-RUN echo '#!/bin/bash\n\
-echo "=== INICIANDO APLICACION ===\n\
-\n\
-# Crear .env\n\
-cat > .env << "EOF"\n\
-APP_NAME=Solutech\n\
-APP_ENV=production\n\
-APP_DEBUG=false\n\
-APP_KEY=base64:oi1nf/JUinLZtIzCfs5U4fb+okBmr6Uf/Q27VCvleqU=\n\
-APP_URL=https://web-solutech.onrender.com\n\
-\n\
-DB_CONNECTION=pgsql\n\
-DB_HOST=dpg-d7ld2h77f7vs73b0or4g-a.oregon-postgres.render.com\n\
-DB_PORT=5432\n\
-DB_DATABASE=solutech\n\
-DB_USERNAME=solutech_user\n\
-DB_PASSWORD=vt21B1imfNpBSuIqIrZ00iPLzf9snF0UZ\n\
-DB_SSLMODE=require\n\
-\n\
-LOG_CHANNEL=stderr\n\
-SESSION_DRIVER=database\n\
-CACHE_DRIVER=database\n\
-EOF\n\
-\n\
-echo "=== .env creado ===\n\
-\n\
-# Verificar assets compilados\n\
-echo "=== VERIFICANDO MANIFEST ===\n\
-if [ -f /var/www/html/public/build/manifest.json ]; then\n\
-    echo "✅ Manifest encontrado"\n\
-else\n\
-    echo "⚠️ Manifest no encontrado, pero continuamos"\n\
-fi\n\
-\n\
-# Limpiar cache\n\
-php artisan config:clear\n\
-php artisan config:cache\n\
-php artisan view:cache\n\
-\n\
-# Ejecutar migraciones\n\
-echo "=== EJECUTANDO MIGRACIONES ===\n\
-php artisan migrate --force\n\
-\n\
-# 🔥 EJECUTAR SEEDERS 🔥\n\
-echo "=== EJECUTANDO SEEDERS ===\n\
-php artisan db:seed --force\n\
-\n\
-# Verificar que los seeders se ejecutaron\n\
-echo "=== VERIFICANDO DATOS ===\n\
-php artisan tinker --execute="echo \\"Usuarios: \\" . App\\Models\\User::count();" 2>/dev/null || echo "No se pudo verificar"\n\
-\n\
-echo "=== INICIANDO APACHE ===\n\
-apache2-foreground\n\
-' > /usr/local/bin/entrypoint.sh && chmod +x /usr/local/bin/entrypoint.sh
+# Script de inicio con seeders
+RUN echo '#!/bin/bash' > /usr/local/bin/entrypoint.sh && \
+    echo 'set -e' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'echo "=== INICIANDO APLICACION ==="' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo '# Crear .env' >> /usr/local/bin/entrypoint.sh && \
+    echo 'cat > .env << "EOF"' >> /usr/local/bin/entrypoint.sh && \
+    echo 'APP_NAME=Solutech' >> /usr/local/bin/entrypoint.sh && \
+    echo 'APP_ENV=production' >> /usr/local/bin/entrypoint.sh && \
+    echo 'APP_DEBUG=false' >> /usr/local/bin/entrypoint.sh && \
+    echo 'APP_KEY=base64:oi1nf/JUinLZtIzCfs5U4fb+okBmr6Uf/Q27VCvleqU=' >> /usr/local/bin/entrypoint.sh && \
+    echo 'APP_URL=https://web-solutech.onrender.com' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'DB_CONNECTION=pgsql' >> /usr/local/bin/entrypoint.sh && \
+    echo 'DB_HOST=dpg-d7ld2h77f7vs73b0or4g-a.oregon-postgres.render.com' >> /usr/local/bin/entrypoint.sh && \
+    echo 'DB_PORT=5432' >> /usr/local/bin/entrypoint.sh && \
+    echo 'DB_DATABASE=solutech' >> /usr/local/bin/entrypoint.sh && \
+    echo 'DB_USERNAME=solutech_user' >> /usr/local/bin/entrypoint.sh && \
+    echo 'DB_PASSWORD=vt21B1imfNpBSuIqIrZ00iPLzf9snF0UZ' >> /usr/local/bin/entrypoint.sh && \
+    echo 'DB_SSLMODE=require' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'LOG_CHANNEL=stderr' >> /usr/local/bin/entrypoint.sh && \
+    echo 'SESSION_DRIVER=database' >> /usr/local/bin/entrypoint.sh && \
+    echo 'CACHE_DRIVER=database' >> /usr/local/bin/entrypoint.sh && \
+    echo 'EOF' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'echo "=== .env creado ==="' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'echo "=== LIMPIANDO CACHE ==="' >> /usr/local/bin/entrypoint.sh && \
+    echo 'php artisan config:clear' >> /usr/local/bin/entrypoint.sh && \
+    echo 'php artisan config:cache' >> /usr/local/bin/entrypoint.sh && \
+    echo 'php artisan view:cache' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'echo "=== EJECUTANDO MIGRACIONES ==="' >> /usr/local/bin/entrypoint.sh && \
+    echo 'php artisan migrate --force' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'echo "=== EJECUTANDO SEEDERS ==="' >> /usr/local/bin/entrypoint.sh && \
+    echo 'if php artisan db:seed --force; then' >> /usr/local/bin/entrypoint.sh && \
+    echo '    echo "✅ Seeders ejecutados correctamente"' >> /usr/local/bin/entrypoint.sh && \
+    echo 'else' >> /usr/local/bin/entrypoint.sh && \
+    echo '    echo "⚠️ Error en seeders, continuando..."' >> /usr/local/bin/entrypoint.sh && \
+    echo 'fi' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'echo "=== VERIFICANDO DATOS ==="' >> /usr/local/bin/entrypoint.sh && \
+    echo 'php artisan tinker --execute="echo \"Usuarios: \" . App\\\\Models\\\\User::count();" 2>/dev/null || echo "No se pudo verificar"' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'echo "=== INICIANDO APACHE ==="' >> /usr/local/bin/entrypoint.sh && \
+    echo 'apache2-foreground' >> /usr/local/bin/entrypoint.sh && \
+    chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
