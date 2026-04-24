@@ -26,18 +26,16 @@ RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-pl
 
 EXPOSE 80
 
-# Script de inicio que crea .env al arrancar
+# Script de inicio simple
 RUN echo '#!/bin/bash\n\
-set -e\n\
+echo "=== INICIANDO ===\n\
 \n\
-echo "=== CREANDO .env ===\n\
-\n\
-# Crear archivo .env desde cero\n\
-cat > .env << EOF\n\
+# Crear .env\n\
+cat > .env << "EOF"\n\
 APP_NAME=Solutech\n\
 APP_ENV=production\n\
 APP_DEBUG=true\n\
-php artisan key:generate --force\n\
+APP_KEY=base64:oi1nf/JUinLZtIzCfs5U4fb+okBmr6Uf/Q27VCvleqU=\n\
 APP_URL=https://web-solutech.onrender.com\n\
 \n\
 DB_CONNECTION=pgsql\n\
@@ -53,26 +51,16 @@ SESSION_DRIVER=database\n\
 CACHE_DRIVER=database\n\
 EOF\n\
 \n\
-# Mostrar que APP_KEY está presente\n\
-echo "=== VERIFICANDO .env ===\n\
-cat .env | grep APP_KEY\n\
+echo "=== .env creado ===\n\
 \n\
-# Forzar que Laravel use el .env\n\
-rm -rf bootstrap/cache/*.php\n\
-\n\
-# Limpiar y recachear configuración\n\
+# Limpiar cache\n\
 php artisan config:clear\n\
 php artisan config:cache\n\
 \n\
-# Verificar que Laravel lee la APP_KEY\n\
-echo "=== VERIFICANDO APP_KEY ===\n\
-php artisan tinker --execute="echo \\"APP_KEY: \\" . env(\\"APP_KEY\\");"\n\
-\n\
-# Ejecutar migraciones\n\
-echo "=== EJECUTANDO MIGRACIONES ===\n\
+# Migrar\n\
 php artisan migrate --force\n\
 \n\
-echo "=== INICIANDO APACHE ===\n\
+# Iniciar Apache\n\
 apache2-foreground\n\
 ' > /usr/local/bin/entrypoint.sh && chmod +x /usr/local/bin/entrypoint.sh
 
