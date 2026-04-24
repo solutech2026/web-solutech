@@ -30,7 +30,6 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Configurar Apache
 RUN a2enmod rewrite
-RUN service apache2 stop
 
 WORKDIR /var/www/html
 
@@ -48,11 +47,11 @@ RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-pl
 # Instalar assets frontend
 RUN npm install && npm run build || true
 
-# Limpiar y cachear configuración
-RUN php artisan config:clear \
-    && php artisan cache:clear \
-    && php artisan view:clear \
-    && php artisan route:clear
+# 🔥 ELIMINÉ estas 4 líneas que causaban el error:
+# RUN php artisan config:clear \
+#     && php artisan cache:clear \
+#     && php artisan view:clear \
+#     && php artisan route:clear
 
 # Crear script de entrada personalizado
 RUN echo '#!/bin/bash\n\
