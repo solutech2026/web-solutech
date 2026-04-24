@@ -31,39 +31,37 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Configurar Apache
 RUN a2enmod rewrite
 
+# 🔥 NUEVO: Configurar DocumentRoot a /var/www/html/public
+RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
+
 WORKDIR /var/www/html
 
 # Copiar archivos de la aplicación
 COPY . .
 
-# Configurar permisos
+# 🔥 NUEVO: Configurar permisos correctamente
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+    && chmod -R 755 /var/www/html/bootstrap/cache \
+    && chmod -R 755 /var/www/html/public
 
-# Instalar dependencias PHP (ignorando platform reqs para Railway)
+# Instalar dependencias PHP
 RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-platform-reqs
 
-# Instalar assets frontend
+# Instalar assets frontend (opcional)
 RUN npm install && npm run build || true
-
-# 🔥 ELIMINÉ estas 4 líneas que causaban el error:
-# RUN php artisan config:clear \
-#     && php artisan cache:clear \
-#     && php artisan view:clear \
-#     && php artisan route:clear
 
 # Crear script de entrada personalizado
 RUN echo '#!/bin/bash\n\
-\necho "Waiting for database to be ready..."\n\
+\necho "🔄 Esperando base de datos..."\n\
 sleep 5\n\
-\necho "Running migrations..."\n\
+\necho "📦 Ejecutando migraciones..."\n\
 php artisan migrate --force\n\
-\necho "Caching config..."\n\
+\necho "🔧 Cacheando configuración..."\n\
 php artisan config:cache\n\
 php artisan route:cache\n\
 php artisan view:cache\n\
-\necho "Starting Apache..."\n\
+\necho "🚀 Iniciando Apache..."\n\
 apache2-foreground' > /usr/local/bin/docker-entrypoint.sh \
     && chmod +x /usr/local/bin/docker-entrypoint.sh
 
