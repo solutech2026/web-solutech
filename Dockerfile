@@ -29,8 +29,15 @@ RUN chown -R www-data:www-data /var/www/html \
 # Instalar dependencias PHP
 RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-platform-reqs
 
-# 🔥 Instalar dependencias Node.js y compilar Vite
-RUN npm install && npm run build
+# 🔥 Configurar variable de entorno para asegurar HTTPS en Vite
+ENV APP_ENV=production
+ENV APP_URL=https://web-solutech.onrender.com
+
+# 🔥 Instalar dependencias Node.js y compilar Vite con la URL correcta
+RUN npm install && NODE_ENV=production npm run build
+
+# 🔥 Limpiar cache de configuración inicial
+RUN php artisan config:clear
 
 EXPOSE 80
 
@@ -42,7 +49,7 @@ echo "=== INICIANDO APLICACION ===\n\
 cat > .env << "EOF"\n\
 APP_NAME=Solutech\n\
 APP_ENV=production\n\
-APP_DEBUG=true\n\
+APP_DEBUG=false\n\
 APP_KEY=base64:oi1nf/JUinLZtIzCfs5U4fb+okBmr6Uf/Q27VCvleqU=\n\
 APP_URL=https://web-solutech.onrender.com\n\
 \n\
@@ -61,16 +68,26 @@ EOF\n\
 \n\
 echo "=== .env creado ===\n\
 \n\
-# Verificar assets compilados\n\
+# 🔥 Verificar assets compilados\n\
 echo "=== VERIFICANDO MANIFEST ===\n\
-ls -la /var/www/html/public/build/ 2>/dev/null || echo "Build directory check"\n\
+if [ -f /var/www/html/public/build/manifest.json ]; then\n\
+    echo "✅ Manifest encontrado"\n\
+    cat /var/www/html/public/build/manifest.json | head -20\n\
+else\n\
+    echo "❌ Manifest NO encontrado - reconstruyendo assets"\n\
+    cd /var/www/html && npm run build\n\
+fi\n\
 \n\
-# Limpiar cache\n\
+# 🔥 Limpiar cache de Laravel\n\
 php artisan config:clear\n\
 php artisan config:cache\n\
 php artisan view:cache\n\
+php artisan route:cache\n\
 \n\
-# Migrar\n\
+# 🔥 Forzar HTTPS desde Laravel\n\
+php artisan tinker --execute="URL::forceScheme(\\"https\\");" 2>/dev/null || true\n\
+\n\
+# Ejecutar migraciones\n\
 php artisan migrate --force\n\
 \n\
 echo "=== INICIANDO APACHE ===\n\

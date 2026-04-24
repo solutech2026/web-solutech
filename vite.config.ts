@@ -24,4 +24,8 @@ export default defineConfig({
     esbuild: {
         jsx: 'automatic',
     },
+    // 🔥 CORREGIDO: https debe ser un objeto o undefined
+    server: {
+        host: '0.0.0.0',
+    },
 });
