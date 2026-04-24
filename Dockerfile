@@ -1,6 +1,6 @@
 FROM php:8.3-apache
 
-# Instalar dependencias incluyendo SSL
+# Instalar dependencias
 RUN apt-get update && apt-get install -y \
     curl git unzip libpq-dev \
     && docker-php-ext-install pdo_pgsql pgsql \
@@ -28,11 +28,11 @@ RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-pl
 
 EXPOSE 80
 
-# Script de inicio con SSL
+# Script de inicio SIMPLE
 RUN echo '#!/bin/bash\n\
-echo "=== CONFIGURANDO PostgreSQL CON SSL ===\n\
+echo "=== INICIANDO APLICACIÓN ===\n\
 \n\
-# Crear .env con SSL\n\
+# Crear .env con los datos de Render\n\
 cat > .env << EOF\n\
 APP_NAME="Solutech"\n\
 APP_ENV=production\n\
@@ -46,32 +46,21 @@ DB_PORT=${DB_PORT}\n\
 DB_DATABASE=${DB_DATABASE}\n\
 DB_USERNAME=${DB_USERNAME}\n\
 DB_PASSWORD=${DB_PASSWORD}\n\
-\n\
-# 🔥 Crítico: Requerir SSL\n\
 DB_SSLMODE=require\n\
 \n\
 LOG_CHANNEL=stderr\n\
 SESSION_DRIVER=database\n\
 EOF\n\
 \n\
-# Forzar SSL también en DATABASE_URL si existe\n\
-if [ ! -z "$DATABASE_URL" ]; then\n\
-    # Agregar ?sslmode=require a la URL\n\
-    export DATABASE_URL="${DATABASE_URL}?sslmode=require"\n\
-    echo "DATABASE_URL actualizado con SSL"\n\
-fi\n\
-\n\
-echo "=== Probando conexión con SSL ===\n\
-php -r "\$pdo = new PDO(\"pgsql:host=${DB_HOST};port=${DB_PORT};dbname=${DB_DATABASE};sslmode=require\", \"${DB_USERNAME}\", \"${DB_PASSWORD}\"); echo \"✅ Conexión exitosa con SSL\\n\"; catch (Exception \$e) { echo \"❌ Error: \" . \$e->getMessage() . \"\\n\"; }"\n\
-\n\
-echo "=== Cacheando configuración ===\n\
+# Cachear configuración\n\
 php artisan config:clear\n\
 php artisan config:cache\n\
 \n\
-echo "=== Ejecutando migraciones ===\n\
+# Ejecutar migraciones\n\
 php artisan migrate --force\n\
 \n\
-echo "=== INICIANDO APACHE ===\n\
-apache2-foreground' > /usr/local/bin/entrypoint.sh && chmod +x /usr/local/bin/entrypoint.sh
+# Iniciar Apache\n\
+apache2-foreground\n\
+' > /usr/local/bin/entrypoint.sh && chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
