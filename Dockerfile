@@ -41,7 +41,7 @@ RUN php artisan config:clear
 
 EXPOSE 80
 
-# Script de inicio (sin la línea problemática de tinker)
+# Script de inicio con SEEDERS
 RUN echo '#!/bin/bash\n\
 echo "=== INICIANDO APLICACION ===\n\
 \n\
@@ -82,7 +82,16 @@ php artisan config:cache\n\
 php artisan view:cache\n\
 \n\
 # Ejecutar migraciones\n\
+echo "=== EJECUTANDO MIGRACIONES ===\n\
 php artisan migrate --force\n\
+\n\
+# 🔥 EJECUTAR SEEDERS 🔥\n\
+echo "=== EJECUTANDO SEEDERS ===\n\
+php artisan db:seed --force\n\
+\n\
+# Verificar que los seeders se ejecutaron\n\
+echo "=== VERIFICANDO DATOS ===\n\
+php artisan tinker --execute="echo \\"Usuarios: \\" . App\\Models\\User::count();" 2>/dev/null || echo "No se pudo verificar"\n\
 \n\
 echo "=== INICIANDO APACHE ===\n\
 apache2-foreground\n\
