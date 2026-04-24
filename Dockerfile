@@ -1,11 +1,12 @@
-FROM php:8.3-cli
+FROM php:8.3-fpm
 
 RUN apt-get update && apt-get install -y \
-    curl git unzip nodejs npm libpq-dev && apt-get clean
+    curl git unzip nodejs npm libpq-dev nginx && apt-get clean
 
 RUN docker-php-ext-install pdo_pgsql pgsql
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY nginx.conf /etc/nginx/sites-enabled/default
 
 WORKDIR /app
 COPY . .
@@ -17,5 +18,4 @@ RUN chmod -R 775 storage bootstrap/cache public/build
 
 EXPOSE 8000
 
-# NO crees .env - Railway ya lo hace automáticamente
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000
+CMD php-fpm -D && nginx -g 'daemon off;'
