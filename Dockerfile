@@ -1,11 +1,14 @@
-FROM php:8.3-cli
+FROM php:8.3-fpm
 
 RUN apt-get update && apt-get install -y \
-    curl git unzip nodejs npm libpq-dev && apt-get clean
+    curl git unzip nodejs npm libpq-dev nginx && apt-get clean
 
 RUN docker-php-ext-install pdo_pgsql pgsql
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copiar la configuración de Nginx
+COPY nginx.conf /etc/nginx/sites-enabled/default
 
 WORKDIR /app
 COPY . .
@@ -15,10 +18,6 @@ RUN npm install && npm run build
 RUN php artisan optimize
 RUN chmod -R 775 storage bootstrap/cache public/build
 
-# Habilitar errores de PHP (ENV, no EXPORT)
-ENV APP_DEBUG=true
-ENV PHP_ERRORS=On
+EXPOSE 8000
 
-EXPOSE ${PORT:-8080}
-
-CMD php artisan migrate --force && php -S 0.0.0.0:${PORT:-8080} -t public 2>&1
+CMD php artisan migrate --force && php-fpm -D && nginx -g "daemon off;"
