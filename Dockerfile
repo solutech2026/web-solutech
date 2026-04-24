@@ -17,5 +17,5 @@ RUN chmod -R 775 storage bootstrap/cache public/build
 
 EXPOSE 8000
 
-# Railway inyecta DATABASE_URL - NO crear .env manualmente
+# NO crees .env - Railway ya lo hace automáticamente
 CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000
