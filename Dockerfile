@@ -15,7 +15,10 @@ RUN npm install && npm run build
 RUN php artisan optimize
 RUN chmod -R 775 storage bootstrap/cache public/build
 
-EXPOSE ${PORT:-8000}
+# Habilitar errores de PHP (ENV, no EXPORT)
+ENV APP_DEBUG=true
+ENV PHP_ERRORS=On
 
-# Usar PORT de Railway, si no existe usar 8000
-CMD php artisan migrate --force && php -S 0.0.0.0:${PORT:-8000} -t public
+EXPOSE ${PORT:-8080}
+
+CMD php artisan migrate --force && php -S 0.0.0.0:${PORT:-8080} -t public 2>&1
