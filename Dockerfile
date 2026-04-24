@@ -29,19 +29,19 @@ RUN chown -R www-data:www-data /var/www/html \
 # Instalar dependencias PHP
 RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-platform-reqs
 
-# 🔥 Configurar variable de entorno para asegurar HTTPS en Vite
+# Configurar variable de entorno para asegurar HTTPS en Vite
 ENV APP_ENV=production
 ENV APP_URL=https://web-solutech.onrender.com
 
-# 🔥 Instalar dependencias Node.js y compilar Vite con la URL correcta
+# Instalar dependencias Node.js y compilar Vite con la URL correcta
 RUN npm install && NODE_ENV=production npm run build
 
-# 🔥 Limpiar cache de configuración inicial
+# Limpiar cache de configuración inicial
 RUN php artisan config:clear
 
 EXPOSE 80
 
-# Script de inicio
+# Script de inicio (sin la línea problemática de tinker)
 RUN echo '#!/bin/bash\n\
 echo "=== INICIANDO APLICACION ===\n\
 \n\
@@ -68,24 +68,18 @@ EOF\n\
 \n\
 echo "=== .env creado ===\n\
 \n\
-# 🔥 Verificar assets compilados\n\
+# Verificar assets compilados\n\
 echo "=== VERIFICANDO MANIFEST ===\n\
 if [ -f /var/www/html/public/build/manifest.json ]; then\n\
     echo "✅ Manifest encontrado"\n\
-    cat /var/www/html/public/build/manifest.json | head -20\n\
 else\n\
-    echo "❌ Manifest NO encontrado - reconstruyendo assets"\n\
-    cd /var/www/html && npm run build\n\
+    echo "⚠️ Manifest no encontrado, pero continuamos"\n\
 fi\n\
 \n\
-# 🔥 Limpiar cache de Laravel\n\
+# Limpiar cache\n\
 php artisan config:clear\n\
 php artisan config:cache\n\
 php artisan view:cache\n\
-php artisan route:cache\n\
-\n\
-# 🔥 Forzar HTTPS desde Laravel\n\
-php artisan tinker --execute="URL::forceScheme(\\"https\\");" 2>/dev/null || true\n\
 \n\
 # Ejecutar migraciones\n\
 php artisan migrate --force\n\
