@@ -29,6 +29,9 @@ RUN chown -R www-data:www-data /var/www/html \
 # Instalar dependencias PHP
 RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-platform-reqs
 
+# 🔥 FORZAR REGENERACIÓN DEL AUTOLOAD
+RUN composer dump-autoload --optimize
+
 # Configurar variable de entorno para asegurar HTTPS en Vite
 ENV APP_ENV=production
 ENV APP_URL=https://web-solutech.onrender.com
@@ -41,7 +44,7 @@ RUN php artisan config:clear
 
 EXPOSE 80
 
-# Script de inicio con seeders
+# Script de inicio con seeders y autoload
 RUN echo '#!/bin/bash' > /usr/local/bin/entrypoint.sh && \
     echo 'set -e' >> /usr/local/bin/entrypoint.sh && \
     echo '' >> /usr/local/bin/entrypoint.sh && \
@@ -70,7 +73,11 @@ RUN echo '#!/bin/bash' > /usr/local/bin/entrypoint.sh && \
     echo '' >> /usr/local/bin/entrypoint.sh && \
     echo 'echo "=== .env creado ==="' >> /usr/local/bin/entrypoint.sh && \
     echo '' >> /usr/local/bin/entrypoint.sh && \
+    echo 'echo "=== REGENERANDO AUTOLOAD ==="' >> /usr/local/bin/entrypoint.sh && \
+    echo 'composer dump-autoload --optimize' >> /usr/local/bin/entrypoint.sh && \
+    echo '' >> /usr/local/bin/entrypoint.sh && \
     echo 'echo "=== LIMPIANDO CACHE ==="' >> /usr/local/bin/entrypoint.sh && \
+    echo 'php artisan optimize:clear' >> /usr/local/bin/entrypoint.sh && \
     echo 'php artisan config:clear' >> /usr/local/bin/entrypoint.sh && \
     echo 'php artisan config:cache' >> /usr/local/bin/entrypoint.sh && \
     echo 'php artisan view:cache' >> /usr/local/bin/entrypoint.sh && \
