@@ -1,7 +1,13 @@
 @extends('layouts.admin')
 
 @section('title', 'Tarjetas NFC')
+
 @section('header', 'Tarjetas NFC')
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/nfc-cards.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+@endpush
 
 @section('content')
 <div class="container py-4">

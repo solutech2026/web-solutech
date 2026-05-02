@@ -1,0 +1,107 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body.bio-government {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+}
+
+.government-card {
+    max-width: 500px;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.gov-header {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    padding: 20px;
+    text-align: center;
+    color: white;
+}
+.gov-emblem i { font-size: 40px; margin-bottom: 10px; }
+.gov-title h3 { font-size: 16px; letter-spacing: 1px; }
+.gov-title p { font-size: 11px; opacity: 0.9; }
+
+.gov-functions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 20px;
+    background: #f8fafc;
+    text-align: center;
+}
+.function-item { text-align: center; }
+.function-item i { font-size: 24px; color: #f59e0b; margin-bottom: 5px; display: block; }
+.function-item span { display: block; font-size: 11px; font-weight: 600; color: #1e293b; }
+.function-item small { font-size: 9px; color: #64748b; display: block; }
+
+.gov-body { padding: 25px; text-align: center; }
+
+.gov-photo {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 15px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    overflow: hidden;
+}
+.gov-photo img { width: 100%; height: 100%; object-fit: cover; }
+.photo-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white; font-size: 40px;
+}
+
+.gov-name { font-size: 20px; color: #1e293b; margin-bottom: 5px; }
+.gov-position { color: #f59e0b; font-weight: 600; margin-bottom: 20px; }
+
+.gov-info { background: #f8fafc; border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: left; }
+.info-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.label { font-size: 12px; color: #64748b; }
+.value { font-size: 14px; font-weight: 600; color: #1e293b; }
+
+.gov-barcode {
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.barcode-number { color: white; font-size: 16px; font-family: monospace; letter-spacing: 2px; }
+.barcode-expiry { color: #f59e0b; font-size: 11px; margin-top: 5px; }
+
+.gov-signature { text-align: center; margin-top: 15px; }
+.signature-line {
+    width: 150px;
+    height: 2px;
+    background: #cbd5e1;
+    margin: 0 auto 5px;
+}
+.gov-signature span { font-size: 10px; color: #64748b; }
+
+.gov-footer {
+    background: #f8fafc;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.footer-badge { display: flex; align-items: center; gap: 8px; color: #667eea; font-size: 12px; }
+.btn-download {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

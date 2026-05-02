@@ -15,7 +15,7 @@
                 </div>
                 <div class="hero-text">
                     <h1>Gestión de Personas</h1>
-                    <p>Administra empleados, estudiantes, personal docente y administrativo</p>
+                    <p>Administra empleados, estudiantes, personal docente, administrativo, ONG de rescate y gobierno</p>
                 </div>
             </div>
             <div class="hero-right">
@@ -34,7 +34,7 @@
                 <i class="fas fa-users"></i>
             </div>
             <div class="stat-info-glass">
-                <h3 id="totalPersons">{{ $persons->count() }}</h3>
+                <h3 id="totalPersons">{{ $persons->total() }}</h3>
                 <p>Total Personas</p>
             </div>
             <div class="stat-trend">
@@ -47,7 +47,7 @@
                 <i class="fas fa-briefcase"></i>
             </div>
             <div class="stat-info-glass">
-                <h3 id="totalEmployees">{{ $persons->where('category', 'employee')->count() }}</h3>
+                <h3 id="totalEmployees">{{ $persons->where('institution_type', 'company')->whereNull('subcategory')->count() }}</h3>
                 <p>Empleados</p>
             </div>
         </div>
@@ -57,7 +57,7 @@
                 <i class="fas fa-school"></i>
             </div>
             <div class="stat-info-glass">
-                <h3 id="totalSchool">{{ $persons->where('category', 'school')->count() }}</h3>
+                <h3 id="totalSchool">{{ $persons->where('institution_type', 'school')->count() }}</h3>
                 <p>Personal Escolar</p>
             </div>
         </div>
@@ -83,6 +83,26 @@
         </div>
 
         <div class="stat-card-glass">
+            <div class="stat-icon-circle red">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <div class="stat-info-glass">
+                <h3 id="totalRescue">{{ $persons->where('institution_type', 'ngo_rescue')->count() }}</h3>
+                <p>ONG de Rescate</p>
+            </div>
+        </div>
+
+        <div class="stat-card-glass">
+            <div class="stat-icon-circle gold">
+                <i class="fas fa-landmark"></i>
+            </div>
+            <div class="stat-info-glass">
+                <h3 id="totalGovernment">{{ $persons->where('institution_type', 'government')->count() }}</h3>
+                <p>Personal Gobierno</p>
+            </div>
+        </div>
+
+        <div class="stat-card-glass">
             <div class="stat-icon-circle pink">
                 <i class="fas fa-id-card"></i>
             </div>
@@ -101,24 +121,30 @@
         </div>
         
         <div class="filters-group">
-            <select id="categoryFilter" class="filter-select-modern">
-                <option value="all">Todas las categorías</option>
-                <option value="employee">Empleados</option>
-                <option value="school">Personal Escolar</option>
+            <select id="institutionTypeFilter" class="filter-select-modern">
+                <option value="all">Todos los tipos</option>
+                <option value="company">🏢 Empresas</option>
+                <option value="school">🏫 Colegios</option>
+                <option value="ngo_rescue">🚒 ONG de Rescate</option>
+                <option value="government">🏛️ Organizaciones Gubernamentales</option>
             </select>
 
             <select id="subcategoryFilter" class="filter-select-modern" disabled>
                 <option value="all">Todas las subcategorías</option>
-                <option value="student">Estudiantes</option>
-                <option value="teacher">Docentes</option>
-                <option value="administrative">Administrativo</option>
+                <option value="student">🎓 Estudiantes</option>
+                <option value="teacher">👨‍🏫 Docentes</option>
+                <option value="administrative">📋 Administrativo</option>
             </select>
 
             <select id="companyFilter" class="filter-select-modern">
-                <option value="all">Todas las empresas/colegios</option>
+                <option value="all">Todas las instituciones</option>
                 @foreach($companies as $company)
                     <option value="{{ $company->id }}" data-type="{{ $company->type }}">
-                        {{ $company->name }} ({{ $company->type == 'company' ? 'Empresa' : 'Colegio' }})
+                        @if($company->type == 'company') 🏢
+                        @elseif($company->type == 'school') 🏫
+                        @elseif($company->type == 'ngo_rescue') 🚒
+                        @else 🏛️ @endif
+                        {{ $company->name }}
                     </option>
                 @endforeach
             </select>
@@ -132,18 +158,22 @@
 
     <!-- Persons Grid -->
     <div class="persons-grid-modern" id="personsGrid">
-        @foreach($persons as $person)
+        @forelse($persons as $person)
         <div class="person-card-modern" 
              data-id="{{ $person->id }}"
-             data-category="{{ $person->category }}"
+             data-institution-type="{{ $person->institution_type }}"
              data-subcategory="{{ $person->subcategory }}"
              data-company="{{ $person->company_id }}">
             
-            <div class="card-badge {{ $person->category }}">
-                @if($person->category == 'employee')
+            <div class="card-badge {{ $person->institution_type }}">
+                @if($person->institution_type == 'company')
                     <i class="fas fa-briefcase"></i> Empleado
-                @else
+                @elseif($person->institution_type == 'school')
                     <i class="fas fa-school"></i> Personal Escolar
+                @elseif($person->institution_type == 'ngo_rescue')
+                    <i class="fas fa-heartbeat"></i> ONG de Rescate
+                @else
+                    <i class="fas fa-landmark"></i> Organización Gubernamental
                 @endif
             </div>
             
@@ -166,6 +196,16 @@
                             @else
                                 <i class="fas fa-building"></i> Administrativo
                             @endif
+                        </span>
+                    @endif
+                    @if($person->rescue_member_number)
+                        <span class="subcategory-badge rescue">
+                            <i class="fas fa-id-card"></i> Miembro #{{ $person->rescue_member_number }}
+                        </span>
+                    @endif
+                    @if($person->government_position)
+                        <span class="subcategory-badge government">
+                            <i class="fas fa-user-tie"></i> {{ $person->government_position_label ?? $person->government_position }}
                         </span>
                     @endif
                 </div>
@@ -198,7 +238,7 @@
                 </div>
                 @endif
                 
-                @if($person->position)
+                @if($person->position && ($person->institution_type == 'company' || $person->subcategory == 'teacher' || $person->subcategory == 'administrative'))
                 <div class="detail-row">
                     <i class="fas fa-user-tie"></i>
                     <span>{{ $person->position }}</span>
@@ -208,7 +248,7 @@
                 @if($person->grade_level && $person->subcategory == 'student')
                 <div class="detail-row">
                     <i class="fas fa-book"></i>
-                    <span>Grado: {{ $person->grade_level_label }}</span>
+                    <span>Grado: {{ $person->grade_level_label ?? $person->grade_level }}</span>
                 </div>
                 @endif
 
@@ -216,6 +256,26 @@
                 <div class="detail-row">
                     <i class="fas fa-chart-line"></i>
                     <span>Promedio: {{ number_format($person->average_grade, 2) }}</span>
+                </div>
+                @endif
+
+                @if($person->rescue_member_category && $person->institution_type == 'ngo_rescue')
+                <div class="detail-row rescue">
+                    <i class="fas fa-tag"></i>
+                    <span>Categoría: {{ $person->rescue_member_category }}</span>
+                </div>
+                @endif
+
+                @if($person->government_level && $person->institution_type == 'government')
+                <div class="detail-row government">
+                    <i class="fas fa-layer-group"></i>
+                    <span>
+                        Nivel: 
+                        @if($person->government_level == 'national') Nacional
+                        @elseif($person->government_level == 'regional') Regional
+                        @elseif($person->government_level == 'municipal') Municipal
+                        @else Parroquial @endif
+                    </span>
                 </div>
                 @endif
             </div>
@@ -251,23 +311,25 @@
                 </div>
             </div>
         </div>
-        @endforeach
+        @empty
+        <div class="empty-state-modern">
+            <div class="empty-icon">
+                <i class="fas fa-address-book"></i>
+            </div>
+            <h3>No hay personas registradas</h3>
+            <p>Comienza registrando empleados, personal escolar, miembros de ONG de rescate o personal gubernamental</p>
+            <a href="{{ route('admin.persons.create') }}" class="btn-primary-modern">
+                <i class="fas fa-user-plus"></i>
+                Registrar primera persona
+            </a>
+        </div>
+        @endforelse
     </div>
 
-    <!-- Empty State -->
-    @if($persons->isEmpty())
-    <div class="empty-state-modern">
-        <div class="empty-icon">
-            <i class="fas fa-address-book"></i>
-        </div>
-        <h3>No hay personas registradas</h3>
-        <p>Comienza registrando empleados o personal escolar en el sistema</p>
-        <a href="{{ route('admin.persons.create') }}" class="btn-primary-modern">
-            <i class="fas fa-user-plus"></i>
-            Registrar primera persona
-        </a>
+    <!-- Pagination -->
+    <div class="pagination-container">
+        {{ $persons->links() }}
     </div>
-    @endif
 </div>
 
 <!-- Modal Asignar Tarjeta NFC -->
@@ -416,8 +478,13 @@
     // FILTROS
     // ============================================
     
-    document.getElementById('categoryFilter')?.addEventListener('change', function() {
-        const subcategoryFilter = document.getElementById('subcategoryFilter');
+    const institutionTypeFilter = document.getElementById('institutionTypeFilter');
+    const subcategoryFilter = document.getElementById('subcategoryFilter');
+    const companyFilter = document.getElementById('companyFilter');
+    const searchInput = document.getElementById('searchInput');
+    
+    // Habilitar/deshabilitar subcategoría según tipo de institución
+    institutionTypeFilter?.addEventListener('change', function() {
         if (this.value === 'school') {
             subcategoryFilter.disabled = false;
         } else {
@@ -428,17 +495,17 @@
     });
     
     function filterPersons() {
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        const category = document.getElementById('categoryFilter').value;
-        const subcategory = document.getElementById('subcategoryFilter').value;
-        const company = document.getElementById('companyFilter').value;
+        const search = searchInput?.value.toLowerCase() || '';
+        const institutionType = institutionTypeFilter?.value || 'all';
+        const subcategory = subcategoryFilter?.value || 'all';
+        const company = companyFilter?.value || 'all';
         
         document.querySelectorAll('.person-card-modern').forEach(card => {
             let show = true;
             const text = card.innerText.toLowerCase();
             
             if (search && !text.includes(search)) show = false;
-            if (category !== 'all' && card.dataset.category !== category) show = false;
+            if (institutionType !== 'all' && card.dataset.institutionType !== institutionType) show = false;
             if (subcategory !== 'all' && card.dataset.subcategory !== subcategory) show = false;
             if (company !== 'all' && card.dataset.company !== company) show = false;
             
@@ -458,7 +525,10 @@
         window.location.href = `/admin/persons/${id}/edit?t=${Date.now()}`;
     }
     
+    let currentPersonId = null;
+    
     function openAssignNFCModal(personId, personName) {
+        currentPersonId = personId;
         document.getElementById('assignPersonName').innerHTML = personName;
         document.getElementById('assignNFCForm').action = `/admin/persons/${personId}/assign-nfc`;
         new bootstrap.Modal(document.getElementById('assignNFCModal')).show();
@@ -487,10 +557,10 @@
     
     function exportPersons() {
         const params = new URLSearchParams({
-            category: document.getElementById('categoryFilter').value,
-            subcategory: document.getElementById('subcategoryFilter').value,
-            company: document.getElementById('companyFilter').value,
-            search: document.getElementById('searchInput').value,
+            institution_type: institutionTypeFilter?.value || 'all',
+            subcategory: subcategoryFilter?.value || 'all',
+            company: companyFilter?.value || 'all',
+            search: searchInput?.value || '',
             t: Date.now()
         });
         window.location.href = `/admin/persons/export?${params.toString()}`;
@@ -512,9 +582,9 @@
     // EVENT LISTENERS
     // ============================================
     
-    document.getElementById('searchInput')?.addEventListener('keyup', filterPersons);
-    document.getElementById('categoryFilter')?.addEventListener('change', filterPersons);
-    document.getElementById('subcategoryFilter')?.addEventListener('change', filterPersons);
-    document.getElementById('companyFilter')?.addEventListener('change', filterPersons);
+    searchInput?.addEventListener('keyup', filterPersons);
+    institutionTypeFilter?.addEventListener('change', filterPersons);
+    subcategoryFilter?.addEventListener('change', filterPersons);
+    companyFilter?.addEventListener('change', filterPersons);
 </script>
 @endpush

@@ -14,49 +14,97 @@ return new class extends Migration
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
             
-            // Datos básicos
+            // ==========================================
+            // DATOS BÁSICOS
+            // ==========================================
             $table->string('name');
             $table->string('slug')->unique();
-            $table->enum('type', ['company', 'school'])->default('company');
+            $table->enum('type', ['company', 'school', 'ngo_rescue', 'government'])->default('company');
             
-            // Datos de contacto
+            // ==========================================
+            // DATOS DE CONTACTO
+            // ==========================================
             $table->string('address')->nullable();
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
             $table->string('website')->nullable();
             
-            // Identificación fiscal
-            $table->string('rif')->nullable(); // RIF de la empresa/colegio
-            $table->string('code')->nullable(); // Código del colegio (opcional)
+            // ==========================================
+            // UBICACIÓN
+            // ==========================================
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+            $table->string('postal_code')->nullable();
+            $table->string('country')->default('Venezuela');
             
-            // Logo e imagen
+            // ==========================================
+            // IDENTIFICACIÓN FISCAL
+            // ==========================================
+            $table->string('tax_id')->nullable(); // RIF / NIT
+            $table->string('code')->nullable(); // Código de la institución
+            
+            // ==========================================
+            // IMÁGENES
+            // ==========================================
             $table->string('logo')->nullable();
             $table->string('cover_image')->nullable(); // Imagen de portada
             
-            // Datos específicos para colegios
-            $table->enum('educational_level', ['preschool', 'primary', 'secondary', 'highschool', 'all'])->nullable();
-            $table->json('grade_levels')->nullable(); // Grados que ofrece el colegio
-            $table->json('sections')->nullable(); // Secciones disponibles
+            // ==========================================
+            // CAMPOS ESPECÍFICOS PARA EMPRESA
+            // ==========================================
+            $table->string('industry')->nullable(); // Sector/Industria
+            $table->string('size')->nullable(); // Tamaño de la empresa
             
-            // Horarios generales
+            // ==========================================
+            // CAMPOS ESPECÍFICOS PARA COLEGIO
+            // ==========================================
+            $table->json('levels')->nullable(); // Niveles educativos (primaria, media, etc)
+            $table->json('shifts')->nullable(); // Jornadas (mañana, tarde, noche)
+            $table->string('principal')->nullable(); // Director/Directora
+            
+            // ==========================================
+            // CAMPOS ESPECÍFICOS PARA ONG DE RESCATE
+            // ==========================================
+            $table->string('rescue_type')->nullable(); // Tipo (Bomberos, PC, Cruz Roja, etc)
+            $table->string('emergency_line')->nullable(); // Línea de emergencia
+            $table->text('coverage_area')->nullable(); // Área de cobertura
+            
+            // ==========================================
+            // CAMPOS ESPECÍFICOS PARA GOBIERNO
+            // ==========================================
+            $table->enum('government_level', ['national', 'regional', 'municipal', 'parish'])->nullable();
+            $table->enum('government_branch', ['executive', 'legislative', 'judicial', 'citizen', 'electoral'])->nullable();
+            $table->string('government_entity_type')->nullable(); // Tipo de ente (ministerio, gobernación, etc)
+            
+            // ==========================================
+            // HORARIOS GENERALES
+            // ==========================================
             $table->time('opening_time')->nullable(); // Hora de apertura
             $table->time('closing_time')->nullable(); // Hora de cierre
             
-            // Configuración
+            // ==========================================
+            // CONFIGURACIÓN
+            // ==========================================
             $table->json('settings')->nullable();
             $table->json('contact_info')->nullable(); // Información de contacto adicional
             $table->json('social_links')->nullable(); // Redes sociales
             
-            // Estado
+            // ==========================================
+            // ESTADO
+            // ==========================================
             $table->boolean('is_active')->default(true);
             $table->text('description')->nullable();
             
             $table->timestamps();
             
-            // Índices
+            // ==========================================
+            // ÍNDICES
+            // ==========================================
             $table->index('type');
             $table->index('slug');
             $table->index('is_active');
+            $table->index('government_level');
+            $table->index('rescue_type');
         });
     }
 

@@ -4,6 +4,12 @@
 
 @section('header', 'Perfil de ' . $person->full_name)
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/persons-show.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+@endpush
+
 @section('content')
 <div class="person-detail-modern">
     <!-- Hero Section -->
@@ -14,20 +20,44 @@
                 @if($person->photo)
                     <img src="{{ asset('storage/' . $person->photo) }}" alt="{{ $person->full_name }}">
                 @else
-                    {{ strtoupper(substr($person->name, 0, 1)) }}{{ strtoupper(substr($person->lastname ?? $person->name, 0, 1)) }}
+                    <div class="avatar-initials">
+                        {{ strtoupper(substr($person->name, 0, 1)) }}{{ strtoupper(substr($person->lastname ?? $person->name, 0, 1)) }}
+                    </div>
                 @endif
             </div>
             <div class="hero-info">
                 <h1>{{ $person->full_name }}</h1>
                 <div class="hero-badges">
-                    <span class="badge-category {{ $person->category }}">
-                        <i class="fas {{ $person->category == 'employee' ? 'fa-briefcase' : 'fa-school' }}"></i>
-                        {{ $person->category_label }}
+                    <span class="badge-category {{ $person->institution_type ?? $person->category }}">
+                        <i class="fas {{ ($person->institution_type ?? $person->category) == 'company' ? 'fa-briefcase' : (($person->institution_type ?? $person->category) == 'ngo_rescue' ? 'fa-heartbeat' : (($person->institution_type ?? $person->category) == 'government' ? 'fa-landmark' : 'fa-school')) }}"></i>
+                        @if(($person->institution_type ?? $person->category) == 'company')
+                            Empleado
+                        @elseif(($person->institution_type ?? $person->category) == 'ngo_rescue')
+                            ONG de Rescate
+                        @elseif(($person->institution_type ?? $person->category) == 'government')
+                            Gobierno
+                        @else
+                            Personal Escolar
+                        @endif
                     </span>
                     @if($person->subcategory)
                     <span class="badge-subcategory {{ $person->subcategory }}">
                         <i class="fas {{ $person->subcategory == 'student' ? 'fa-graduation-cap' : ($person->subcategory == 'teacher' ? 'fa-chalkboard-user' : 'fa-building') }}"></i>
-                        {{ $person->subcategory_label }}
+                        @if($person->subcategory == 'student') Estudiante
+                        @elseif($person->subcategory == 'teacher') Docente
+                        @else Administrativo @endif
+                    </span>
+                    @endif
+                    @if($person->rescue_member_number)
+                    <span class="badge-subcategory rescue">
+                        <i class="fas fa-id-card"></i>
+                        Miembro #{{ $person->rescue_member_number }}
+                    </span>
+                    @endif
+                    @if($person->government_position)
+                    <span class="badge-subcategory government">
+                        <i class="fas fa-user-tie"></i>
+                        {{ $person->government_position_label ?? $person->government_position }}
                     </span>
                     @endif
                     @if($person->average_grade)
@@ -84,8 +114,33 @@
         <button class="tab-btn active" data-tab="info">
             <i class="fas fa-user-circle"></i> Información Personal
         </button>
-        <button class="tab-btn" data-tab="academic" id="academicTab" style="display: none;">
+        @if($person->subcategory == 'student')
+        <button class="tab-btn" data-tab="academic">
             <i class="fas fa-graduation-cap"></i> Información Académica
+        </button>
+        @endif
+        @if($person->subcategory == 'employee')
+        <button class="tab-btn" data-tab="laboral">
+            <i class="fas fa-briefcase"></i> Información Laboral
+        </button>
+        @endif
+        @if(in_array($person->subcategory, ['teacher', 'administrative']))
+        <button class="tab-btn" data-tab="school">
+            <i class="fas fa-school"></i> Información Escolar
+        </button>
+        @endif
+        @if(($person->institution_type ?? $person->category) == 'ngo_rescue')
+        <button class="tab-btn" data-tab="rescue">
+            <i class="fas fa-id-card"></i> Carnet de Rescate
+        </button>
+        @endif
+        @if(($person->institution_type ?? $person->category) == 'government')
+        <button class="tab-btn" data-tab="government">
+            <i class="fas fa-landmark"></i> Datos Gubernamentales
+        </button>
+        @endif
+        <button class="tab-btn" data-tab="health">
+            <i class="fas fa-heartbeat"></i> Salud y Emergencias
         </button>
         <button class="tab-btn" data-tab="schedule">
             <i class="fas fa-clock"></i> Horarios
@@ -96,13 +151,10 @@
         <button class="tab-btn" data-tab="access">
             <i class="fas fa-history"></i> Historial de Accesos
         </button>
-        <button class="tab-btn" data-tab="emergency">
-            <i class="fas fa-ambulance"></i> Emergencias
-        </button>
     </div>
 
     <div class="detail-content">
-        <!-- TAB 1: Información Personal -->
+        <!-- TAB 1: Información Personal (TODOS) -->
         <div class="tab-pane active" id="tab-info">
             <div class="detail-grid">
                 <div class="info-card-glass">
@@ -114,7 +166,7 @@
                         <div class="info-row">
                             <div class="info-label">
                                 <i class="fas fa-id-card"></i>
-                                <span>Cédula / Documento</span>
+                                <span>Cédula / ID</span>
                             </div>
                             <div class="info-value">{{ $person->document_id ?? 'No registrada' }}</div>
                         </div>
@@ -154,11 +206,11 @@
                         <div class="info-row">
                             <div class="info-label">
                                 <i class="fas fa-building"></i>
-                                <span>{{ $person->category == 'employee' ? 'Empresa' : 'Colegio' }}</span>
+                                <span>Institución</span>
                             </div>
                             <div class="info-value">{{ $person->company->name ?? 'N/A' }}</div>
                         </div>
-                        @if($person->position)
+                        @if($person->position && ($person->subcategory == 'employee' || $person->subcategory == 'teacher' || $person->subcategory == 'administrative'))
                         <div class="info-row">
                             <div class="info-label">
                                 <i class="fas fa-user-tie"></i>
@@ -171,18 +223,20 @@
                         <div class="info-row">
                             <div class="info-label">
                                 <i class="fas fa-layer-group"></i>
-                                <span>Departamento</span>
+                                <span>Departamento / Área</span>
                             </div>
                             <div class="info-value">{{ $person->department }}</div>
                         </div>
                         @endif
-                        @if($person->teacher_type)
+                        @if($person->company_logo)
                         <div class="info-row">
                             <div class="info-label">
-                                <i class="fas fa-chalkboard-user"></i>
-                                <span>Tipo de Docente</span>
+                                <i class="fas fa-building"></i>
+                                <span>Logo</span>
                             </div>
-                            <div class="info-value">{{ $person->teacher_type_label }}</div>
+                            <div class="info-value">
+                                <img src="{{ asset('storage/' . $person->company_logo) }}" alt="Logo" style="height: 50px;">
+                            </div>
                         </div>
                         @endif
                     </div>
@@ -236,13 +290,14 @@
             </div>
         </div>
 
-        <!-- TAB 2: Información Académica (solo estudiantes) -->
+        <!-- TAB 2: Información Académica (solo ESTUDIANTES) -->
+        @if($person->subcategory == 'student')
         <div class="tab-pane" id="tab-academic">
             <div class="academic-grid">
                 <div class="info-card-glass">
                     <div class="card-header-glass">
                         <i class="fas fa-graduation-cap"></i>
-                        <h3>Datos Académicos Actuales</h3>
+                        <h3>Datos Académicos</h3>
                     </div>
                     <div class="info-list">
                         <div class="info-row">
@@ -251,6 +306,13 @@
                                 <span>Grado</span>
                             </div>
                             <div class="info-value">{{ $person->grade_level_label ?? 'No especificado' }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">
+                                <i class="fas fa-layer-group"></i>
+                                <span>Sección</span>
+                            </div>
+                            <div class="info-value">{{ $person->section ?? 'No especificada' }}</div>
                         </div>
                         <div class="info-row">
                             <div class="info-label">
@@ -296,8 +358,270 @@
                 </div>
             </div>
         </div>
+        @endif
 
-        <!-- TAB 3: Horarios -->
+        <!-- TAB 3: Información Laboral (solo EMPLEADOS) -->
+        @if(($person->institution_type ?? $person->category) == 'company')
+        <div class="tab-pane" id="tab-laboral">
+            <div class="info-card-glass">
+                <div class="card-header-glass">
+                    <i class="fas fa-briefcase"></i>
+                    <h3>Información Laboral</h3>
+                </div>
+                <div class="info-list">
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-user-tie"></i>
+                            <span>Cargo</span>
+                        </div>
+                        <div class="info-value">{{ $person->position ?? 'No especificado' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-layer-group"></i>
+                            <span>Área / Departamento</span>
+                        </div>
+                        <div class="info-value">{{ $person->department ?? 'No especificado' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- TAB 4: Información Escolar (DOCENTES y ADMINISTRATIVOS) -->
+        @if(in_array($person->subcategory, ['teacher', 'administrative']))
+        <div class="tab-pane" id="tab-school">
+            <div class="info-card-glass">
+                <div class="card-header-glass">
+                    <i class="fas fa-school"></i>
+                    <h3>Información {{ $person->subcategory == 'teacher' ? 'Docente' : 'Administrativa' }}</h3>
+                </div>
+                <div class="info-list">
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-user-tie"></i>
+                            <span>Cargo</span>
+                        </div>
+                        <div class="info-value">{{ $person->position ?? 'No especificado' }}</div>
+                    </div>
+                    @if($person->subcategory == 'teacher')
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-chalkboard-user"></i>
+                            <span>Tipo de Docente</span>
+                        </div>
+                        <div class="info-value">{{ $person->teacher_type_label ?? 'No especificado' }}</div>
+                    </div>
+                    @endif
+                    @if($person->subcategory == 'administrative')
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-layer-group"></i>
+                            <span>Departamento</span>
+                        </div>
+                        <div class="info-value">{{ $person->department ?? 'No especificado' }}</div>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- TAB 5: Carnet de Rescate (solo ONG RESCATE) -->
+        @if(($person->institution_type ?? $person->category) == 'ngo_rescue')
+        <div class="tab-pane" id="tab-rescue">
+            <div class="info-card-glass rescue-card">
+                <div class="card-header-glass">
+                    <i class="fas fa-id-card"></i>
+                    <h3>🎖️ Carnet de Rescate <span class="info-badge rescue">ONG</span></h3>
+                </div>
+                <div class="info-list">
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-hashtag"></i>
+                            <span>Número de Miembro</span>
+                        </div>
+                        <div class="info-value"><strong>{{ $person->rescue_member_number ?? 'No asignado' }}</strong></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-tag"></i>
+                            <span>Categoría de Miembro</span>
+                        </div>
+                        <div class="info-value">{{ $person->rescue_member_category ?? 'No especificada' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Fecha de Vencimiento</span>
+                        </div>
+                        <div class="info-value">{{ $person->rescue_expiry_date ? \Carbon\Carbon::parse($person->rescue_expiry_date)->format('m/Y') : 'No registrada' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-user-md"></i>
+                            <span>Especialidad / Área</span>
+                        </div>
+                        <div class="info-value">{{ $person->rescue_specialty_area ?? 'No especificada' }}</div>
+                    </div>
+                    @if($person->rescue_certifications)
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-certificate"></i>
+                            <span>Certificaciones</span>
+                        </div>
+                        <div class="info-value">{{ $person->rescue_certifications }}</div>
+                    </div>
+                    @endif
+                </div>
+                
+                @if($person->rescue_member_number)
+                <div class="carnet-mini-preview">
+                    <p><strong>ORGANIZACIÓN DE RESCATE</strong></p>
+                    <p>MIEMBRO N°: {{ $person->rescue_member_number }}</p>
+                    <p>CATEGORÍA: {{ $person->rescue_member_category ?? 'N/A' }}</p>
+                    <p>VENCE: {{ $person->rescue_expiry_date ? \Carbon\Carbon::parse($person->rescue_expiry_date)->format('m/Y') : 'N/A' }}</p>
+                </div>
+                @endif
+            </div>
+        </div>
+        @endif
+
+        <!-- TAB 6: Datos Gubernamentales (solo GOBIERNO) -->
+        @if(($person->institution_type ?? $person->category) == 'government')
+        <div class="tab-pane" id="tab-government">
+            <div class="info-card-glass government-card">
+                <div class="card-header-glass">
+                    <i class="fas fa-landmark"></i>
+                    <h3>🏛️ Información Gubernamental <span class="info-badge government">Gobierno</span></h3>
+                </div>
+                <div class="info-list">
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-layer-group"></i>
+                            <span>Nivel del Gobierno</span>
+                        </div>
+                        <div class="info-value">
+                            @if($person->government_level == 'national') 🏛️ Nacional
+                            @elseif($person->government_level == 'regional') 🏢 Regional
+                            @elseif($person->government_level == 'municipal') 🏘️ Municipal
+                            @elseif($person->government_level == 'parish') 📌 Parroquial
+                            @else No especificado @endif
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-balance-scale"></i>
+                            <span>Rama del Poder</span>
+                        </div>
+                        <div class="info-value">
+                            @if($person->government_branch == 'executive') ⚡ Poder Ejecutivo
+                            @elseif($person->government_branch == 'legislative') 📜 Poder Legislativo
+                            @elseif($person->government_branch == 'judicial') ⚖️ Poder Judicial
+                            @elseif($person->government_branch == 'citizen') 👁️ Poder Ciudadano
+                            @elseif($person->government_branch == 'electoral') 🗳️ Poder Electoral
+                            @else No especificado @endif
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-building"></i>
+                            <span>Ministerio / Ente</span>
+                        </div>
+                        <div class="info-value">{{ $person->government_entity_label ?? $person->government_entity ?? 'No especificado' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-user-tie"></i>
+                            <span>Cargo / Jerarquía</span>
+                        </div>
+                        <div class="info-value">{{ $person->government_position_label ?? $person->government_position ?? 'No especificado' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-id-card"></i>
+                            <span>N° de Carnet / Credencial</span>
+                        </div>
+                        <div class="info-value">{{ $person->government_card_number ?? 'No registrado' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Fecha de Ingreso</span>
+                        </div>
+                        <div class="info-value">{{ $person->government_joining_date ? \Carbon\Carbon::parse($person->government_joining_date)->format('d/m/Y') : 'No registrada' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- TAB 7: Salud y Emergencias (TODOS) -->
+        <div class="tab-pane" id="tab-health">
+            <div class="emergency-grid">
+                <div class="info-card-glass">
+                    <div class="card-header-glass">
+                        <i class="fas fa-ambulance"></i>
+                        <h3>Contacto de Emergencia</h3>
+                    </div>
+                    <div class="info-list">
+                        <div class="info-row">
+                            <div class="info-label">
+                                <i class="fas fa-user"></i>
+                                <span>Nombre del contacto</span>
+                            </div>
+                            <div class="info-value">{{ $person->emergency_contact_name ?? 'No registrado' }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">
+                                <i class="fas fa-phone-alt"></i>
+                                <span>Teléfono de emergencia</span>
+                            </div>
+                            <div class="info-value">{{ $person->emergency_phone ?? 'No registrado' }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">
+                                <i class="fas fa-heart"></i>
+                                <span>Parentesco</span>
+                            </div>
+                            <div class="info-value">{{ $person->emergency_relationship ?? 'No registrado' }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card-glass">
+                    <div class="card-header-glass">
+                        <i class="fas fa-notes-medical"></i>
+                        <h3>Información de Salud</h3>
+                    </div>
+                    <div class="info-list">
+                        <div class="info-row">
+                            <div class="info-label">
+                                <i class="fas fa-tint"></i>
+                                <span>Tipo de Sangre</span>
+                            </div>
+                            <div class="info-value">{{ $person->blood_type ?? 'No registrado' }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">
+                                <i class="fas fa-allergies"></i>
+                                <span>Alergias</span>
+                            </div>
+                            <div class="info-value">{{ $person->allergies ?? 'No registradas' }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">
+                                <i class="fas fa-heartbeat"></i>
+                                <span>Enfermedades / Condiciones</span>
+                            </div>
+                            <div class="info-value">{{ $person->medical_conditions ?? 'No registradas' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 8: Horarios (TODOS) -->
         <div class="tab-pane" id="tab-schedule">
             <div class="info-card-glass">
                 <div class="card-header-glass">
@@ -325,7 +649,7 @@
             </div>
         </div>
 
-        <!-- TAB 4: Tarjeta NFC -->
+        <!-- TAB 9: Tarjeta NFC -->
         <div class="tab-pane" id="tab-nfc">
             <div class="info-card-glass">
                 <div class="card-header-glass">
@@ -364,7 +688,7 @@
             </div>
         </div>
 
-        <!-- TAB 5: Historial de Accesos -->
+        <!-- TAB 10: Historial de Accesos -->
         <div class="tab-pane" id="tab-access">
             <div class="info-card-glass">
                 <div class="card-header-glass">
@@ -389,59 +713,6 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-
-        <!-- TAB 6: Emergencias -->
-        <div class="tab-pane" id="tab-emergency">
-            <div class="emergency-grid">
-                <div class="info-card-glass">
-                    <div class="card-header-glass">
-                        <i class="fas fa-ambulance"></i>
-                        <h3>Contacto de Emergencia</h3>
-                    </div>
-                    <div class="info-list">
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="fas fa-user"></i>
-                                <span>Nombre del contacto</span>
-                            </div>
-                            <div class="info-value">{{ $person->emergency_contact_name ?? 'No registrado' }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="fas fa-phone-alt"></i>
-                                <span>Teléfono de emergencia</span>
-                            </div>
-                            <div class="info-value">{{ $person->emergency_phone ?? 'No registrado' }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                @if($person->subcategory == 'student')
-                <div class="info-card-glass">
-                    <div class="card-header-glass">
-                        <i class="fas fa-notes-medical"></i>
-                        <h3>Información Médica</h3>
-                    </div>
-                    <div class="info-list">
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="fas fa-allergies"></i>
-                                <span>Alergias</span>
-                            </div>
-                            <div class="info-value">{{ $person->allergies ?? 'No registradas' }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="fas fa-heartbeat"></i>
-                                <span>Condiciones médicas</span>
-                            </div>
-                            <div class="info-value">{{ $person->medical_conditions ?? 'No registradas' }}</div>
-                        </div>
-                    </div>
-                </div>
-                @endif
             </div>
         </div>
     </div>
@@ -517,33 +788,33 @@
                         <label>Grado *</label>
                         <select name="grade_level" class="form-select-modern" required>
                             <option value="">Seleccionar grado</option>
-                            <optgroup label="Primaria">
-                                <option value="1st">1er Grado</option>
-                                <option value="2nd">2do Grado</option>
-                                <option value="3rd">3er Grado</option>
-                                <option value="4th">4to Grado</option>
-                                <option value="5th">5to Grado</option>
-                                <option value="6th">6to Grado</option>
+                            <optgroup label="EDUCACIÓN PRIMARIA">
+                                <option value="1er_grado">1er Grado</option>
+                                <option value="2do_grado">2do Grado</option>
+                                <option value="3er_grado">3er Grado</option>
+                                <option value="4to_grado">4to Grado</option>
+                                <option value="5to_grado">5to Grado</option>
+                                <option value="6to_grado">6to Grado</option>
                             </optgroup>
-                            <optgroup label="Liceo / Secundaria">
-                                <option value="7th">1er Año</option>
-                                <option value="8th">2do Año</option>
-                                <option value="9th">3er Año</option>
+                            <optgroup label="EDUCACIÓN MEDIA GENERAL">
+                                <option value="7mo_grado">7mo Grado (1er Año)</option>
+                                <option value="8vo_grado">8vo Grado (2do Año)</option>
+                                <option value="9no_grado">9no Grado (3er Año)</option>
                             </optgroup>
-                            <optgroup label="Ciclo Diversificado">
-                                <option value="10th">4to Año</option>
-                                <option value="11th">5to Año</option>
+                            <optgroup label="EDUCACIÓN MEDIA DIVERSIFICADA">
+                                <option value="4to_ano">4to Año (10° grado)</option>
+                                <option value="5to_ano">5to Año (11° grado)</option>
                             </optgroup>
                         </select>
                     </div>
                     <div class="form-group-modern">
                         <label>Promedio (opcional)</label>
-                        <input type="number" name="average" class="input-modern" step="0.01" min="0" max="100" placeholder="0 - 100">
+                        <input type="number" name="average" class="input-modern" step="0.01" min="0" max="20" placeholder="0 - 20">
                     </div>
                     <div class="form-group-modern">
-                        <label>Archivo PDF *</label>
-                        <input type="file" name="file" class="input-modern" accept=".pdf" required>
-                        <small class="form-text">Máximo 5MB. Solo archivos PDF</small>
+                        <label>Archivo *</label>
+                        <input type="file" name="file" class="input-modern" accept=".pdf,.jpg,.png" required>
+                        <small class="form-text">Máximo 5MB. Formatos: PDF, JPG, PNG</small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -569,7 +840,7 @@
                 @csrf
                 <div class="modal-body">
                     <div class="current-photo-modal" style="text-align: center; margin-bottom: 1rem;">
-                        <img id="currentPhotoPreview" src="{{ $person->photo_url }}" alt="Foto actual" style="width: 150px; height: 150px; border-radius: 1rem; object-fit: cover;">
+                        <img id="currentPhotoPreview" src="{{ $person->photo_url ?? asset('images/default-avatar.png') }}" alt="Foto actual" style="width: 150px; height: 150px; border-radius: 1rem; object-fit: cover;">
                     </div>
                     <div class="form-group-modern">
                         <label>Seleccionar nueva foto</label>
@@ -587,12 +858,6 @@
 </div>
 @endsection
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/persons-show.css') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-@endpush
-
 @push('scripts')
 <script>
     let currentPersonId = {{ $person->id }};
@@ -601,8 +866,8 @@
     @if($person->bio_url)
     new QRCode(document.getElementById("qrCodeBio"), {
         text: "{{ $person->bio_full_url }}",
-        width: 60,
-        height: 60,
+        width: 80,
+        height: 80,
         colorDark: "#1f2937",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.H
@@ -614,9 +879,7 @@
         alert('URL copiada al portapapeles');
     }
 
-    // ============================================
     // TABS
-    // ============================================
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const tabId = this.dataset.tab;
@@ -629,14 +892,7 @@
         });
     });
 
-    // Mostrar tabs según categoría
-    @if($person->subcategory == 'student')
-        document.getElementById('academicTab').style.display = 'flex';
-    @endif
-
-    // ============================================
-    // CARGAR HORARIOS
-    // ============================================
+    // Cargar Horarios
     function loadSchedules() {
         fetch(`/admin/persons/{{ $person->id }}/schedules`)
             .then(response => response.json())
@@ -663,9 +919,7 @@
             });
     }
 
-    // ============================================
-    // CARGAR HISTORIAL DE ACCESOS
-    // ============================================
+    // Cargar Historial de Accesos
     function loadAccessLogs() {
         fetch(`/admin/persons/{{ $person->id }}/access-logs`)
             .then(response => response.json())
@@ -682,7 +936,7 @@
                 tbody.innerHTML = data.map(log => `
                     <tr>
                         <td><div class="date-cell"><i class="far fa-calendar-alt"></i> ${log.access_time}</div></td>
-                        <td>${log.gate}</td>
+                        <td>${log.gate || 'Principal'}</td>
                         <td><span class="method-badge ${log.verification_method}"><i class="fas ${log.verification_method == 'nfc' ? 'fa-id-card' : 'fa-key'}"></i> ${log.verification_method_label}</span></td>
                         <td><span class="status-badge ${log.status}">${log.status_label}</span></td>
                     </tr>
@@ -694,9 +948,8 @@
             });
     }
 
-    // ============================================
-    // CARGAR BOLETINES
-    // ============================================
+    // Cargar Boletines
+    @if($person->subcategory == 'student')
     function loadReportCards() {
         fetch(`/admin/persons/{{ $person->id }}/report-cards`)
             .then(response => response.json())
@@ -727,10 +980,9 @@
                 document.getElementById('reportCardsList').innerHTML = '<div class="empty-state-small"><i class="fas fa-exclamation-triangle"></i><p>Error al cargar boletines</p></div>';
             });
     }
+    @endif
 
-    // ============================================
-    // ASIGNAR NFC
-    // ============================================
+    // Asignar NFC
     function openAssignNFCModal(personId) {
         new bootstrap.Modal(document.getElementById('assignNFCModal')).show();
     }
@@ -743,7 +995,7 @@
         }
         
         fetch(`/admin/persons/${personId}/assign-nfc`, {
-            method: 'PUT',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -761,7 +1013,7 @@
     function unassignNFCCard(personId) {
         if (confirm('¿Desvincular la tarjeta NFC de esta persona?')) {
             fetch(`/admin/persons/${personId}/unassign-nfc`, {
-                method: 'POST',
+                method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 }
@@ -769,9 +1021,7 @@
         }
     }
 
-    // ============================================
-    // BOLETINES
-    // ============================================
+    // Subir Boletín
     function openUploadReportModal() {
         new bootstrap.Modal(document.getElementById('uploadReportModal')).show();
     }
@@ -811,9 +1061,7 @@
         }
     }
 
-    // ============================================
-    // FOTO DE PERFIL
-    // ============================================
+    // Cambiar Foto
     function openChangePhotoModal() {
         new bootstrap.Modal(document.getElementById('changePhotoModal')).show();
     }
@@ -842,9 +1090,7 @@
           });
     });
 
-    // ============================================
-    // ELIMINAR PERSONA
-    // ============================================
+    // Eliminar Persona
     function deletePerson(id) {
         if (confirm('¿Eliminar esta persona? Esta acción no se puede deshacer.')) {
             fetch(`/admin/persons/${id}`, {
@@ -856,9 +1102,7 @@
         }
     }
 
-    // ============================================
-    // INICIALIZAR
-    // ============================================
+    // Inicializar
     document.addEventListener('DOMContentLoaded', function() {
         loadSchedules();
         loadAccessLogs();

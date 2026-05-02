@@ -6,16 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Person;
 use App\Models\Company;
 use App\Models\NfcCard;
-use App\Models\AccessLog;
 use App\Models\Schedule;
+use App\Models\AccessLog;
 use App\Models\ReportCard;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class PersonController extends Controller
@@ -25,7 +25,7 @@ class PersonController extends Controller
      */
     public function index()
     {
-        $persons = Person::with('company', 'user')->latest()->get();
+        $persons = Person::with('company', 'user')->latest()->paginate(15);
         $companies = Company::all();
         $availableCards = NfcCard::whereNull('assigned_to')->where('status', 'active')->get();
 
@@ -50,8 +50,6 @@ class PersonController extends Controller
         Log::info('Datos recibidos:', $request->all());
 
         $rules = $this->getValidationRules($request);
-        Log::info('Reglas de validación:', $rules);
-
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
@@ -61,47 +59,49 @@ class PersonController extends Controller
                 ->withInput();
         }
 
+        // Validación manual de campos condicionales
+        $conditionalErrors = $this->validateConditionalFields($request);
+        if (!empty($conditionalErrors)) {
+            return redirect()->back()
+                ->withErrors($conditionalErrors)
+                ->withInput();
+        }
+
         try {
             DB::beginTransaction();
 
-            Log::info('Iniciando transacción...');
-
             // Crear usuario si es necesario
             $userId = $this->createUserIfNeeded($request);
-            Log::info('Usuario creado/obtenido: ' . ($userId ?? 'null'));
 
             // Crear persona
             $person = $this->createPerson($request, $userId);
-            Log::info('Persona creada con ID: ' . ($person->id ?? 'null'));
 
             // Asignar tarjeta NFC si se seleccionó
             if ($request->card_id) {
-                $card = NfcCard::find($request->card_id);
-                if ($card && !$card->assigned_to) {
-                    $card->assigned_to = $person->id;
-                    $card->assigned_at = now();
-                    $card->save();
-
-                    $person->nfc_card_id = $card->id;
-                    $person->save();
-                    Log::info('Tarjeta NFC asignada: ' . $card->card_code);
-                }
+                $this->assignNfcCardToPerson($person, $request->card_id);
             }
 
             // Guardar foto si se subió
             if ($request->hasFile('photo')) {
                 $this->savePhoto($request->file('photo'), $person);
-                Log::info('Foto guardada');
+            }
+
+            // Guardar logo de organización si se subió
+            if ($request->hasFile('organization_logo')) {
+                $this->saveOrganizationLogo($person, $request->file('organization_logo'));
             }
 
             // Guardar horarios (solo para estudiantes, docentes y administrativos)
             if ($this->shouldSaveSchedules($request)) {
                 $this->saveSchedules($request, $person->id);
-                Log::info('Horarios guardados');
+            }
+
+            // Guardar boletines de notas (solo para estudiantes)
+            if ($request->hasFile('grade_report_first') || $request->hasFile('grade_report_second') || $request->hasFile('grade_report_third')) {
+                $this->saveGradeReports($request, $person);
             }
 
             DB::commit();
-            Log::info('Transacción completada exitosamente');
 
             return redirect()
                 ->route('admin.persons.index')
@@ -109,7 +109,6 @@ class PersonController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('ERROR AL REGISTRAR: ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
 
             return redirect()->back()
                 ->with('error', 'Error al registrar la persona: ' . $e->getMessage())
@@ -131,7 +130,8 @@ class PersonController extends Controller
         $accessLogs = AccessLog::where('person_id', $id)
             ->with('nfcCard')
             ->orderBy('access_time', 'desc')
-            ->paginate(50);
+            ->limit(100)
+            ->get();
 
         $accessStats = [
             'total' => AccessLog::where('person_id', $id)->count(),
@@ -151,7 +151,7 @@ class PersonController extends Controller
      */
     public function edit($id)
     {
-        $person = Person::with('schedules')->findOrFail($id);
+        $person = Person::with('schedules', 'reportCards')->findOrFail($id);
         $companies = Company::all();
 
         return view('admin.persons.create_edit', compact('person', 'companies'));
@@ -168,7 +168,6 @@ class PersonController extends Controller
         $person = Person::findOrFail($id);
 
         $rules = $this->getValidationRules($request, $id);
-
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
@@ -178,23 +177,28 @@ class PersonController extends Controller
                 ->withInput();
         }
 
+        // Validación manual de campos condicionales
+        $conditionalErrors = $this->validateConditionalFields($request);
+        if (!empty($conditionalErrors)) {
+            return redirect()->back()
+                ->withErrors($conditionalErrors)
+                ->withInput();
+        }
+
         try {
             DB::beginTransaction();
 
             // Actualizar persona
             $this->updatePerson($request, $person);
 
-            // Asignar nueva tarjeta si se seleccionó y no tiene una
-            if ($request->card_id && !$person->nfc_card_id) {
-                $card = NfcCard::find($request->card_id);
-                if ($card && !$card->assigned_to) {
-                    $card->assigned_to = $person->id;
-                    $card->assigned_at = now();
-                    $card->save();
+            // Asignar nueva tarjeta si se seleccionó
+            if ($request->card_id) {
+                $this->assignNfcCardToPerson($person, $request->card_id);
+            }
 
-                    $person->nfc_card_id = $card->id;
-                    $person->save();
-                }
+            // Desvincular tarjeta si se solicitó
+            if ($request->has('unassign_card') && $request->unassign_card == '1') {
+                $this->unassignNfcCardFromPerson($person);
             }
 
             // Actualizar foto si se subió nueva
@@ -208,18 +212,31 @@ class PersonController extends Controller
                 $this->deletePhotoFile($person);
             }
 
+            // Actualizar logo de organización
+            if ($request->hasFile('organization_logo')) {
+                $this->deleteOrganizationLogo($person);
+                $this->saveOrganizationLogo($person, $request->file('organization_logo'));
+            }
+
+            // Eliminar logo si se solicitó
+            if ($request->has('remove_organization_logo') && $request->remove_organization_logo == '1') {
+                $this->deleteOrganizationLogo($person);
+            }
+
             // Actualizar horarios (solo si aplica)
             if ($this->shouldSaveSchedules($request)) {
                 Schedule::where('person_id', $person->id)->delete();
                 $this->saveSchedules($request, $person->id);
             }
 
+            // Actualizar boletines de notas
+            if ($request->hasFile('grade_report_first') || $request->hasFile('grade_report_second') || $request->hasFile('grade_report_third')) {
+                $this->saveGradeReports($request, $person, true);
+            }
+
             DB::commit();
             
             $person->refresh();
-            Log::info('Persona actualizada correctamente');
-            Log::info('Emergencia guardada - Nombre: ' . ($person->emergency_contact_name ?? 'NULL'));
-            Log::info('Emergencia guardada - Teléfono: ' . ($person->emergency_phone ?? 'NULL'));
 
             return redirect()
                 ->route('admin.persons.index')
@@ -246,6 +263,9 @@ class PersonController extends Controller
             // Eliminar foto
             $this->deletePhotoFile($person);
 
+            // Eliminar logo de organización
+            $this->deleteOrganizationLogo($person);
+
             // Eliminar archivos de boletines
             if ($person->reportCards) {
                 foreach ($person->reportCards as $reportCard) {
@@ -254,10 +274,21 @@ class PersonController extends Controller
                 }
             }
 
+            // Eliminar archivos de boletines antiguos
+            if ($person->grade_report_first) {
+                Storage::disk('public')->delete($person->grade_report_first);
+            }
+            if ($person->grade_report_second) {
+                Storage::disk('public')->delete($person->grade_report_second);
+            }
+            if ($person->grade_report_third) {
+                Storage::disk('public')->delete($person->grade_report_third);
+            }
+
             // Eliminar horarios
             Schedule::where('person_id', $person->id)->delete();
 
-            // Eliminar registros de acceso de esta persona
+            // Eliminar registros de acceso
             AccessLog::where('person_id', $person->id)->delete();
 
             // Liberar tarjeta NFC
@@ -293,8 +324,176 @@ class PersonController extends Controller
         }
     }
 
+    // ============================================
+    // MÉTODOS PARA AJAX
+    // ============================================
+
     /**
-     * Upload photo for a person.
+     * Get schedules for a person (AJAX).
+     */
+    public function getSchedules($id)
+    {
+        $schedules = Schedule::where('person_id', $id)
+            ->orderByRaw("FIELD(day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday')")
+            ->get()
+            ->map(function ($schedule) {
+                return [
+                    'id' => $schedule->id,
+                    'day' => $schedule->day,
+                    'day_label' => $this->getDayLabel($schedule->day),
+                    'start_time' => date('H:i', strtotime($schedule->start_time)),
+                    'end_time' => date('H:i', strtotime($schedule->end_time)),
+                    'subject' => $schedule->subject,
+                    'classroom' => $schedule->classroom,
+                ];
+            });
+
+        return response()->json($schedules);
+    }
+
+    /**
+     * Get access logs for a person (AJAX).
+     */
+    public function getAccessLogs($id)
+    {
+        $logs = AccessLog::where('person_id', $id)
+            ->latest('access_time')
+            ->limit(100)
+            ->get()
+            ->map(function ($log) {
+                return [
+                    'id' => $log->id,
+                    'access_time' => $log->access_time->format('d/m/Y H:i:s'),
+                    'gate' => $log->gate ?? 'Puerta Principal',
+                    'verification_method' => $log->verification_method,
+                    'verification_method_label' => strtoupper($log->verification_method),
+                    'status' => $log->status,
+                    'status_label' => $log->status == 'granted' ? 'Permitido' : 'Denegado',
+                ];
+            });
+
+        return response()->json($logs);
+    }
+
+    /**
+     * Get report cards for a student (AJAX).
+     */
+    public function getReportCards($id)
+    {
+        try {
+            $person = Person::findOrFail($id);
+
+            if ($person->subcategory !== 'student') {
+                return response()->json(['success' => false, 'error' => 'No es un estudiante'], 400);
+            }
+
+            $reportCards = $person->reportCards()->orderBy('academic_year', 'desc')->get()->map(function ($rc) {
+                return [
+                    'id' => $rc->id,
+                    'period' => $rc->period,
+                    'period_label' => $this->getPeriodLabel($rc->period),
+                    'academic_year' => $rc->academic_year,
+                    'grade_level' => $rc->grade_level,
+                    'grade_level_label' => $this->getGradeLevelLabel($rc->grade_level),
+                    'file_url' => Storage::url($rc->file_path),
+                    'file_name' => $rc->file_name,
+                    'average' => $rc->average,
+                    'created_at' => $rc->created_at->format('d/m/Y'),
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $reportCards,
+                'overall_average' => $person->average_grade
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Upload report card (AJAX).
+     */
+    public function uploadReportCard(Request $request, $id)
+    {
+        $request->validate([
+            'period' => 'required|in:first,second,third',
+            'academic_year' => 'required|string',
+            'grade_level' => 'required|string',
+            'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'average' => 'nullable|numeric|min:0|max:20',
+        ]);
+
+        try {
+            $person = Person::findOrFail($id);
+
+            if ($person->subcategory !== 'student') {
+                return response()->json(['success' => false, 'error' => 'Solo estudiantes pueden tener boletines'], 400);
+            }
+
+            // Eliminar boletín existente del mismo periodo y año
+            $existingReport = ReportCard::where('person_id', $person->id)
+                ->where('period', $request->period)
+                ->where('academic_year', $request->academic_year)
+                ->first();
+
+            if ($existingReport) {
+                Storage::disk('public')->delete($existingReport->file_path);
+                $existingReport->delete();
+            }
+
+            $file = $request->file('file');
+            $extension = $file->getClientOriginalExtension();
+            $fileName = $person->id . '_' . $request->period . '_' . $request->academic_year . '.' . $extension;
+            $filePath = $file->storeAs('report_cards/' . $person->id, $fileName, 'public');
+
+            $reportCard = ReportCard::create([
+                'person_id' => $person->id,
+                'period' => $request->period,
+                'academic_year' => $request->academic_year,
+                'grade_level' => $request->grade_level,
+                'file_path' => $filePath,
+                'file_name' => $file->getClientOriginalName(),
+                'average' => $request->average,
+            ]);
+
+            $this->updateStudentAverage($person->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Boletín subido exitosamente',
+                'data' => $reportCard
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Delete report card (AJAX).
+     */
+    public function deleteReportCard($personId, $reportCardId)
+    {
+        try {
+            $reportCard = ReportCard::where('person_id', $personId)->findOrFail($reportCardId);
+
+            Storage::disk('public')->delete($reportCard->file_path);
+            $reportCard->delete();
+
+            $this->updateStudentAverage($personId);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Boletín eliminado exitosamente'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Upload photo (AJAX).
      */
     public function uploadPhoto(Request $request, $id)
     {
@@ -322,28 +521,7 @@ class PersonController extends Controller
     }
 
     /**
-     * Delete photo for a person.
-     */
-    public function deletePhoto($id)
-    {
-        try {
-            $person = Person::findOrFail($id);
-            $this->deletePhotoFile($person);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Foto eliminada exitosamente'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al eliminar la foto: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Assign NFC card to person.
+     * Assign NFC card (AJAX).
      */
     public function assignNfc(Request $request, $id)
     {
@@ -355,43 +533,25 @@ class PersonController extends Controller
             DB::beginTransaction();
 
             $person = Person::findOrFail($id);
-            $card = NfcCard::findOrFail($request->card_id);
-
-            if ($card->assigned_to) {
-                return redirect()->back()
-                    ->with('error', 'Esta tarjeta NFC ya está asignada a otra persona.');
-            }
-
-            if ($person->nfc_card_id) {
-                $oldCard = NfcCard::find($person->nfc_card_id);
-                if ($oldCard) {
-                    $oldCard->assigned_to = null;
-                    $oldCard->assigned_at = null;
-                    $oldCard->save();
-                }
-            }
-
-            $card->assigned_to = $person->id;
-            $card->assigned_at = now();
-            $card->save();
-
-            $person->nfc_card_id = $card->id;
-            $person->save();
+            $this->assignNfcCardToPerson($person, $request->card_id);
 
             DB::commit();
 
-            return redirect()
-                ->route('admin.persons.index')
-                ->with('success', "Tarjeta {$card->card_code} asignada a {$person->full_name} exitosamente.");
+            return response()->json([
+                'success' => true,
+                'message' => 'Tarjeta NFC asignada exitosamente'
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()
-                ->with('error', 'Error al asignar la tarjeta NFC: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
     /**
-     * Unassign NFC card from person.
+     * Unassign NFC card (AJAX).
      */
     public function unassignNfc($id)
     {
@@ -399,376 +559,105 @@ class PersonController extends Controller
             DB::beginTransaction();
 
             $person = Person::findOrFail($id);
-
-            if (!$person->nfc_card_id) {
-                return redirect()->back()
-                    ->with('error', 'Esta persona no tiene una tarjeta NFC asignada.');
-            }
-
-            $card = NfcCard::find($person->nfc_card_id);
-            if ($card) {
-                $card->assigned_to = null;
-                $card->assigned_at = null;
-                $card->save();
-            }
-
-            $person->nfc_card_id = null;
-            $person->save();
+            $this->unassignNfcCardFromPerson($person);
 
             DB::commit();
 
-            return redirect()
-                ->route('admin.persons.index')
-                ->with('success', 'Tarjeta NFC desvinculada exitosamente.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Tarjeta NFC desvinculada exitosamente'
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()
-                ->with('error', 'Error al desvincular la tarjeta NFC: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Upload report card (boletín de notas) for a student.
-     */
-    public function uploadReportCard(Request $request, $id)
-    {
-        $request->validate([
-            'period' => 'required|in:first,second,third',
-            'academic_year' => 'required|string',
-            'grade_level' => 'required|string',
-            'file' => 'required|file|mimes:pdf|max:5120',
-            'average' => 'nullable|numeric|min:0|max:100',
-            'subjects_grades' => 'nullable|array'
-        ]);
-
-        try {
-            $person = Person::findOrFail($id);
-
-            if ($person->subcategory !== 'student') {
-                return response()->json(['error' => 'Solo estudiantes pueden tener boletines'], 400);
-            }
-
-            $existingReport = ReportCard::where('person_id', $person->id)
-                ->where('period', $request->period)
-                ->where('academic_year', $request->academic_year)
-                ->first();
-
-            if ($existingReport) {
-                Storage::disk('public')->delete($existingReport->file_path);
-                $existingReport->delete();
-            }
-
-            $file = $request->file('file');
-            $fileName = $person->id . '_' . $request->period . '_' . $request->academic_year . '.pdf';
-            $filePath = $file->storeAs('report_cards/' . $person->id, $fileName, 'public');
-
-            $reportCard = ReportCard::create([
-                'person_id' => $person->id,
-                'period' => $request->period,
-                'academic_year' => $request->academic_year,
-                'grade_level' => $request->grade_level,
-                'file_path' => $filePath,
-                'file_name' => $file->getClientOriginalName(),
-                'average' => $request->average,
-                'subjects_grades' => $request->subjects_grades,
-            ]);
-
-            $this->updateStudentAverage($person->id);
-            $person->update(['period' => $request->period]);
-
             return response()->json([
-                'success' => true,
-                'message' => 'Boletín subido exitosamente',
-                'data' => $reportCard
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al subir el boletín: ' . $e->getMessage()], 500);
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
-    }
-
-    /**
-     * Get report cards for a student.
-     */
-    public function getReportCards($id)
-    {
-        try {
-            $person = Person::findOrFail($id);
-
-            if ($person->subcategory !== 'student') {
-                return response()->json(['error' => 'No es un estudiante'], 400);
-            }
-
-            $reportCards = $person->reportCards()->orderBy('academic_year', 'desc')->get()->map(function ($rc) {
-                return [
-                    'id' => $rc->id,
-                    'period' => $rc->period,
-                    'period_label' => $this->getPeriodLabel($rc->period),
-                    'academic_year' => $rc->academic_year,
-                    'grade_level' => $rc->grade_level,
-                    'file_url' => Storage::url($rc->file_path),
-                    'file_name' => $rc->file_name,
-                    'average' => $rc->average,
-                    'created_at' => $rc->created_at->format('d/m/Y'),
-                ];
-            });
-
-            return response()->json([
-                'success' => true,
-                'data' => $reportCards,
-                'overall_average' => $person->average_grade
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al obtener los boletines: ' . $e->getMessage()], 500);
-        }
-    }
-
-    /**
-     * Delete report card.
-     */
-    public function deleteReportCard($personId, $reportCardId)
-    {
-        try {
-            $reportCard = ReportCard::where('person_id', $personId)->findOrFail($reportCardId);
-
-            Storage::disk('public')->delete($reportCard->file_path);
-            $reportCard->delete();
-
-            $this->updateStudentAverage($personId);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Boletín eliminado exitosamente'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al eliminar el boletín: ' . $e->getMessage()], 500);
-        }
-    }
-
-    /**
-     * Export persons list to CSV.
-     */
-    public function export(Request $request)
-    {
-        $query = Person::with('company');
-
-        if ($request->category && $request->category != 'all') {
-            $query->where('category', $request->category);
-        }
-
-        if ($request->subcategory && $request->subcategory != 'all') {
-            $query->where('subcategory', $request->subcategory);
-        }
-
-        if ($request->company && $request->company != 'all') {
-            $query->where('company_id', $request->company);
-        }
-
-        if ($request->search) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                    ->orWhere('lastname', 'like', '%' . $request->search . '%')
-                    ->orWhere('document_id', 'like', '%' . $request->search . '%')
-                    ->orWhere('email', 'like', '%' . $request->search . '%');
-            });
-        }
-
-        $persons = $query->get();
-
-        $filename = 'personas_' . date('Y-m-d_His') . '.csv';
-        $handle = fopen('php://temp', 'w');
-
-        fputcsv($handle, [
-            'ID',
-            'Nombre',
-            'Apellido',
-            'Categoría',
-            'Subcategoría',
-            'Empresa/Colegio',
-            'Cédula',
-            'Email',
-            'Teléfono',
-            'Género',
-            'Fecha Nacimiento',
-            'Cargo',
-            'Departamento',
-            'Biografía',
-            'Grado',
-            'Año Escolar',
-            'Periodo',
-            'Promedio',
-            'Contacto Emergencia',
-            'Teléfono Emergencia',
-            'Alergias',
-            'Condiciones Médicas',
-            'Tipo Docente',
-            'Fecha Registro',
-            'Estado NFC',
-            'URL Pública'
-        ]);
-
-        foreach ($persons as $person) {
-            fputcsv($handle, [
-                $person->id,
-                $person->name,
-                $person->lastname ?? '',
-                $person->category == 'employee' ? 'Empleado' : 'Personal Escolar',
-                $this->getSubcategoryLabel($person->subcategory),
-                $person->company->name ?? 'N/A',
-                $person->document_id ?? '',
-                $person->email ?? '',
-                $person->phone ?? '',
-                $this->getGenderLabel($person->gender),
-                $person->birth_date ?? '',
-                $person->position ?? '',
-                $person->department ?? '',
-                $person->bio ?? '',
-                $person->grade_level ?? '',
-                $person->academic_year ?? '',
-                $this->getPeriodLabel($person->period),
-                $person->average_grade ?? '',
-                $person->emergency_contact_name ?? '',
-                $person->emergency_phone ?? '',
-                $person->allergies ?? '',
-                $person->medical_conditions ?? '',
-                $this->getTeacherTypeLabel($person->teacher_type),
-                $person->created_at->format('d/m/Y H:i'),
-                $person->nfc_card_id ? 'Asignada' : 'Sin asignar',
-                $person->bio_full_url ?? ''
-            ]);
-        }
-
-        rewind($handle);
-        $content = stream_get_contents($handle);
-        fclose($handle);
-
-        return response($content)
-            ->withHeaders([
-                'Content-Type' => 'text/csv',
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-            ]);
-    }
-
-    /**
-     * Search persons (AJAX).
-     */
-    public function search(Request $request)
-    {
-        $query = Person::with('company');
-
-        if ($request->q) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->q . '%')
-                    ->orWhere('lastname', 'like', '%' . $request->q . '%')
-                    ->orWhere('document_id', 'like', '%' . $request->q . '%')
-                    ->orWhere('email', 'like', '%' . $request->q . '%');
-            });
-        }
-
-        if ($request->category && $request->category != 'all') {
-            $query->where('category', $request->category);
-        }
-
-        if ($request->subcategory && $request->subcategory != 'all') {
-            $query->where('subcategory', $request->subcategory);
-        }
-
-        $persons = $query->limit(20)->get()->map(function ($person) {
-            return [
-                'id' => $person->id,
-                'full_name' => $person->full_name,
-                'photo_url' => $person->photo_url,
-                'document_id' => $person->document_id,
-                'email' => $person->email,
-                'category_label' => $person->category_label,
-                'subcategory_label' => $person->subcategory_label,
-                'company_name' => $person->company->name ?? 'N/A',
-            ];
-        });
-
-        return response()->json($persons);
-    }
-
-    /**
-     * Get access logs for a person (AJAX).
-     */
-    public function getAccessLogs($id)
-    {
-        $logs = AccessLog::where('person_id', $id)
-            ->latest()
-            ->limit(100)
-            ->get()
-            ->map(function ($log) {
-                return [
-                    'id' => $log->id,
-                    'access_time' => $log->access_time->format('d/m/Y H:i:s'),
-                    'gate' => $log->gate ?? 'Puerta Principal',
-                    'verification_method' => $log->verification_method,
-                    'verification_method_label' => strtoupper($log->verification_method),
-                    'status' => $log->status,
-                    'status_label' => $log->status == 'granted' ? 'Permitido' : 'Denegado',
-                ];
-            });
-
-        return response()->json($logs);
-    }
-
-    /**
-     * Get schedules for a person (AJAX).
-     */
-    public function getSchedules($id)
-    {
-        $schedules = Schedule::where('person_id', $id)
-            ->orderByRaw("FIELD(day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday')")
-            ->get()
-            ->map(function ($schedule) {
-                return [
-                    'id' => $schedule->id,
-                    'day' => $schedule->day,
-                    'day_label' => $this->getDayLabel($schedule->day),
-                    'start_time' => date('H:i', strtotime($schedule->start_time)),
-                    'end_time' => date('H:i', strtotime($schedule->end_time)),
-                    'subject' => $schedule->subject,
-                    'classroom' => $schedule->classroom,
-                ];
-            });
-
-        return response()->json($schedules);
     }
 
     // ============================================
-    // MÉTODOS PRIVADOS
+    // MÉTODOS PRIVADOS DE VALIDACIÓN
     // ============================================
 
     /**
-     * Update student average grade from report cards
+     * Validate required fields based on institution type
      */
-    private function updateStudentAverage($personId)
+    private function validateConditionalFields($request)
     {
-        $person = Person::find($personId);
-        if ($person && $person->subcategory === 'student') {
-            $average = $person->reportCards()->avg('average');
-            $person->update(['average_grade' => $average]);
+        $errors = [];
+        $institutionType = $request->institution_type;
+        
+        if ($institutionType == 'company') {
+            // Campos de empresa son OPCIONALES - no se validan
+            // No se agregan errores para position y department
+            
+        } elseif ($institutionType == 'school') {
+            $subcategory = $request->subcategory;
+            
+            if ($subcategory == 'student') {
+                if (empty($request->grade_level)) {
+                    $errors['grade_level'] = 'El campo Grado es requerido para estudiantes.';
+                }
+                if (empty($request->academic_year)) {
+                    $errors['academic_year'] = 'El campo Año Escolar es requerido para estudiantes.';
+                }
+                
+            } elseif ($subcategory == 'teacher') {
+                if (empty($request->position)) {
+                    $errors['position'] = 'El campo Cargo es requerido para docentes.';
+                }
+                
+            } elseif ($subcategory == 'administrative') {
+                if (empty($request->position)) {
+                    $errors['position'] = 'El campo Cargo es requerido para personal administrativo.';
+                }
+                if (empty($request->department)) {
+                    $errors['department'] = 'El campo Departamento es requerido para personal administrativo.';
+                }
+            } elseif (empty($subcategory)) {
+                $errors['subcategory'] = 'Debe seleccionar un rol en el colegio.';
+            }
+            
+        } elseif ($institutionType == 'ngo_rescue') {
+            if (empty($request->rescue_member_number)) {
+                $errors['rescue_member_number'] = 'El campo Número de Miembro es requerido para ONG de Rescate.';
+            }
+            if (empty($request->rescue_member_category)) {
+                $errors['rescue_member_category'] = 'El campo Categoría de Miembro es requerido para ONG de Rescate.';
+            }
+            
+        } elseif ($institutionType == 'government') {
+            if (empty($request->government_level)) {
+                $errors['government_level'] = 'El campo Nivel del Gobierno es requerido.';
+            }
+            if (empty($request->government_entity)) {
+                $errors['government_entity'] = 'El campo Ministerio / Ente es requerido.';
+            }
+            if (empty($request->government_position)) {
+                $errors['government_position'] = 'El campo Cargo / Jerarquía es requerido.';
+            }
+        } else {
+            $errors['institution_type'] = 'Debe seleccionar un tipo de organización.';
         }
+        
+        // Validar campos de emergencia para todos - AHORA SON OPCIONALES
+        // Comentado para que sean opcionales
+        // if (empty($request->emergency_contact_name)) {
+        //     $errors['emergency_contact_name'] = 'El campo Nombre del contacto es requerido.';
+        // }
+        // if (empty($request->emergency_phone)) {
+        //     $errors['emergency_phone'] = 'El campo Número de contacto es requerido.';
+        // }
+        // if (empty($request->emergency_relationship)) {
+        //     $errors['emergency_relationship'] = 'El campo Parentesco es requerido.';
+        // }
+        
+        return $errors;
     }
 
     /**
-     * Determine if schedules should be saved for this person type
-     */
-    private function shouldSaveSchedules($request)
-    {
-        if ($request->category === 'employee') {
-            return false;
-        }
-        
-        if ($request->category === 'school') {
-            return in_array($request->subcategory, ['student', 'teacher', 'administrative']);
-        }
-        
-        return false;
-    }
-
-    /**
-     * Get validation rules based on category and subcategory
+     * Get validation rules based on institution_type and subcategory
      */
     private function getValidationRules($request, $id = null)
     {
@@ -776,7 +665,7 @@ class PersonController extends Controller
         $uniqueEmail = $id ? 'unique:persons,email,' . $id : 'unique:persons,email';
 
         $rules = [
-            'category' => 'required|in:employee,school',
+            'institution_type' => 'required|in:company,school,ngo_rescue,government',
             'name' => 'required|string|max:255',
             'lastname' => 'nullable|string|max:255',
             'document_id' => 'nullable|string|max:50|' . $uniqueDocument,
@@ -786,43 +675,67 @@ class PersonController extends Controller
             'birth_date' => 'nullable|date',
             'company_id' => 'required|exists:companies,id',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'organization_logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            
+            // Datos comunes para todos (ahora nullable - opcionales)
+            'emergency_contact_name' => 'nullable|string|max:255',
+            'emergency_phone' => 'nullable|string|max:20',
+            'emergency_relationship' => 'nullable|string|max:100',
+            'blood_type' => 'nullable|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'allergies' => 'nullable|string',
+            'medical_conditions' => 'nullable|string',
         ];
 
-        if ($request->category == 'employee') {
+        if ($request->institution_type == 'company') {
+            // Campos opcionales para empresa
             $rules['position'] = 'nullable|string|max:255';
             $rules['department'] = 'nullable|string|max:255';
-            $rules['bio'] = 'nullable|string';
             
-        } elseif ($request->category == 'school') {
+        } elseif ($request->institution_type == 'school') {
             $rules['subcategory'] = 'required|in:student,teacher,administrative';
             
             if ($request->subcategory == 'student') {
-                $rules['grade_level'] = 'required|string';
-                $rules['academic_year'] = 'required|string';
+                $rules['grade_level'] = 'nullable|string';
+                $rules['academic_year'] = 'nullable|string';
+                $rules['section'] = 'nullable|string|max:10';
                 $rules['period'] = 'nullable|in:first,second,third';
-                $rules['emergency_contact_name'] = 'nullable|string';
-                $rules['emergency_phone'] = 'nullable|string';
-                $rules['allergies'] = 'nullable|string';
-                $rules['medical_conditions'] = 'nullable|string';
+                $rules['grade_report_first'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120';
+                $rules['grade_report_second'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120';
+                $rules['grade_report_third'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120';
                 
             } elseif ($request->subcategory == 'teacher') {
                 $rules['position'] = 'nullable|string|max:255';
                 $rules['teacher_type'] = 'nullable|in:regular,substitute,special_education,part_time';
                 $rules['bio'] = 'nullable|string';
-                $rules['emergency_contact_name'] = 'nullable|string';
-                $rules['emergency_phone'] = 'nullable|string';
                 
             } elseif ($request->subcategory == 'administrative') {
                 $rules['position'] = 'nullable|string|max:255';
                 $rules['department'] = 'nullable|string|max:255';
                 $rules['bio'] = 'nullable|string';
-                $rules['emergency_contact_name'] = 'nullable|string';
-                $rules['emergency_phone'] = 'nullable|string';
             }
+            
+        } elseif ($request->institution_type == 'ngo_rescue') {
+            $rules['rescue_member_number'] = 'nullable|string|max:50';
+            $rules['rescue_member_category'] = 'nullable|string|max:100';
+            $rules['rescue_expiry_date'] = 'nullable|date';
+            $rules['rescue_specialty_area'] = 'nullable|string|max:255';
+            $rules['rescue_certifications'] = 'nullable|string';
+            
+        } elseif ($request->institution_type == 'government') {
+            $rules['government_level'] = 'nullable|in:national,regional,municipal,parish';
+            $rules['government_branch'] = 'nullable|in:executive,legislative,judicial,citizen,electoral';
+            $rules['government_entity'] = 'nullable|string|max:255';
+            $rules['government_position'] = 'nullable|string|max:255';
+            $rules['government_card_number'] = 'nullable|string|max:100';
+            $rules['government_joining_date'] = 'nullable|date';
         }
 
         return $rules;
     }
+
+    // ============================================
+    // MÉTODOS DE CREACIÓN Y ACTUALIZACIÓN
+    // ============================================
 
     /**
      * Create user account if requested
@@ -842,7 +755,7 @@ class PersonController extends Controller
             'password' => Hash::make($password),
         ]);
 
-        $role = $this->getRoleByCategory($request->category, $request->subcategory);
+        $role = $this->getRoleByCategory($request->institution_type, $request->subcategory ?? null);
         if ($role) {
             $user->assignRole($role);
         }
@@ -851,13 +764,13 @@ class PersonController extends Controller
     }
 
     /**
-     * Get role name based on category and subcategory
+     * Get role name based on institution type and subcategory
      */
-    private function getRoleByCategory($category, $subcategory = null)
+    private function getRoleByCategory($institutionType, $subcategory = null)
     {
-        if ($category == 'employee') {
+        if ($institutionType == 'company') {
             return 'employee';
-        } elseif ($category == 'school') {
+        } elseif ($institutionType == 'school') {
             if ($subcategory == 'teacher') {
                 return 'teacher';
             } elseif ($subcategory == 'administrative') {
@@ -865,18 +778,22 @@ class PersonController extends Controller
             } elseif ($subcategory == 'student') {
                 return 'student';
             }
+        } elseif ($institutionType == 'ngo_rescue') {
+            return 'rescuer';
+        } elseif ($institutionType == 'government') {
+            return 'government';
         }
         return null;
     }
 
     /**
-     * Create a new person with filtered data based on category
+     * Create a new person
      */
     private function createPerson($request, $userId = null)
     {
         $data = [
             'user_id' => $userId,
-            'category' => $request->category,
+            'institution_type' => $request->institution_type,
             'subcategory' => $request->subcategory ?? null,
             'name' => $request->name,
             'lastname' => $request->lastname,
@@ -888,57 +805,64 @@ class PersonController extends Controller
             'company_id' => $request->company_id,
             'bio_url' => Person::generateUniqueBioUrl(),
             'is_active' => true,
+            
+            // Datos de emergencia y salud
+            'emergency_contact_name' => $request->emergency_contact_name ?? null,
+            'emergency_phone' => $request->emergency_phone ?? null,
+            'emergency_relationship' => $request->emergency_relationship ?? null,
+            'blood_type' => $request->blood_type ?? null,
+            'allergies' => $request->allergies ?? null,
+            'medical_conditions' => $request->medical_conditions ?? null,
         ];
 
-        if ($request->category == 'employee') {
+        if ($request->institution_type == 'company') {
             $data['position'] = $request->position ?? null;
             $data['department'] = $request->department ?? null;
-            $data['bio'] = $request->bio ?? null;
             
-        } elseif ($request->category == 'school') {
+        } elseif ($request->institution_type == 'school') {
             if ($request->subcategory == 'student') {
                 $data['grade_level'] = $request->grade_level;
                 $data['academic_year'] = $request->academic_year;
-                $data['period'] = $request->period;
-                $data['emergency_contact_name'] = $request->emergency_contact_name ?? null;
-                $data['emergency_phone'] = $request->emergency_phone ?? null;
-                $data['allergies'] = $request->allergies ?? null;
-                $data['medical_conditions'] = $request->medical_conditions ?? null;
+                $data['section'] = $request->section ?? null;
+                $data['period'] = $request->period ?? null;
                 
             } elseif ($request->subcategory == 'teacher') {
                 $data['position'] = $request->position ?? null;
-                $data['teacher_type'] = $request->teacher_type;
+                $data['teacher_type'] = $request->teacher_type ?? null;
                 $data['bio'] = $request->bio ?? null;
-                $data['emergency_contact_name'] = $request->emergency_contact_name ?? null;
-                $data['emergency_phone'] = $request->emergency_phone ?? null;
                 
             } elseif ($request->subcategory == 'administrative') {
                 $data['position'] = $request->position ?? null;
                 $data['department'] = $request->department ?? null;
                 $data['bio'] = $request->bio ?? null;
-                $data['emergency_contact_name'] = $request->emergency_contact_name ?? null;
-                $data['emergency_phone'] = $request->emergency_phone ?? null;
             }
+            
+        } elseif ($request->institution_type == 'ngo_rescue') {
+            $data['rescue_member_number'] = $request->rescue_member_number ?? null;
+            $data['rescue_member_category'] = $request->rescue_member_category ?? null;
+            $data['rescue_expiry_date'] = $request->rescue_expiry_date ?? null;
+            $data['rescue_specialty_area'] = $request->rescue_specialty_area ?? null;
+            $data['rescue_certifications'] = $request->rescue_certifications ?? null;
+            
+        } elseif ($request->institution_type == 'government') {
+            $data['government_level'] = $request->government_level ?? null;
+            $data['government_branch'] = $request->government_branch ?? null;
+            $data['government_entity'] = $request->government_entity ?? null;
+            $data['government_position'] = $request->government_position ?? null;
+            $data['government_card_number'] = $request->government_card_number ?? null;
+            $data['government_joining_date'] = $request->government_joining_date ?? null;
         }
 
-        Log::info('Datos a guardar:', $data);
-        
         return Person::create($data);
     }
 
     /**
-     * Update an existing person with filtered data based on category
+     * Update an existing person
      */
     private function updatePerson($request, $person)
     {
-        Log::info('=== updatePerson - INICIO ===');
-        Log::info('Categoría: ' . $request->category);
-        Log::info('Subcategoría: ' . $request->subcategory);
-        Log::info('Emergency Contact Name recibido: "' . $request->emergency_contact_name . '"');
-        Log::info('Emergency Phone recibido: "' . $request->emergency_phone . '"');
-
         $data = [
-            'category' => $request->category,
+            'institution_type' => $request->institution_type,
             'subcategory' => $request->subcategory ?? null,
             'name' => $request->name,
             'lastname' => $request->lastname,
@@ -948,75 +872,144 @@ class PersonController extends Controller
             'gender' => $request->gender,
             'birth_date' => $request->birth_date,
             'company_id' => $request->company_id,
+            
+            // Datos de emergencia y salud
+            'emergency_contact_name' => $request->emergency_contact_name ?? null,
+            'emergency_phone' => $request->emergency_phone ?? null,
+            'emergency_relationship' => $request->emergency_relationship ?? null,
+            'blood_type' => $request->blood_type ?? null,
+            'allergies' => $request->allergies ?? null,
+            'medical_conditions' => $request->medical_conditions ?? null,
         ];
 
-        if ($request->category == 'employee') {
+        if ($request->institution_type == 'company') {
             $data['position'] = $request->position ?? null;
             $data['department'] = $request->department ?? null;
-            $data['bio'] = $request->bio ?? null;
-            $data['grade_level'] = null;
-            $data['academic_year'] = null;
-            $data['period'] = null;
-            $data['emergency_contact_name'] = null;
-            $data['emergency_phone'] = null;
-            $data['allergies'] = null;
-            $data['medical_conditions'] = null;
-            $data['teacher_type'] = null;
+            $this->clearSchoolFields($data);
+            $this->clearRescueFields($data);
+            $this->clearGovernmentFields($data);
             
-        } elseif ($request->category == 'school') {
+        } elseif ($request->institution_type == 'school') {
             if ($request->subcategory == 'student') {
                 $data['grade_level'] = $request->grade_level;
                 $data['academic_year'] = $request->academic_year;
-                $data['period'] = $request->period;
-                
-                // Guardar los valores de emergencia - Usar el valor del request si existe
-                // Si el campo viene vacío, guardar null, pero si tiene valor, guardarlo
-                $data['emergency_contact_name'] = $request->filled('emergency_contact_name') ? $request->emergency_contact_name : null;
-                $data['emergency_phone'] = $request->filled('emergency_phone') ? $request->emergency_phone : null;
-                $data['allergies'] = $request->filled('allergies') ? $request->allergies : null;
-                $data['medical_conditions'] = $request->filled('medical_conditions') ? $request->medical_conditions : null;
-                
-                // Limpiar campos laborales
-                $data['position'] = null;
-                $data['department'] = null;
-                $data['bio'] = null;
-                $data['teacher_type'] = null;
+                $data['section'] = $request->section ?? null;
+                $data['period'] = $request->period ?? null;
+                $this->clearWorkFields($data);
+                $this->clearRescueFields($data);
+                $this->clearGovernmentFields($data);
                 
             } elseif ($request->subcategory == 'teacher') {
                 $data['position'] = $request->position ?? null;
-                $data['teacher_type'] = $request->teacher_type;
+                $data['teacher_type'] = $request->teacher_type ?? null;
                 $data['bio'] = $request->bio ?? null;
-                $data['emergency_contact_name'] = $request->emergency_contact_name ?? null;
-                $data['emergency_phone'] = $request->emergency_phone ?? null;
-                $data['department'] = null;
-                $data['grade_level'] = null;
-                $data['academic_year'] = null;
-                $data['allergies'] = null;
-                $data['medical_conditions'] = null;
+                $this->clearStudentFields($data);
+                $this->clearRescueFields($data);
+                $this->clearGovernmentFields($data);
                 
             } elseif ($request->subcategory == 'administrative') {
                 $data['position'] = $request->position ?? null;
                 $data['department'] = $request->department ?? null;
                 $data['bio'] = $request->bio ?? null;
-                $data['emergency_contact_name'] = $request->emergency_contact_name ?? null;
-                $data['emergency_phone'] = $request->emergency_phone ?? null;
-                $data['grade_level'] = null;
-                $data['academic_year'] = null;
-                $data['allergies'] = null;
-                $data['medical_conditions'] = null;
-                $data['teacher_type'] = null;
+                $this->clearStudentFields($data);
+                $this->clearRescueFields($data);
+                $this->clearGovernmentFields($data);
             }
+            
+        } elseif ($request->institution_type == 'ngo_rescue') {
+            $data['rescue_member_number'] = $request->rescue_member_number ?? null;
+            $data['rescue_member_category'] = $request->rescue_member_category ?? null;
+            $data['rescue_expiry_date'] = $request->rescue_expiry_date ?? null;
+            $data['rescue_specialty_area'] = $request->rescue_specialty_area ?? null;
+            $data['rescue_certifications'] = $request->rescue_certifications ?? null;
+            $this->clearWorkFields($data);
+            $this->clearStudentFields($data);
+            $this->clearGovernmentFields($data);
+            
+        } elseif ($request->institution_type == 'government') {
+            $data['government_level'] = $request->government_level ?? null;
+            $data['government_branch'] = $request->government_branch ?? null;
+            $data['government_entity'] = $request->government_entity ?? null;
+            $data['government_position'] = $request->government_position ?? null;
+            $data['government_card_number'] = $request->government_card_number ?? null;
+            $data['government_joining_date'] = $request->government_joining_date ?? null;
+            $this->clearWorkFields($data);
+            $this->clearStudentFields($data);
+            $this->clearRescueFields($data);
         }
 
-        Log::info('Datos a actualizar:', $data);
-        
         $person->update($data);
-        $person->refresh();
-        
-        Log::info('Después de actualizar - Emergency Contact Name: "' . ($person->emergency_contact_name ?? 'NULL') . '"');
-        Log::info('Después de actualizar - Emergency Phone: "' . ($person->emergency_phone ?? 'NULL') . '"');
-        Log::info('=== updatePerson - FIN ===');
     }
+
+    // ============================================
+    // MÉTODOS DE LIMPIEZA DE CAMPOS
+    // ============================================
+
+    /**
+     * Clear work-related fields
+     */
+    private function clearWorkFields(&$data)
+    {
+        $data['position'] = null;
+        $data['department'] = null;
+        $data['bio'] = null;
+        $data['teacher_type'] = null;
+    }
+
+    /**
+     * Clear student-related fields
+     */
+    private function clearStudentFields(&$data)
+    {
+        $data['grade_level'] = null;
+        $data['academic_year'] = null;
+        $data['section'] = null;
+        $data['period'] = null;
+    }
+
+    /**
+     * Clear school-related fields
+     */
+    private function clearSchoolFields(&$data)
+    {
+        $data['grade_level'] = null;
+        $data['academic_year'] = null;
+        $data['section'] = null;
+        $data['period'] = null;
+        $data['position'] = null;
+        $data['department'] = null;
+        $data['bio'] = null;
+        $data['teacher_type'] = null;
+    }
+
+    /**
+     * Clear rescue-related fields
+     */
+    private function clearRescueFields(&$data)
+    {
+        $data['rescue_member_number'] = null;
+        $data['rescue_member_category'] = null;
+        $data['rescue_expiry_date'] = null;
+        $data['rescue_specialty_area'] = null;
+        $data['rescue_certifications'] = null;
+    }
+
+    /**
+     * Clear government-related fields
+     */
+    private function clearGovernmentFields(&$data)
+    {
+        $data['government_level'] = null;
+        $data['government_branch'] = null;
+        $data['government_entity'] = null;
+        $data['government_position'] = null;
+        $data['government_card_number'] = null;
+        $data['government_joining_date'] = null;
+    }
+
+    // ============================================
+    // MÉTODOS DE ARCHIVOS Y GUARDADO
+    // ============================================
 
     /**
      * Save photo for a person
@@ -1026,10 +1019,7 @@ class PersonController extends Controller
         $fileName = 'person_' . $person->id . '_' . time() . '.' . $file->getClientOriginalExtension();
         $filePath = $file->storeAs('persons/photos', $fileName, 'public');
 
-        $person->update([
-            'photo' => $filePath,
-            'photo_url' => null
-        ]);
+        $person->update(['photo' => $filePath]);
     }
 
     /**
@@ -1041,10 +1031,30 @@ class PersonController extends Controller
             Storage::disk('public')->delete($person->photo);
         }
 
-        $person->update([
-            'photo' => null,
-            'photo_url' => null
-        ]);
+        $person->update(['photo' => null]);
+    }
+
+    /**
+     * Save organization logo
+     */
+    private function saveOrganizationLogo($person, $file)
+    {
+        $fileName = 'org_logo_' . $person->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $filePath = $file->storeAs('organizations/logos', $fileName, 'public');
+        
+        $person->update(['organization_logo' => $filePath]);
+    }
+
+    /**
+     * Delete organization logo
+     */
+    private function deleteOrganizationLogo($person)
+    {
+        if ($person->organization_logo && Storage::disk('public')->exists($person->organization_logo)) {
+            Storage::disk('public')->delete($person->organization_logo);
+        }
+        
+        $person->update(['organization_logo' => null]);
     }
 
     /**
@@ -1072,29 +1082,102 @@ class PersonController extends Controller
         }
     }
 
-    // ============================================
-    // MÉTODOS DE ETIQUETAS (LABELS)
-    // ============================================
-
-    private function getSubcategoryLabel($subcategory)
+    /**
+     * Save grade reports (boletines) for a student
+     */
+    private function saveGradeReports($request, $person, $deleteExisting = false)
     {
-        $labels = [
-            'student' => 'Estudiante',
-            'teacher' => 'Docente',
-            'administrative' => 'Administrativo'
-        ];
-        return $labels[$subcategory] ?? '';
+        $periods = ['first', 'second', 'third'];
+        
+        foreach ($periods as $period) {
+            $fieldName = 'grade_report_' . $period;
+            
+            if ($request->hasFile($fieldName)) {
+                if ($deleteExisting && $person->$fieldName) {
+                    Storage::disk('public')->delete($person->$fieldName);
+                }
+                
+                $file = $request->file($fieldName);
+                $extension = $file->getClientOriginalExtension();
+                $fileName = $person->id . '_' . $period . '_' . time() . '.' . $extension;
+                $filePath = $file->storeAs('report_cards/' . $person->id, $fileName, 'public');
+                
+                $person->update([$fieldName => $filePath]);
+            }
+        }
     }
 
-    private function getGenderLabel($gender)
+    /**
+     * Determine if schedules should be saved
+     */
+    private function shouldSaveSchedules($request)
     {
-        $labels = [
-            'male' => 'Masculino',
-            'female' => 'Femenino',
-            'other' => 'Otro'
-        ];
-        return $labels[$gender] ?? '';
+        if ($request->institution_type == 'company') {
+            return false;
+        }
+        
+        if ($request->institution_type == 'school') {
+            return in_array($request->subcategory, ['student', 'teacher', 'administrative']);
+        }
+        
+        return false;
     }
+
+    /**
+     * Assign NFC card to a person
+     */
+    private function assignNfcCardToPerson($person, $cardId)
+    {
+        $card = NfcCard::findOrFail($cardId);
+
+        if ($card->assigned_to && $card->assigned_to != $person->id) {
+            throw new \Exception('Esta tarjeta NFC ya está asignada a otra persona.');
+        }
+
+        if ($person->nfc_card_id && $person->nfc_card_id != $cardId) {
+            $this->unassignNfcCardFromPerson($person);
+        }
+
+        $card->assigned_to = $person->id;
+        $card->assigned_at = now();
+        $card->save();
+
+        $person->nfc_card_id = $card->id;
+        $person->save();
+    }
+
+    /**
+     * Unassign NFC card from a person
+     */
+    private function unassignNfcCardFromPerson($person)
+    {
+        if ($person->nfc_card_id) {
+            $card = NfcCard::find($person->nfc_card_id);
+            if ($card) {
+                $card->assigned_to = null;
+                $card->assigned_at = null;
+                $card->save();
+            }
+            $person->nfc_card_id = null;
+            $person->save();
+        }
+    }
+
+    /**
+     * Update student average grade from report cards
+     */
+    private function updateStudentAverage($personId)
+    {
+        $person = Person::find($personId);
+        if ($person && $person->subcategory === 'student') {
+            $average = $person->reportCards()->avg('average');
+            $person->update(['average_grade' => $average]);
+        }
+    }
+
+    // ============================================
+    // MÉTODOS DE ETIQUETAS
+    // ============================================
 
     private function getPeriodLabel($period)
     {
@@ -1104,17 +1187,6 @@ class PersonController extends Controller
             'third' => 'Tercer Lapso'
         ];
         return $labels[$period] ?? '';
-    }
-
-    private function getTeacherTypeLabel($type)
-    {
-        $labels = [
-            'regular' => 'Docente Regular',
-            'substitute' => 'Docente Suplente',
-            'special_education' => 'Educación Especial',
-            'part_time' => 'Medio Tiempo'
-        ];
-        return $labels[$type] ?? '';
     }
 
     private function getDayLabel($day)
@@ -1128,5 +1200,23 @@ class PersonController extends Controller
             'saturday' => 'Sábado'
         ];
         return $labels[$day] ?? $day;
+    }
+
+    private function getGradeLevelLabel($gradeLevel)
+    {
+        $labels = [
+            '1er_grado' => '1er Grado',
+            '2do_grado' => '2do Grado',
+            '3er_grado' => '3er Grado',
+            '4to_grado' => '4to Grado',
+            '5to_grado' => '5to Grado',
+            '6to_grado' => '6to Grado',
+            '7mo_grado' => '7mo Grado (1er Año)',
+            '8vo_grado' => '8vo Grado (2do Año)',
+            '9no_grado' => '9no Grado (3er Año)',
+            '4to_ano' => '4to Año (10° grado)',
+            '5to_ano' => '5to Año (11° grado)',
+        ];
+        return $labels[$gradeLevel] ?? $gradeLevel;
     }
 }

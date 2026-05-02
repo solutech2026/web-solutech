@@ -35,10 +35,10 @@ Route::get('/contacto', [ContactController::class, 'index'])->name('contacto');
 
 // Rutas públicas de Bio (perfiles públicos)
 Route::prefix('bio')->name('bio.')->group(function () {
-    Route::get('/{url}', [PublicBioController::class, 'show'])->name('public');
-    Route::get('/{url}/data', [PublicBioController::class, 'getData'])->name('public.data');
-    Route::get('/{url}/vcard', [PublicBioController::class, 'downloadVCard'])->name('public.vcard');
-    Route::get('/{url}/redirect', [PublicBioController::class, 'redirectToProfile'])->name('redirect');
+    Route::get('/{url}', [App\Http\Controllers\Public\BioController::class, 'show'])->name('public');
+    Route::get('/{url}/data', [App\Http\Controllers\Public\BioController::class, 'getData'])->name('public.data');
+    Route::get('/{url}/vcard', [App\Http\Controllers\Public\BioController::class, 'downloadVCard'])->name('public.vcard');
+    Route::get('/{url}/redirect', [App\Http\Controllers\Public\BioController::class, 'redirectToProfile'])->name('redirect');
 });
 
 // ============================================================================
@@ -209,12 +209,24 @@ Route::prefix('admin')->name('admin.')->group(function () {
 // ============================================================================
 
 Route::prefix('lectores')->name('lectores.')->group(function () {
+    // Rutas principales
     Route::get('/', [NFCReaderController::class, 'index'])->name('index');
     Route::get('/nuevo', [NFCReaderController::class, 'config'])->name('nuevo');
     Route::get('/{id}/editar', [NFCReaderController::class, 'config'])->name('editar');
     Route::post('/guardar/{id?}', [NFCReaderController::class, 'save'])->name('guardar');
     Route::delete('/{id}', [NFCReaderController::class, 'delete'])->name('eliminar');
+    
+    // Rutas de conexión y pruebas
     Route::post('/{id}/test', [NFCReaderController::class, 'test'])->name('test');
+    Route::get('/check-all-status', [NFCReaderController::class, 'checkAllStatus'])->name('check-all-status');
+    
+    // ⚠️ IMPORTANTE: Estas son las rutas que te faltan ⚠️
+    Route::get('/scan-networks', [NFCReaderController::class, 'scanNetworks'])->name('scan-networks');
+    Route::post('/connect-wifi', [NFCReaderController::class, 'connectToWifi'])->name('connect-wifi');
+    
+    // Rutas adicionales
+    Route::get('/{id}/status', [NFCReaderController::class, 'getStatus'])->name('status');
+    Route::post('/{id}/reset', [NFCReaderController::class, 'resetReader'])->name('reset');
 });
 
 // ============================================================================
